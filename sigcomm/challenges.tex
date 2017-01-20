@@ -33,22 +33,15 @@ Building a deadlock avoidance scheme that does not make any changes to routing
 protocols is easier said than done. The key problem is that the routing is
 dynamic -- paths can change in response to link failures or load.
 
-\begin{figure}
-	%\vspace{-0.1in}
-	\centering
-	\includegraphics[width=0.4\textwidth] {figs/up-down}
-	\caption{UP-DOWN routing in a Clos network.}\label{fig:up-down}
-\end{figure}
-
-Take {Figure~\ref{fig:up-down} as an example. It shows a simplified (and small) version of
-network deployed in our data center. If packets always follow so-called
-up-down (also called valley-free~\cite{qiu2007toward}) routing, then deadlock
-cannot happen as CBD is not possible. In up-down routing, a packet first goes UP
-from the source server to one of the common ancestor switches of the source and
-destination servers, then it goes DOWN from the common ancestor to the
-destination server.  In UP-DOWN routing, the following property holds: when the
-packet is on its way UP, it should not go DOWN; when it is on its way DOWN, it
-should not go UP.
+Figure~\ref{fig:priority_transition}(a) shows a simplified (and small) version
+of network deployed in our data center, and an example of up-down routing (also
+called valley-free~\cite{qiu2007toward}).  In up-down routing, a packet first
+goes UP from the source server to one of the common ancestor switches of the
+source and destination servers, then it goes DOWN from the common ancestor to
+the destination server.  In UP-DOWN routing, the following property holds: when
+the packet is on its way UP, it should not go DOWN; when it is on its way DOWN,
+it should not go UP. Thus, with up-down routing, there can be no CBD and hence
+no deadlock.
 
 %\begin{figure}
 	%\vspace{-0.1in}
@@ -58,12 +51,12 @@ should not go UP.
 	%\label{fig:up-down-deadlock}
 %\end{figure}
 
-However, packets may deviate from the UP-DOWN paths due to several reasons
-including software errors on routers, link flapping, routing protocol
-flapping~\cite{f10}. As have shown in~\cite{shpiner2016unlocking}, when the
-UP-DOWN property is broken and packets may reroute multiple times between two
-layers of switches, and deadlocks may form as a result, as shown in
-Figure~\ref{fig:priority_transition}(a).
+However, packets may deviate from the UP-DOWN paths due to many reasons,
+including link failures (leading to route flaps), which are quite common in data
+center networks~\cite{netpilot,f10}.  As have shown
+in~\cite{shpiner2016unlocking}, when the UP-DOWN property is broken and packets
+may reroute multiple times between two layers of switches, and deadlocks may
+form as a result, as shown in Figure~\ref{fig:priority_transition}(b).
 
 We regularly observe deviations from up-down routing in our data centers.  We
 see hundreds of such routes per day, and they can persist for minutes or even

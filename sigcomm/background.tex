@@ -1,8 +1,8 @@
 \section{Background}
 \label{sec:background}
 
-We now provide a brief primer on RDMA, RoCE, the problem of deadlocks in data
-center networks, and prior work in this area.
+We now provide a brief primer on RDMA, RoCE, the problem of deadlocks and prior
+work in this area.
 
 {\bf RDMA and RoCE:} Remote Direct Memory Access (RDMA) technology offers high
 throughput, low latency and low CPU overhead, by bypassing end-host networking
@@ -17,8 +17,7 @@ mechanism~\cite{pfc}.  Using PFC, a switch can pause an incoming link when its
 ingress buffer occupancy reaches a preset threshold. As long as sufficient
 ``headroom'' is reserved to buffer packets that are in flight during the time
 takes for the PAUSE to take effect, no packet will be dropped due to buffer
-overflow. See~\cite{cisco-whitepaper,dcqcn} and \S\ref{subsec:pfcheadroom} for
-details. 
+overflow~\cite{cisco-whitepaper,dcqcn}. 
 
 The PFC standard defines 8 classes\footnote{Although, only one or two can be
 used in practice -- see \S\ref{subsec:pfcheadroom}.}, called priorities~\footnote{The word priority is a
@@ -31,9 +30,7 @@ switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$ until a resume
 message (XOFF) with priority $j$ is received.
 
-In short, PFC does flow control on a per-port, per-priority basis. This can
-cause a number of problems, such as unfairness and
-head-of-the-line-blocking~\cite{dcqcn}. Worse yet, it can lead to deadlocks.
+PFC prevents buffer overflow, but it can lead to deadlocks.
 
 %% Since PAUsing is carried out
 %% on a per-ingress port, and not on a per-flow basis, problems such as unfairness
@@ -43,17 +40,17 @@ head-of-the-line-blocking~\cite{dcqcn}. Worse yet, it can lead to deadlocks.
 %% dedicated headroom, typically, no more than two or three priorities are
 %% used~\cite{rdmaatscale}.
 
-{\bf Deadlock:} PFC can lead to deadlocks, if paused links form a cycle, as
-shown in Figure~\ref{fig:deadlock_example}. Once formed, deadlock is
-``permanent'' in the sense that it will continue to exist even if no new traffic
-is injected into the loop. Deadlocks in PFC-based networks (or more generally,
-in credit-flow networks) are a well-known problem. It is not merely a
+{\bf Deadlock:} Deadlock forms when paused links form a cycle
+(Figure~\ref{fig:deadlock_example}). Once formed,
+deadlock is ``permanent'' in the sense that it will continue to exist even if no
+new traffic is injected into the loop. Deadlocks in PFC-based networks (or more
+generally, in credit-flow networks) are a well-known problem. It is not merely a
 theoretical problem -- it has been reported in practice~\cite{rdmaatscale}.
 
-In~\cite{hu2016deadlocks} it was shown that Circular Buffer Dependency (CBD) is a
-{\em necessary} condition for deadlock formation. {\em Sufficient} condition for
-deadlock formation in PFC networks have yet to be fully
-understood~\cite{hu2016deadlocks}. 
+It is well known that Circular Buffer Dependency (CBD) is a {\em necessary}
+condition for deadlock formation~\cite{tcp-bolt,hu2016deadlocks}. {\em
+Sufficient} condition for deadlock formation in PFC networks have yet to be
+fully understood~\cite{hu2016deadlocks}. 
 
 {\bf Prior work on deadlock avoidance:} Prior work on deadlock management falls
 in two categories: deadlock avoidance, or deadlock detection and resolution. Our
@@ -68,10 +65,8 @@ $(i)$ they cannot be deployed with existing routing, or, $(ii)$ they do not deal
 with dynamic nature of data center networks, or, $(iii)$ they require excessive
 switch buffers or number of priorities. 
 
-In the next section, we will describe these three challenges in more detail, and
-briefly review why previously proposed schemes for deadlock avoidance fail to
-meet them. We provide a more detailed review of related work in
-\S\ref{sec:related}.
+We now describe these three challenges in more detail. See \S\ref{sec:related}
+for a detailed review of prior work.
 
 %% Prior work on deadlock formation fails to meet the three challanges: first, they
 %% do not work with To avoid such deadlocks, {\em deadlock-free

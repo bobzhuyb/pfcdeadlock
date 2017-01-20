@@ -2,15 +2,19 @@
 \section{\sysname{} for Clos Topology}
 \label{sec:specific}
 
-While \sysname{} works for any topology, we start by demonstrating the main
-ideas on the most popular data center topology, Clos, with common Clos
+While \sysname{} works for any topology, we first describe the core ideas using
+the most popular data center topology, Clos, with common Clos
 routing\footnote{Clos routing can be implemented by BGP (Microsoft, Facebook) or
-by customized routing protocol (Google).}.  Before delving into the details, we
-define the following terms.
+by customized routing protocol (Google).}.  
 
-\para{Lossless routes:} The input to \sysname{}. It is a set of packet paths
+\subsection {Preliminaries}
+
+We first define a few terms and a logical switch model.
+
+\para{Expected Lossless routes:} The input to \sysname{}. It is a set of packet paths
 that network operators require to be lossless. For example, in he Clos network,
-the operator may say that all up-down paths are lossless.
+the operator may want that all up-down paths are lossless. In the rest of the
+section, we refer to these routes simply as lossless routes.
 
 \para{Lossless class:} A lossless class is a service that we provide for
 applications.  Network guarantees that packets in a lossless class will not drop
@@ -18,16 +22,21 @@ on lossless routes.
 
 \para{Tag:} Tag is a small integer assigned / associated with a packet. The tag
 is embedded in a packet. A packet belonging to one lossless class may change its
-tag value, which means that a lossless class may have multiple tag values. Tags
-can be implemented using TTL or special DSCP values.
+tag value, which means that a lossless class may have multiple tag values.
 
-\para{Switch model:} A switch is composed of multiple ports.  Per port, there
-are limited number of separated ingress queues and egress queues.  Switch
-classifies packets into queues based on {\em tags}.  Each queue can be lossless
-or lossy, depending on whether PFC is enabled for that priority.  All packets
-are put into a lossy queue unless there are whitelist rules that classify
-specific packets into lossless queues. Lossless ingress queues can trigger PFC,
-while lossless egress queues react to PFC from the next hop.
+\para{Switch model:} The architecture of modern data center switches is quite
+complex.  For ease of discussion, we use the following simplified
+model\footnote{See \S\ref{sec:implementation} for full implementation details.}
+in this section.  A switch has multiple ports. Each port has upto 7 lossless
+ingress queues associated with it, and one lossy queue\footnote{Typically, there
+is just one shared buffer and ``queues'' are just counters and linked lists.}.
+The queue number corresponds to the PFC priority.  Switch classifies arriving
+packets into queues based on {\em tags}.  Typically, each tag maps to a single
+priority value. If a tag does not match any priority value, the packet is added
+to a lossy queue. Before forwarding a packet, the switch can rewrite the tag
+according to user-specified rules.
+
+We now describe the core idea behind \sysname{}.
 
 \subsection{Tagging on Bounce}\label{subsec:tag}
 
@@ -55,27 +64,28 @@ Consider Figure~\ref{fig:priority_transition}(a). Both the green and blue flows
 follow up-down routing and there is no deadlock. 
 
 Now, let's assume that as shown in Figure~\ref{fig:priority_transition}(b), two
-links fail, which forces both flows to take so-called 1-bounce paths. As shown,
-this can lead to CBD, and hence deadlock.
+links fail, and both flows take paths that are not strictly up-down ( $L2$ to
+$S1$ for green flow, $L3$ to $S2$ for blue flow). We call these paths 1-bounce
+paths, as the path violates the up-down rule once. As shown, this can lead to
+CBD, and hence may cause deadlock.
 
-One way to avoid such deadlocks is to put any packets that have deviated from
-the up-down routes in a lossy queue -- i.e. assign them a priority value that is
-not associated with a lossless class.  
+One way to avoid such CBD is to put any packets that have deviated from the
+up-down routes in a lossy queue.  Being assigned to lossy queue means that such
+packets will not trigger PFC. Since the basic up-down paths are deadlock free,
+and the bounced packets do not trigger PFC, the network will stay deadlock free
+even if packets bounce.
 
-Note that being assigned to lossy priority does not mean that the packets are
-dropped -- they are dropped only if they arrive at an ingress queue that is
-full. However, these packets will not trigger PFC. Since the basic up-down paths
-are deadlock free, and the bounced packets do not trigger PFC, the network will
-stay deadlock free even if packets bounce.
+We stress that being assigned to lossy queue does not mean that the packets are
+immediately (or ever) dropped -- they are dropped {\em only if} they arrive at a
+queue that is full. The only thing we need is that these packets not trigger
+PFC.
 
 Thus, if each switch can detect that an arriving packet has deviated (sometime
 in past) from the up-down path, it can put it in lossy queue, and there will be
 no deadlock.
 
-Note that this solution requires no changes to existing routing protocols, and
-dynamic routing is handled by assigning packets to lossy queues.
-
-But how can a switch determine whether the packet has bounced, using just local
+Note that this solution requires no changes to existing routing protocol.  But
+how can a switch determine whether the packet has bounced, using just local
 information, in presence of dynamic routing?
 
 %% 
@@ -121,19 +131,23 @@ Note that $L2$ needs only local information to do the tagging. We can initially
 assign a $NoBounce$ tag to every packet. $L2$ then simply needs to check ingress
 and egress port for each packet: it changes the tag from $NoBounce$ to $Bounced$
 if a packet arriving from ingress port connected to $S2$ exits on egress port
-connected to $S1$.  Modern switch hardware indeed provides the functionality to
-install such a tagging rule (\S\ref{sec:implemenation}).  It is easy to see that
-these rules can be pre-computed since we know the topology, and the set of
-routes that we want to be ``lossless'' (i.e. the up-down routes). 
+connected to $S1$.  It is easy to see that these rules can be pre-computed since
+we know the topology, and the set of routes that we want to be ``lossless''
+(i.e. the up-down routes). 
 
-Of course, the basic idea is not enough. First of all, packets may bounce not
-just from the spine layer, but at any layer. Also, recall from
+This, in essence, is the core idea behind \sysname{} -- leveraging the knowledge of
+topology, and the paths that need to be lossless, we can create a system of tags
+and {\em static} rules that manipulate these tags to ensure that there will not
+be CBD, despite dynamic routing.
+
+Of course, this basic idea is not enough. First of all, packets may bounce not
+just from the spine layer, but at any layer. Second, recall from
 \S\ref{sec:reroute} that ``bounces'' are a fact of life in data center networks.
 The operator may not want to put packets that have suffered just a single bounce
 into a lossy queue -- we may want to wait until the packet has bounced more than
-once before assigning it to a lossless queue. Finally, we must ensure that we don't
-end up using more lossless queues than the switch can support. We now show how
-to do this.
+once before assigning it to a lossless queue. Third, we must ensure that we
+don't end up using more lossless queues than the switch can support. To this
+end, we show how to combine tags.
 
 \subsection{Combining Tags}
 \label{subsec:combine}
@@ -157,7 +171,7 @@ going up (therefore, bouncing) for any reasons, they increase the tag by one.
 Assuming there are $k$ available lossless queues, all switches put packets with
 tag $i$ to $i^{th}$ lossless queues. This means packets with up to $k-1$ bounces
 are all lossless. If a packet bounces more than $k-1$ times, it will carry a tag
-larger than $k$. All switches will put such packets into a lossy queue.
+larger than $k$. All switches will put such packets into a lossy queue. See 
 
 This design satisfies all three challenges described in
 \S\ref{sec:challenges}. We do not change the routing protocol. We work with
@@ -165,9 +179,12 @@ existing hardware. We deal with dynamic changes to routes, and we do not exceed
 the number of available lossless queues.
 
 We now provide brief proof sketches to prove that the above algorithm is
-deadlock free, and optimal in terms of number of lossless priorities used. 
+deadlock free, and optimal in terms of number of lossless priorities used.
+A more formal description of the algorithm, using notation developed in the next
+section, is shown in Appendix~\ref{sec:clos_optimal}.
 
 \subsection {Deadlock freedom and optimality}
+\label{subsec:specific_deadlock_free}
 
 \begin{figure}[t]
 	%\vspace{-0.1in}

@@ -1,69 +1,36 @@
-\section{Generic \sysname{} design}
+\section{Generalizing \sysname{}}
 \label{sec:generic}
 
-In addition to Clos networks, prior literatures have proposed different data center
-network topology. In this section, we show that \sysname{} can be extended to
-support generic topology and routing. In addition, unlike the prior section focusing 
-on high-level ideas, we will formalize the expression of \sysname{}. This is necessary
-for explaining the algorithm without specific topology properties.
+We now generalize the design of \sysname{} for any topology. First, we 
+formalize the description of the tagging system. See Table~\ref{tab:symbols} for
+notation.
 
-After removing the Clos-specific mechanisms, here is a brief description of 
-generic \sysname{}.
-
-%We briefly describe the generic implementation of \sysname{}. The implementation 
-%is described in detail in \S\ref{sec:implementation}.
-
-\sysname{} works by tagging packets.  A packet arrives at the ingress port $i$
-of a switch $S$ with a tag $j$. The arriving packet packet is enqueued in ingress 
-queue $j$.  At departure, based on the values of $i$, $j$ and egress port, 
-the packet is possibly given a new tag, say $k$. In this case, the packet is put 
-into egress queue $k$. The rest of the forwarding pipeline, as well as PFC 
-PAUSE/Resume behavior (\S\ref{sec:background}) operates without change. 
-
-The smartness of the system lies in generating the tag changing rules: based on 
-ingress port, incoming tag and egress port, the switch must decide whether to change
-the tag, and what the new tag value is. In Clos version \sysname{}, we leverage
-our knowledge of Clos and find that tagging on bounce is a good solution. 
-Similar to the Clos version \sysname{}, we use the topology and {\em lossless routes} 
-as input to generate these rules for generic topology.
-The rules generation is based on similar ideas as for Clos network.  
-
-%\sysname{} does not require any changes to the topology of the network or the
-%routing. However, our  key insight is that we can take the topology and the
-%routes that must be lossless (we call them {\em lossless routes}) as input, and
-%use them to generate the mappings described earlier. 
-
-
-%First, the switch configurations eliminate deadlock by reacting to the past path of each packet
-%and move the packet into a safe priority just before CBD may appear.  Second,
-%the transition of priority is designed carefully so that  a single tag in the
-%packet header is sufficient for each switch to make such decisions. Finally, we
-%make sure that \sysname{} requires only a small number of lossless queues. We
-%now describe these ideas in detail.
-
-\subsection{Definition of A Tagging Scheme}
-
-Before we get to the detailed designs, we first formalize the tagging scheme.
-Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch $A$'s $i^{th}$ ingress port.
-We use a {\em tagged graph} $G(V,E)$ to uniquely represent a tagging scheme.
-Given a tagging scheme, the {\em tagged graph} $G(V,E)$ is generated following below rules.
+Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch
+$A$'s $i^{th}$ ingress port.  We use a {\em tagged graph} $G(V,E)$ to uniquely
+represent a tagging scheme.  Given a tagging scheme, the {\em tagged graph}
+$G(V,E)$ is defined as: 
 
 \begin{enumerate}
-\item $G$ contains a node, $(A_i, x)$, {\em iff.} a port $A_i$ may receive packets with tag $x$, and these packets must 
+\item $G$ contains a node, $(A_i, x)$, {\em iff.} port $A_i$ may receive packets with tag $x$, and these packets must 
 be lossless. $V$ is the set of all such nodes.
-\item In $G$, there exists an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
+
+\item $G$ contains an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
 connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $x=y$ also counts).
 $E$ is the set of all such edges.
+
 \end{enumerate}
 
-The tags define a partition of the tagged graph, $\{G_k\}$, whose nodes are $V(G_k) = \{(A_i,
-k) | \forall A, i\}$ and edges are $E(G_k) = \{v_0 \rightarrow v_1 | \forall v_0, v_1 \in V(G_k) and v_0 \rightarrow v_1 \in E(G)\}$
-Each $G_k$ is mapped to a unique
-lossless priority.  Each node is an ACL rule to match on a tag on an ingress port, and
-assign corresponding lossless queue.  In addition, each edge corresponds 
-to a switch action of setting the tag for the next hop at the egress.
+Given a tag $k$, we also define $\{G_k\}$, with vertices $V(G_k)$ and edges
+$E(G_k)$: 
+$$V(G_k) = \{(A_i, k) | \forall A, i\} $$
+$$E(G_k) = \{v_0 \rightarrow v_1 | \forall v_0, v_1 \in V(G_k),  v_0 \rightarrow v_1 \in E(G)\} $$
+Each tag $k$ is mapped to a unique lossless priority.  
 
-\begin{table}
+Each node has a rule to match on a tag on an ingress port, and assign the packet
+to corresponding lossless queue.  In addition, each edge corresponds to a switch
+action of setting the tag for the next hop at the egress.
+
+\begin{table}[t]
 \small
 \centering
 \begin{tabular}{|c|c|}
@@ -75,27 +42,39 @@ $(A_i, x)\rightarrow(B_j, y)$ & A tagged edge \\ \hline
 $V$ & All tagged nodes  \\ \hline
 $E$ & All tagged edges \\ \hline
 $G(V, E)$ & Tagged graph \\ \hline
+$G_k$ & Partition of $G(V,E)$ for priority $k$ \\ \hline
 \end{tabular}
 \caption{Notations in the formalized description.}
 \label{tab:symbols}
+		\vspace{-1em}
 \end{table}
 
-\para{Handling packets that do not follow the lossless routes.}
-If a packet does not match any edges in $G(V,E)$, it means the packet is not 
-expected in the lossless routing.
-Such packets are assigned a special tag, and all switches match on this tag and 
-assign lossy priority. This rule sits at the bottom of switch egress ACL, acting 
-as a default safeguard that avoids unexpected buffer dependency.
+If a packet arrives at $A_i$ with tag $x$, and is destined for port $B_j$, and
+there is no corresponding edge in $G(V,E)$, it means that the packet has
+traversed on a path that is not expected to be lossless.  Such packets are
+assigned a special tag, and all switches assign this tag to lossy
+priority\footnote{This rule is always the last rule in the 
+list, acting as a default safeguard that avoids unexpected buffer dependency.
+See \S\ref{sec:implementation}.}.
 
-To guarantee deadlock-free, we directly extend the properties described 
-in \S~\ref{subsec:combine} to two requirements of $G(V,E)$. First, any 
-$G_i$ does {\em not} have a cycle. This is because each edge in $G_i$ is 
-essentially a buffer dependency -- whether $A_i$ can dequeue packets depending on whether
-$B_j$ has paused upstream. A cycle in $G_i$ means cyclic buffer dependency.
-Second, there is no link going from $G_i$ to $G_j$ if $i>j$. 
-This means we enforce the order of $G_i$.
+In the rest of the section, we will describe how to generate the tagging graph
+-- i.e. the tagging rules. But first, we prove that the tagging scheme described
+by such a graph is deadlock free, as long as the graph meets two requirements.
 
-\subsubsection{Proof of deadlock freedom}
+\begin{enumerate} 
+
+		\item  Any $G_k$ for $G$ {\em must not} have a cycle.  This is
+				because each edge in $G_k$ is essentially a buffer dependency --
+				whether $A_i$ can dequeue packets depending on whether $B_j$ has
+				paused upstream. A cycle in $G_k$ means cyclic buffer
+				dependency.  
+		\item There must be no link going from
+				$G_x$ to $G_y$ if $x>y$.  This means we enforce the order of
+				$G_x$.
+\end{enumerate}
+
+These requirements are essentially generalization of the properties
+discussed in \S\ref{subsec:specific_deadlock_free}. 
 
 \begin{theorem}
 Any tag system, defined by $G(V,E)$, that satisfies the above two requirements is deadlock-free.
@@ -114,41 +93,17 @@ the first requirement, $G_t$ does {\em not} have a cycle. Contradicted.
 Without loss of generality, we assume $t_0 < t_1$, and $v_i$ has tag $t_0$, $v_j$
 has tag $t_1$. Because $v_i$ and $v_j$ belongs to a circle, there must exists 
 a path going from $v_j$ to $v_i$. Since $t_0 < t_1$, there must exist a hop where
-the tag decreases. However, according to the second requirement, such hop cannot
+the tag decreases. However, according to the second requirement, such a hop cannot
 exist. Contradicted.
 
 Case 1 and Case 2 cover all possible scenarios. Thus, we conclude that there does not 
 exist a $G(V,E)$ that satisfies the two requirements but is not deadlock-free.
 \end{proof}
 
-%\textbf{Proof sketch:} We prove by contradiction. Suppose we can find a topology and a
-%set of lossless routes, for which there exists a subspace partition and priority
-%transition that satisfies the above two requirements, but is not deadlock-free.
-%Then, as the tag system is not deadlock-free, we can find a set of micropaths
-%that form a CBD. 
+We now describe the algorithm to generate $G(V,E)$ for any given topology, and set of
+paths that need to be lossless. 
 
-
-
-%\textbf{Case 2:} These micropaths are in different subspaces. We sort these
-%micropaths according to the subspaces they belong to, and choose a micropath in
-%the smallest subspace. Since these micropaths can form a CBD,  starting from the
-%source end of the chosen micropath, we can always find a circular path back to
-%the chosen micropath when traversing along these micropaths. 
- 
-%According to requirement 1, once we enter a larger subspace, we can never go
-%back. So this circular path should only include micropaths in the smallest
-%subspace. But according to requirement 2, micropaths within the same subspace do
-%not form a CBD. Hence no circular path can be found within the smallest
-%subspace. So this circular path does not exist. Contradicted.
- 
-%Thus, we conclude that there do not exist a set of micropaths that form a CBD.
-%This contradicts the supposition that the tag system is not deadlock-free.
-%Hence, any tag system that satisfies the above two requirements is
-%deadlock-free.
-
-
-\subsection{Step 1: Deadlock-free Tags} 
-
+\subsection{Generating $G(V,E)$} 
 \begin{figure*}[t]
 	\centering
 	\subfloat[short for lof][Input topology and lossless routes.] {
@@ -160,15 +115,15 @@ exist a $G(V,E)$ that satisfies the two requirements but is not deadlock-free.
 	\caption{The input and output of Algorithm~\ref{alg:ttl}.}\label{fig:three_node}
 \end{figure*}
 
-Like the Clos version \sysname{}, we will first design a tagging scheme that avoids
-deadlock, then combine tags to reduce the required lossless queues. 
-For general graph without structure information, a straight forward tagging 
-system is to monotonically decrease the tag (thus, the priority) every hop, as described in 
-Algorithm~\ref{alg:ttl}. 
+As in \S\ref{sec:specific}, we will first design a tagging scheme that avoids
+deadlock, then combine tags to reduce the number of required lossless queues.
+For general graph without structure information, a straightforward tagging
+system is to monotonically decrease the tag (thus, the priority) at every hop,
+as described in Algorithm~\ref{alg:ttl}. 
 
-\begin{algorithm}
+\begin{algorithm}[t]
 	\small
-    \KwIn{Topology and lossless routes $R$}
+    \KwIn{Topology and expected lossless routes $R$}
 	\KwOut{A tagged graph $G(V, E)$}
 	$V \gets Set()$\;
 	$E \gets Set()$\; 
@@ -185,109 +140,29 @@ Algorithm~\ref{alg:ttl}.
 	\label{alg:ttl}
 \end{algorithm}
 
-It is easy to verify that the above requirements are met\fixme{may need to elaborate}, so 
-deadlock is eliminated with this tagging system. However, it requires 
-too many tags (lossless queues) in a large network since it depends on the diameter of the topology.
+It is easy to verify that the graph generated by this algorithm meets the two
+requirements specified earlier, and thus it guarantees deadlock freedom.
+Figure~\ref{fig:three_node} shows a small example, including the topology, the
+set of desired lossless paths, the generated graph, and the corresponding rule
+lists for each node.  
 
-We use a three node topology as an example to demonstrate the input and output of the 
-algorithm, as shown in Figure~\ref{fig:three_node}. It will require {\em four} 
-tags, since the longest path length is four.
+Of course, with just this basic algorithm, we may end up with too many tags
+(i.e. lossless priorities) -- in fact, as many as diameter of the
+network~\cite{xxx}. This is why we need 4 lossless priorities for the example in
+Figure~\ref{fig:three_node}.  We now show how to combine tags to reduce the
+number of lossless queues needed.
 
-\fixme{This idea appeared in prior work. However, it is a special case in our tagging system,
-and has the drawback that it requires too many lossless queues. Here we give it a formal 
-expression in our framwork, and will further optimize it in the next section.}
+\subsection{Combining tags} 
 
-
-%% Section~\ref{sec:greedy} shows a way to achieve this.  Inevitably, we will need
-%% {\em multiple} switch lossless queues to support one lossless application class.
-%% Specifically, we divide the buffer of network nodes into $k$ partitions, and let
-%% the $j$-$th$ partition associated with priority queue $j$. If a packet is
-%% classified into priority queue $j$, it will be buffered in the $j$-$th$ buffer
-%% partition and can generate PFC of priority $j$.  In this section, we focus on
-%% supporting {\em just one} lossless application class. In
-%% Section~\ref{sec:specific}, we will revisit this issue and show how we may
-%% support multiple application classes more efficiently.
-
-\para{The counter-part in the Clos version.} To ease the comparison, we show the tagging
-scheme of Clos in Algorithm~\ref{alg:clos}. The only difference is where the tag
-is updated. It is due to the fact that we have more knowledge of Clos, a structured topology.
-Algorithm~\ref{alg:clos} already includes the idea of combining tags (\S\ref{subsec:combine}),
-so the algorithm in the next section will not further optimize the output.
-
-\begin{algorithm}
-	\small
-    \KwIn{Clos topology and lossless routes $R$}
-	\KwOut{A tagged graph $G(V, E)$}
-	$V \gets Set()$\;
-	$E \gets Set()$\; 
-	\For{each path $r$ in $R$} {
-		$tag \gets 0$\;
-		\For{each hop $h$ in $r$} {
-			$V \gets V \cup \{(h, tag)\}$\;
-			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
-			\If{$h$ is up-facing \&\& nextHop is down-facing} {
-				$tag \gets tag+1$\;
-			}
-		}
-	}
-	\Return{$G(V, E)$}\;
-    \caption{The optimal tagging system for Clos topology.}
-	\label{alg:clos}
-\end{algorithm}
-
-
-
-%\subsection{Idea 2: Tag for Ordered Micropath Subspaces}\label{sec:tag_order}
-
-%By properly dividing lossless routes into multiple subspaces of micropaths, we
-%can ensure that CBD is eliminated {\em within} each subspace. We will discuss
-%the details of the algorithm are described later in this section. But first, we
-%must consider another issue: Even though proper micropath partition ensures no
-%CBD {\em within} each priority, packets can still cause CBD {\em across}
-%priorities, as shown in Figure~\ref{fig:subspace}(a). Switch must know the past
-%path of each packet in order to decide the priority that avoids CBD. Obviously,
-%the tag size is limited, so we can't carry the entire history of the packet in
-%the tag. Thus, we need the next idea.
-
-%As shown in Figure~\ref{fig:subspace}(b), we enforce the order of transitioning
-%among micropath subspaces and tag only based on current subspace.  With this,
-%the packets do not need to record the whole history of past micropaths in
-%headers. A fixed length header field (most commonly, DSCP) is sufficient to
-%carry the tag. The tag values are one-one mapped to the micropath subspaces,
-%which one-one maps to priority queues on each switch. 
-
-%Thus, with \sysname{}, the switch enqueues each packet into priority queue based
-%on its tag, and changes the tag if the switch decides to change the packet's
-%priority at the next hop.  We can prove that the network is deadlock-free if the
-%tag system, which defines micropath subspaces and transition, satisfies the two
-%requirements below:
-
-%\begin{enumerate}
-%	\item A packet's tag is unchanged or changed at each hop of its path. When the tag is changed, it must be changed monotonically 
-%	along any packet's path (e.g., always increasing).
-%	\item For any given tag, all micropaths within the corresponding micropath subspace do not form cyclic buffer dependency.
-%\end{enumerate}
-
-%Putting these two ideas together we can generate a system of tags and tag
-%conversion tables for each switch. However, we must pay heed to the fact that 
-%a switch cannot support more than one or two lossless priorities in practice. 
-%Thus, we must minimize the number of tags we use.
-
-\subsection{Step 2: Greedily Combining Tags} 
-
-The tags in Algorithm~\ref{alg:ttl} have not been combined and must be combined
-to reduce the number of tags. In this section, we focus on the number of lossless 
-queues for just {\em one} application class, like \S\ref{subsec:combine}.
-
-Leveraging the brute-force tagging system as a start
-point, we design Algorithm~\ref{alg:greedy} to minize the number of lossless
-queues. It works by greedily combining as many nodes, from brute-force tagging
-system, as possible into each micropath subspaces under CBD-free constraint. To
+The tags generated by Algorithm~\ref{alg:ttl} can be combined to reduce the
+number of required lossless queues.  Algorithm~\ref{alg:greedy} uses a greedy
+heuristic for this purpose.  It works by greedily combining as many nodes in
+$G(V,E)$ as possible into each micropath subspaces under CBD-free constraint. To
 ensure the monotonic property, we start from combing the nodes with largest tag
 to smallest tag in the brute-force tagging system.  Obviously, the monotonic
 property will still hold after combination. 
 
-\begin{algorithm}
+\begin{algorithm}[t]
 	\small
     \KwIn{The brute-force tagged graph $G(V, E)$}
 	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
@@ -327,30 +202,29 @@ property will still hold after combination.
 	\label{fig:greedy}
 \end{figure}
 
-We use the same three-node example as the previous section, and show the output 
-$G'(V', E')$ in Figure~\ref{fig:greedy}. 
-We assign a new tag $t'$ (different from the brute-force tag) based on $G'(V', E')$, 
-and generate switch configurations based on the algorithm output. We see that
-the tags have been reduced to {\em two}.
+In  Figure~\ref{fig:greedy} we see Algorithm~\ref{alg:greedy} in action to
+minimize the $G(V,E)$ from Figure~\ref{fig:three_node}. We see that the number
+of tags is reduced to {\em two}.
 
+\subsection {Discussion}
+\label{subsec:caveats}
 
-\subsubsection{Performance Analysis}\label{subsec:caveats}
-
-\para{Algorithm runtime}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$ 
+\para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$ 
 (denoted as $T$ below), which equals to the longest path in {\em lossless routes} and
-total number of switches $S$, the brute-force tagged graph at most have $S \times T$ nodes.
+total number of switches $S$, $G(V,E)$ can have at most have $S \times T$ nodes.
 Each node will be examined exactly once for checking whether $G_{tmp}$ is acyclic.
-Checking whether $G_{tmp}$ is acyclic with a newly added node requires a Breath-First Search,
+Checking whether $G_{tmp}$ is acyclic with a newly added node requires a Breadth-First Search,
 with runtime complexity of $O(|V_{tmp}| + |E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number
-os switches $S$, and $|E_{tmp}|$ is bounded by the number of links, $L$, in the network.
+of switches $S$, and $|E_{tmp}|$ is bounded by the number of links, $L$, in the network.
 Therefore, the total runtime complexity is $O(S \times T \times (S+L))$.
 
-\para{The output number of tags.} Algorithm~\ref{alg:greedy} significantly 
-reduces the number of tags on topology other than Clos. For example, we 
-have tested it on BCube topology without any special design for BCube. It gives the optimal 
-result -- a $k$-level BCube needs $k$ tags for {\em one} lossless application 
-class. In addition, we test unstructure topology like Jellyfish. The result is still promising.
-\fixme{Jellyfish with 1000 nodes require only X tags. Details are in \S\ref{sec:eval}.}
+\para{Number of tags:} Algorithm~\ref{alg:greedy} significantly reduces the
+number of tags on topology other than Clos. For example, it gives optimal
+results for BCube topology without requiring any BCube-specific changes -- a
+$k$-level BCube needs $k$ tags to prevent deadlock with default routing. The
+results are promising even for unstructured topology like Jellyfish.  For
+example, Jellyfish with 1000 nodes require only five tags with shortest-path
+routing. See \S\ref{sec:eval} for details.
 
 \begin{figure}[t]
 	%\vspace{-0.1in}
@@ -360,115 +234,73 @@ class. In addition, we test unstructure topology like Jellyfish. The result is s
 	\label{fig:nonoptimal}
 \end{figure}
 
-However, Algorithm~\ref{alg:greedy} may not always return the optimal solution. For example, 
-we again consider the simple three-layer Clos network in Figure~\ref{fig:nonoptimal}. 
-Assuming ``normal'' and ``1-bounce'' packets must be lossless,  
+\para{Optimality:}
+Algorithm~\ref{alg:greedy} may not always return the optimal solution. For example, 
+consider the simple three-layer Clos network in Figure~\ref{fig:nonoptimal}. 
+Assuming ``normal'' and ``1-bounce'' paths must be lossless,  
 we know the optimal tagging system only requires {\em two} lossless queues. However, the 
 greedy algorithm will output {\em three} lossless queues. The reason is that 
 Algorithm~\ref{alg:greedy} does not combine bounces that happen when the packet is going up
 and when the packet is coming down. As a result, it has to 
-assign a separate prirotiy for each case, as shown in Figure~\ref{fig:nonoptimal}.
+assign a separate priority for each case, as shown in Figure~\ref{fig:nonoptimal}.
 The fundamental reason is that generic algorithm does not fully utilize the inherently 
 characteristics of structured topology like Clos. 
 
-%Second, the generic algorithm is inefficient in reusing priorities for multiple application classes.
-%For example, the generic algorithm output is two priorities per application class, and the operators
-%have up to two prioritie on switches. In this case, only {\em one} lossless application
-%class is supported. However, if we can find a smarter tagging system that ensures basic connectivity 
-%with only the first micropath, we can compress {\em two} application classes into two switch priorities, 
-%as described in Section~\ref{sec:clos}.
+However, we do note that the number of tags in the solution of
+Algorithm~\ref{alg:greedy} is an upper bound on the optimal solution.  Without
+any assumptions, the worst case is the same as using the brute-force solution,
+which require as many tags as the length of longest lossless route, $T$.
+However, if we know that the smallest cycle in lossless routes is longer than
+$l$, the output number of tags is bounded by $\lceil T/l \rceil$. We omit the
+proof for brevity.
 
-\para{Higher bound.} Though Algorithm~\ref{alg:greedy} does not guarantee optimal result, 
-it has a higher bound of the tags. Without any assumptions, the worst case 
-is the same as using the brute-force solution, which require as many tags as the length of 
-longest lossless route, $T$. However, if we know that the smallest cycle in lossless routes
-is longer than $l$, the output number of tags is bounded by $\lceil T/l \rceil$. The proof
-can be directly obtained from the greedy algorithm process, and is omitted for brevity.
+\para{Multiple application classes:} Sometimes, system administrators need to
+use multiple lossless priorities to keep different traffic classes from impacting each
+other. For example, in~\cite{dcqcn} congestion notification packets were
+assigned a separate lossless class from data traffic to ensure that they would
+not just be delivered losslessly, but also would not be held up behind data
+traffic.
 
-\subsection{Step 3: Tag Reusing}
+A n{\"a}ive way to use \sysname{} in such cases is to treat each application (or
+traffic class) separately.  For example, in \S\ref{subsec:combine}, we showed
+that for the Clos network, if we want to make  all paths with no more than $M$
+bounces lossless, we need $M+1$ priorities. If there are $N$ applications, the
+n{\"a}ive approach would use $N*(M+1)$ priorities.  However, the switches may
+not have sufficient buffer to support this large number of lossless queues
+(\S\ref{subsec:pfcheadroom}.
 
-When handling multiple lossless application classes, the tag reusing for generic topology 
-remains mostly the same as the Clos-version Tagger.
-The first lossless class starts with tag 0. The second lossless class starts with 
-tag 1. For all tag changing rules that are for first class, {\em e.g.,} 
-$(A_i, x)\rightarrow(B_j, y)$, we install another rule handling the second class,
-{\em i.e.,} $(A_i, x+1)\rightarrow(B_j, y+1)$. This goes on to more lossless classes.
+However, if we are willing to trade off some isolation, we can proceed as
+follows.  We start the first lossless class with tag 1, and uses tag upto $M+1$.
+The second lossless class starts with tag 2, and change tags in the same way as
+the first class.  That is, whenever it has a bounce, the tag will increase by
+one. The second lossless class uses tag from 2 to $M+2$. This goes on until the
+$N'th$ lossless class. The total number of tags and lossless classes required is
+$M + N$. The operator can further reduce the number of tags required by allowing
+some application classes to tolerate fewer bounces than others.
 
-For Clos version, we prove that there is no deadlock even after the traffic mix among
-different classes. However, with the output of Algorithm~\ref{alg:greedy}, the traffic
-of differenct classes does {\em not} even mix on the same link with the same tag!
-This is because, whenever the packets of class $m$ switch to tag $n$,  the packets of
-class $m+1$ will switch to $n+1$. Therefore, $G_n$ of class $m$ and $G_n$ of class $m+1$
-remain disconnected and cannot create a cycle.
+We can prove that there is still no deadlock after such mix, by revisiting two
+properties described in \S\ref{subsec:specific_deadlock_free}. First, there is
+still no deadlock within each tag, because each tag is still a set of
+``up-down'' routing. Second, the update of tags is still monotonical. We omit
+formal proof for brevity. 
 
+The reduced isolation may be quite acceptable, since only a small
+fraction of packets experience one-bounce and may mix with traffic in the next
+lossless class. 
 
+This technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
+We omit details.
 
-\subsection{Idea 3: Reusing Tags and Lossless Queues}\label{subsec:reusing}
+\para{The need to specify expected lossless paths:} The need to specify expected
+lossless paths is not a problem in practice. For Clos networks, it is easy to
+enumerate paths with any given limit on bouncing. For a general topology, as long
+as the routing is traffic agnostic, it is usually easy to determine what routes
+the routing algorithm will compute -- e.g. BGP will find shortest AS path etc.
+In case an SDN controller is used, the controller algorithm can be used to
+generate the paths under a variety of conditions. Even for traffic aware
+routing, the operator can run a variety of simulations. 
 
-The prior ideas have been focusing on supporting single lossless application class. 
-However, multiple lossless classes impose bigger challenge on the number of priority queues.
-
-Assuming the operators want to make all paths with no more than $M$ bounces lossless, 
-and there are $N$ different lossless application classes. The most straightforward
-way is to assign totally different tags for each lossless class. Each class must have 
-$M+1$ different tags. In total, it requires $(M+1) \times N$ tags and lossless queues.
-Based on the calcualtion in \S\ref{subsec:pfcheadroom}, we can only support \fixme{one}
-lossless class assuming $M=1$.
-
-Our idea is to reuse tags and lossless queues across different lossless application classes.
-It works as follows. We start the first lossless class with tag 1, and uses tag upto $M+1$
-as described in prior section.
-The second lossless class starts with tag 2, and change tags in the same way as the first class.
-That is, whenever it has a bounce, the tag will increase by one. The second lossless class
-uses tag from 2 to $M+2$. This goes on until the $N'th$ lossless class. The total number of tags
-and lossless classes requried is $M + N$.
-
-Reusing tags and queues means the traffic from different classes may mix in some cases.
-For example, the second lossless class's ``normal'' traffic may mix with the first 
-class's ``one-bounce'' traffic.
-We can prove that there is still no deadlock after such mix, by revisiting Tagger's two
-properties described in the prior section. First, there is still no deadlock within each tag, 
-because each tag is still a set of ``up-down'' routing. Second, the update of tags is still
-monotonical. Thus, deadlock-free still holds.
-
-\para{Trade-off.} The mix of traffic also means a trade-off: we weaken the isolation between two application 
-lossless classes. This is usually acceptable for Clos topology in practice. As \S\ref{sec:reroute}
-shows, only a small fraction of packets experience one-bounce and may mix with traffic
-in the next lossless class.
-
-\para{Further reduce tags at the cost of some classes.} If the operators allow some classes
-to tolerate less bounces, the number of lossless queues can be further reduced. For example,
-Two lossless queues can support {\em two} lossless application classes, if the second class
-does not need to guarantee lossless for one-bounce traffic.
-
-%the second class supports one less bounce, the third class supports two less, and so on.
-%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
-%we leave the choice to operators. In practice, we run two application classes with two priority 
-%queues on switch. The second class is still lossless for most of the time, as numbers in 
-%Section~\ref{sec:reroute} show.
-
-%\subsection{Idea 3: Lossless Classes Reusing Tags}
-
-%Above tagging system allows us to run $k$ application classes with $k$ lossless priorities. 
-
-%The trade-off is that the second class supports one less bounce, the third class supports two less, and so on.
-%Under fixed constraints on the number of priorities on switches, how many application classes run in parallel?
-%we leave the choice to operators. In practice, we run two application classes with two priority 
-%queues on switch. The second class is still lossless for most of the time, as numbers in 
-%Section~\ref{sec:reroute} show.
-
-
-%On the other hand, the generic algorithm cannot support this at all. The problem is the lossless routing will 
-%become disconnected if any one priority (a micropath segment) is missing. Therefore, when the 
-%second application class starts with tag 1, the traffic between at least some hosts becomes 
-%{\em always} lossy.
-
-%Adding the priority reuse, $k$ lossless application classes can run in parallel at the cost that $i^{th}$ class only supports $k-i+1$ times bouncing.
-
-
-
-
-
-
-
-
+The reader may also dislike the possibility that we eventually push a wayward
+packet into a lossy queue. We stress that we do this only as a last resort, and
+we reiterate that it does not mean that the packets are automatically or
+immediately dropped. 
