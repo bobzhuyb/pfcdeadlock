@@ -19,8 +19,7 @@ ingress buffer occupancy reaches a preset threshold. As long as sufficient
 takes for the PAUSE to take effect, no packet will be dropped due to buffer
 overflow~\cite{cisco-whitepaper,dcqcn}. 
 
-The PFC standard defines 8 classes\footnote{Although, only one or two can be
-used in practice -- see \S\ref{subsec:pfcheadroom}.}, called priorities~\footnote{The word priority is a
+The PFC standard defines 8 classes, called priorities~\footnote{The word priority is a
 misnomer. There is no implicit ordering among priorities -- they are really just
 separate classes.}. Packets in each priority are buffered separately, and PAUSE
 messages carry this priority.  When a packet arrives at port $i$ of switch $S$
@@ -30,7 +29,6 @@ switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$ until a resume
 message (XOFF) with priority $j$ is received.
 
-PFC prevents buffer overflow, but it can lead to deadlocks.
 
 %% Since PAUsing is carried out
 %% on a per-ingress port, and not on a per-flow basis, problems such as unfairness
@@ -40,12 +38,13 @@ PFC prevents buffer overflow, but it can lead to deadlocks.
 %% dedicated headroom, typically, no more than two or three priorities are
 %% used~\cite{rdmaatscale}.
 
-{\bf Deadlock:} Deadlock forms when paused links form a cycle
-(Figure~\ref{fig:deadlock_example}). Once formed,
-deadlock is ``permanent'' in the sense that it will continue to exist even if no
-new traffic is injected into the loop. Deadlocks in PFC-based networks (or more
-generally, in credit-flow networks) are a well-known problem. It is not merely a
-theoretical problem -- it has been reported in practice~\cite{rdmaatscale}.
+{\bf Deadlock:} PFC prevents buffer overflow, but it can lead to deadlocks.
+Deadlock forms when paused links form a cycle
+(Figure~\ref{fig:deadlock_example}). Once formed, deadlock is ``permanent'' in
+the sense that it will continue to exist even if no new traffic is injected into
+the loop. Deadlocks in PFC-based networks (or more generally, in credit-flow
+networks) are a well-known problem. It is not merely a theoretical problem -- it
+has been reported in practice~\cite{rdmaatscale}.
 
 It is well known that Circular Buffer Dependency (CBD) is a {\em necessary}
 condition for deadlock formation~\cite{tcp-bolt,hu2016deadlocks}. {\em

@@ -24,9 +24,6 @@ onerous because RoCEv2 itself can be deployed without any changes to routing
 protocols -- RoCEv2 packets are encapsulated in normal UDP packets are routed
 like any normal IP packets.
 
-Thus, unlike prior work, \sysname{} requires no changes to the underlying routing
-protocol.
-
 \subsection{Data Center Networks are Dynamic}\label{sec:reroute}
 
 Building a deadlock avoidance scheme that does not make any changes to routing
@@ -58,7 +55,7 @@ in~\cite{shpiner2016unlocking}, when the UP-DOWN property is broken and packets
 may reroute multiple times between two layers of switches, and deadlocks may
 form as a result, as shown in Figure~\ref{fig:priority_transition}(b).
 
-We regularly observe deviations from up-down routing in our data centers.  We
+Deviations from up-down routing are common in our data centers.  We
 see hundreds of such routes per day, and they can persist for minutes or even
 longer. Overall, we estimate that $0.001\%$ of the traffic is routed over such
 paths. This may sound tiny, but given that our network carries petabytes of
@@ -130,27 +127,22 @@ in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 \label{subsec:pfcheadroom}
 
 One easy way to avoid deadlock without changing routing is to buffer packets
-from each flow separately from other flows at each hop -- essentialy putting
+from each flow separately from other flows at each hop -- essentially putting
 each flow in its own class, and applying per-hop backpressure only within the
-class.  A more sophesticated scheme in~\cite{karol2003prevention} requires as
+class.  A more sophisticated scheme in~\cite{karol2003prevention} requires as
 many priorities as the diameter of the network. 
 
-One obvious problem with this idea is that the PFC standrad supports only 8
-priority classes. But a bigger problem is that a switch can support only a small
-number of lossless queues.
+One problem with this idea is that the PFC standard supports only 8 priority
+classes. But modern commodity switches can realistically support fewer than 8
+lossless classes.  The problem is that  to guarantee the lossless property, a
+switch needs to reserve certain amount of {\it headroom} from the memory pool.
+The size of the memory pool thus determines the number of lossless queues that
+the switch ASIC can support.
 
-The number of lossless queues that a switch can support is limited by two
-factors. First, the commodity switching ASICs typically support only a small
-number of queues (e.g., eight) and we need to use some of the queues for the
-lossy traffic. Second, to guarantee the lossless property, a switch needs to
-reserve certain amount of {\it headroom} from the memory pool. The size of the
-memory pool is of limited size, hence the number of lossless queues is further
-limited by the size of the memory pool.
-
-The reserved headroom per port per lossless queue is to absorb the packets in
-flight from the time a receiver decides to send a PFC pause frame to its
-upstream sender to the time the sender stops transmitting after receiving the
-pause frame. See \cite{rdmaatscale} for how PFC works. We describe how the
+The reserved headroom per port, per lossless queue is needed to absorb the
+packets in flight from the time a receiver decides to send a PFC pause frame to
+its upstream sender to the time the sender stops transmitting after receiving
+the pause frame. We describe how the
 headroom size is calculated in Appendix \ref{APPHEADROOM}.
 
 From Appendix \ref{APPHEADROOM}, we can see that for a typical 32-port 40GbE
@@ -158,20 +150,18 @@ Ethernet switch, it needs to reserve 2.76MB memory as the headroom to support
 one lossless queue. For a switch of 12MB memory, this is 23\% of the total
 memory.
 
-The headroom calculated in Appendix \ref{APPHEADROOM} is to make sure that
-packets cannot be dropped. In practice, the reservation size should be larger
-than that. This is because we need some additional reservation to make sure that
-the link is not under-utilized, when the receiver releases the sender from been
-paused. Furthermore, we need to reserve buffers for lossy traffic, which is
-still the dominating traffic in data centers. Consider all these constrains, the
-number of lossless queues can be supported by the current commodity switches
-typically is limited to two.
+The headroom calculated in Appendix \ref{APPHEADROOM} ensures that  
+packets are not dropped. In practice, the reservation size needs to be larger to 
+ensure that the link is not under-utilized when the receiver un-pauses the
+sender. Furthermore, we need to reserve buffers for non-RDMA (i.e. lossy) traffic, which is
+still the dominating traffic in data centers. With these constrains, the
+current commodity switches can typically support just two or three lossless
+classes~\cite{rdmaatscale}.
 
-We note that new switching ASICs may be able to support more lossless queues by
-adding more memory, using smaller cell size (64-byte), reducing the pause frame
-response time. But the widely deployed switches support only two lossless
-queues. It is unlikely that the switches can support more than four or five
-lossless queues. Hence the solutions that use a large number of lossless queues
-are not practical. 
+New switching ASICs may be able to support more lossless queues by adding more
+memory, using smaller cell size (64-byte) and by reducing the pause frame
+response time. But even these are not expected to support more than four or five
+lossless queues. Hence the solutions that require a large number of lossless
+queues are not practical. 
 
 We now describe how \sysname{} addresses these three challenges. 
