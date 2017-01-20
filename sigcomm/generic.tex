@@ -115,6 +115,104 @@ paths that need to be lossless.
 	\caption{The input and output of Algorithm~\ref{alg:ttl}.}\label{fig:three_node}
 \end{figure*}
 
+\begin{table*}[t]
+	\centering
+	\begin{tabular}{lll}
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 2 & 3 & \textcolor{red}{1} \\
+			\hline
+			0 & 2 & 4 & \textcolor{red}{1} \\
+			\hline
+			1 & 3 & 2 & \textcolor{red}{2} \\
+			\hline
+			1 & 3 & 4 & \textcolor{red}{2} \\
+			\hline
+			1 & 4 & 2 & \textcolor{red}{2} \\
+			\hline
+			1 & 4 & 3 & \textcolor{red}{2} \\
+			\hline
+			2 & 3 & 2& \textcolor{red}{3} \\
+			\hline
+			2 & 3 & 4 & \textcolor{red}{3} \\
+			\hline
+			2 & 4 & 2 & \textcolor{red}{3} \\
+			\hline
+			2 & 4 & 3 & \textcolor{red}{3} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(a) rules installed in A} \\
+		\end{tabular}
+		&
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 2 & 1 & \textcolor{red}{1} \\
+			\hline
+			0 & 2 & 4 & \textcolor{red}{1} \\
+			\hline
+			1 & 1 & 2 & \textcolor{red}{2} \\
+			\hline
+			1 & 1 & 4 & \textcolor{red}{2} \\
+			\hline
+			1 & 4 & 1 & \textcolor{red}{2} \\
+			\hline
+			1 & 4 & 2 & \textcolor{red}{2} \\
+			\hline
+			2 & 1 & 2& \textcolor{red}{3} \\
+			\hline
+			2 & 1 & 4 & \textcolor{red}{3} \\
+			\hline
+			2 & 4 & 1 & \textcolor{red}{3} \\
+			\hline
+			2 & 4 & 2 & \textcolor{red}{3} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(b) rules installed in B} \\
+		\end{tabular}
+		&
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 4 & 1 & \textcolor{red}{1} \\
+			\hline
+			0 & 4 & 3 & \textcolor{red}{1} \\
+			\hline
+			1 & 1 & 3 & \textcolor{red}{2} \\
+			\hline
+			1 & 1 & 4 & \textcolor{red}{2} \\
+			\hline
+			1 & 3 & 1 & \textcolor{red}{2} \\
+			\hline
+			1 & 3 & 4 & \textcolor{red}{2} \\
+			\hline
+			2 & 1 & 3& \textcolor{red}{3} \\
+			\hline
+			2 & 1 & 4 & \textcolor{red}{3} \\
+			\hline
+			2 & 3 & 1 & \textcolor{red}{3} \\
+			\hline
+			2 & 3 & 4 & \textcolor{red}{3} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(c) rules installed in C} \\
+		\end{tabular}
+	\end{tabular}
+	\caption{Tag rewriting rules under Algorithm~\ref{alg:ttl}.}
+	\label{table:tagging_table}
+\end{table*}
+
+
 As in \S\ref{sec:specific}, we will first design a tagging scheme that avoids
 deadlock, then combine tags to reduce the number of required lossless queues.
 For general graph without structure information, a straightforward tagging
@@ -201,6 +299,86 @@ property will still hold after combination.
 	\caption{Algorithm~\ref{alg:greedy} output for the example in Figure~\ref{fig:three_node}.}
 	\label{fig:greedy}
 \end{figure}
+
+\begin{table*}[t]
+	\centering
+	\begin{tabular}{lll}
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 2 & 3 & \textcolor{red}{0} \\
+			\hline
+			0 & 2 & 4 & \textcolor{red}{0} \\
+			\hline
+			0 & 3 & 2 & \textcolor{red}{0} \\
+			\hline
+			0 & 3 & 4 & \textcolor{red}{1} \\
+			\hline
+			0 & 4 & 2 & \textcolor{red}{0} \\
+			\hline
+			0 & 4 & 3 & \textcolor{red}{0} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(a) rules installed in A} \\
+		\end{tabular}
+		&
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 2 & 1 & \textcolor{red}{0} \\
+			\hline
+			0 & 2 & 4 & \textcolor{red}{0} \\
+			\hline
+			0 & 1 & 2 & \textcolor{red}{0} \\
+			\hline
+			0 & 1 & 4 & \textcolor{red}{1} \\
+			\hline
+			0 & 4 & 1 & \textcolor{red}{0} \\
+			\hline
+			0 & 4 & 2 & \textcolor{red}{0} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(b) rules installed in B} \\
+		\end{tabular}
+		&
+		
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			\hline
+			\hline
+			0 & 4 & 1 & \textcolor{red}{0} \\
+			\hline
+			0 & 4 & 3 & \textcolor{red}{0} \\
+			\hline
+			0 & 1 & 3 & \textcolor{red}{0} \\
+			\hline
+			0 & 1 & 4 & \textcolor{red}{0} \\
+			\hline
+			0 & 3 & 1 & \textcolor{red}{0} \\
+			\hline
+			0 & 3 & 4 & \textcolor{red}{0} \\
+			\hline
+			1 & 1 & 4 & \textcolor{red}{1} \\
+			\hline
+			1 & 3 & 4 & \textcolor{red}{1} \\
+			\hline
+			others & others & others & \textcolor{red}{lossy tag} \\
+			\hline
+			\multicolumn{4}{c}{(c) rules installed in C} \\
+		\end{tabular}
+		
+	\end{tabular}
+	\caption{Tag rewriting rules under Algorithm~\ref{alg:greedy}.}
+	\label{table:tagging_table2}
+\end{table*}
+
 
 In  Figure~\ref{fig:greedy} we see Algorithm~\ref{alg:greedy} in action to
 minimize the $G(V,E)$ from Figure~\ref{fig:three_node}. We see that the number
