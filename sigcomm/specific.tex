@@ -12,7 +12,7 @@ by customized routing protocol (Google).}.
 We first define a few terms and a logical switch model.
 
 \para{Expected Lossless routes:} The input to \sysname{}. It is a set of packet paths
-that network operators require to be lossless. For example, in he Clos network,
+that network operators require to be lossless. For example, in the Clos network,
 the operator may want that all up-down paths are lossless. In the rest of the
 section, we refer to these routes simply as lossless routes.
 
@@ -28,7 +28,7 @@ tag value, which means that a lossless class may have multiple tag values.
 complex.  For ease of discussion, we use the following simplified
 model\footnote{See \S\ref{sec:implementation} for full implementation details.}
 in this section.  A switch has multiple ports. Each port has upto 7 lossless
-ingress queues associated with it, and one lossy queue\footnote{Typically, there
+queues associated with it, and one lossy queue\footnote{Typically, there
 is just one shared buffer and ``queues'' are just counters and linked lists.}.
 The queue number corresponds to the PFC priority.  Switch classifies arriving
 packets into queues based on {\em tags}.  Typically, each tag maps to a single
@@ -47,7 +47,7 @@ We now describe the core idea behind \sysname{}.
 	\subfloat[short for lof][Basic Clos topology] {
 		\includegraphics[width=0.4\textwidth] {figs/updown_paths}
 	}
-\vspace{-0.1in}
+%\vspace{-0.1in}
 	\subfloat[short for lof][1-bounce paths creates CBD.] {
 		\includegraphics[width=0.5\textwidth] {figs/cbd_a}
 	}
@@ -120,6 +120,7 @@ switch $S1$, the first switch after bounce, to detect the bounce and put the
 packet in a lossy queue. However, without additional information, $S1$ cannot
 differentiate bounced packets from normal up-going packets, {\em e.g.,} blue
 flow packets before bounce. 
+\fixme{Do we need to mention TTL here? How clever are reviewers?}
 
 It turns out that $L2$ can provide this information.  In normal ``up-down''
 routing, $L2$ would never forward a packet that arrived from $S2$ to $S1$. So,
@@ -171,20 +172,26 @@ going up (therefore, bouncing) for any reasons, they increase the tag by one.
 Assuming there are $k$ available lossless queues, all switches put packets with
 tag $i$ to $i^{th}$ lossless queues. This means packets with up to $k-1$ bounces
 are all lossless. If a packet bounces more than $k-1$ times, it will carry a tag
-larger than $k$. All switches will put such packets into a lossy queue. See 
+larger than $k$. All switches will put such packets into a lossy queue. 
+
+\fixme{Figure~\ref{fig:priority_transition}(c) shows the scenario after
+we apply \sysname{} on Figure~\ref{fig:priority_transition}(b). The CBD is
+splited into two parts that are assigned to two different lossless queues.
+In \S\ref{subsec:specific_deadlock_free}, we will prove that all potential CBDs
+like Figure~\ref{fig:priority_transition}(b) are all eliminated.}
 
 This design satisfies all three challenges described in
 \S\ref{sec:challenges}. We do not change the routing protocol. We work with
 existing hardware. We deal with dynamic changes to routes, and we do not exceed
 the number of available lossless queues.
 
+\subsection {Deadlock freedom and optimality}
+\label{subsec:specific_deadlock_free}
+
 We now provide brief proof sketches to prove that the above algorithm is
 deadlock free, and optimal in terms of number of lossless priorities used.
 A more formal description of the algorithm, using notation developed in the next
 section, is shown in Appendix~\ref{sec:clos_optimal}.
-
-\subsection {Deadlock freedom and optimality}
-\label{subsec:specific_deadlock_free}
 
 \begin{figure}[t]
 	%\vspace{-0.1in}
@@ -197,7 +204,7 @@ section, is shown in Appendix~\ref{sec:clos_optimal}.
 		\includegraphics[width=0.26\textwidth] {figs/subspace_b}
 	}
 	
-	\caption{Ordered subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
+	\caption{DAG across subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
 \end{figure}
 
 \para{\sysname{} is deadlock-free for Clos networks:} \sysname{} has two important
@@ -206,15 +213,16 @@ is no CBD because each tag only has a set of ``up-down'' routing paths.  Second,
 every time the tag changes, it changes monotonically. This means that the packet
 is going unidirectionally in a DAG of priority queues. This is important because
 otherwise CBD may still happen across subspaces (Figure~\ref{fig:subspace}).  We
-conclude that no CBD can form either within a tag or across different tags. The
-network is deadlock-free since CBD is a necessary condition of
-deadlock~\cite{our_hotnets_paper}.
+conclude that no CBD can form either within a tag or across different tags. 
+\fixme{A more formal proof, which also applies for generic topology, is in 
+\S\ref{sec:generic}}. The network is deadlock-free since CBD is a necessary 
+condition of deadlock~\cite{our_hotnets_paper}.
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k-1$ bounces paths lossless and deadlock-free, at least $k$
 lossless priorities are required. We use contradiction.  Assume there exists a
 system with only $k-1$ lossless priorities. Consider a flow that loops between
-$T1$ and $S1$ for $k$ times, which means bounces $k-1$ times at $T1$. With
+$T1$ and $L1$ for $k$ times, which means bounces $k-1$ times at $T1$. With
 Pigeonhole principle, we know that at least two times during the looping, the
 packet must have the same lossless priority. This is already sufficient to cause
 a deadlock~\cite{our_hotnets_paper}. Contradiction.
@@ -227,7 +235,7 @@ tags and associated rules that ensure that packets are correctly classified
 into $k$ lossless queues to ensure that there is no deadlock.   This system can
 be implemented with existing hardware, without requiring any changes to the
 routing protocol. We also showed that this system is optimal, in the sense that
-we cannot make do with fewer lossless queues.
+we cannot prevent deadlock with fewer lossless queues.
 
 We now show how to generalize \sysname{} for any topology.
 
