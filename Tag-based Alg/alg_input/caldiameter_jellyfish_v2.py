@@ -37,7 +37,7 @@ for server1 in range(ServerNum):
     for server2 in range(ServerNum):
         if str(server2+N) in pred:
             path = predecessor_to_path(pred, str(server1+N), str(server2+N))
-            if len(path) > netdiameter:
-                netdiameter = len(path)       
+            if (len(path)-1) > netdiameter:
+                netdiameter = len(path)-1      
             
 sys.stdout.write("netdiameter=" + str(netdiameter)+" ")
