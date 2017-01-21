@@ -37,6 +37,8 @@ lossless class.
 This technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
 We omit details.
 
+\para{Why not use TTL as a tag:} \fixme{Yibo ... write this.}
+
 \para{The need to specify expected lossless paths:} The need to specify expected
 lossless paths is not a problem in practice. For Clos networks, it is easy to
 enumerate paths with any given limit on bouncing. For a general topology, as long
@@ -70,3 +72,8 @@ high performance RDMA networks. More importantly, we must ensure proper
 operation of currently deployed RDMA hardware, which is reliant on PFC, and in
 which we and our customers have made substantial investments.
 
+\para{Management issues:} Using \sysname{} may add to network management
+overhead. If network topology or routing requirements change (e.g. network
+expansion), ACLs must be recomputed and reinstalled. Presence of ACLs may
+complicate network debugging and tracing. However, we believe that overall, the
+benefits of \sysname{} outweigh the costs.
