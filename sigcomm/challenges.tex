@@ -40,14 +40,6 @@ the packet is on its way UP, it should not go DOWN; when it is on its way DOWN,
 it should not go UP. Thus, with up-down routing, there can be no CBD and hence
 no deadlock.
 
-%\begin{figure}
-	%\vspace{-0.1in}
-	%\centering
-	%\includegraphics[width=0.4\textwidth] {figs/up-down}
-	%\caption{Violation of up-down routing can lead to deadlocks}
-	%\label{fig:up-down-deadlock}
-%\end{figure}
-
 However, packets may deviate from the UP-DOWN paths due to many reasons,
 including link failures (leading to route flaps), which are quite common in data
 center networks~\cite{netpilot,f10}.  As have shown
@@ -58,70 +50,10 @@ form as a result, as shown in Figure~\ref{fig:priority_transition}(b).
 Deviations from up-down routing are common in our data centers.  We
 see hundreds of such routes per day, and they can persist for minutes or even
 longer. Overall, we estimate that $0.001\%$ of the traffic is routed over such
-paths. This may sound tiny, but given that our network carries petabytes of
+paths. This may sound tiny, but given that our network carries exabytes of
 traffic per day, the absolute amount of traffic affected by such routing is
-quite high. This makes the threat of deadlocks, as discussed
+in petabytes. This makes the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
-
-%% In this paper, we show our measurement results from a large cloud computing
-%% provider that UP-DOWN routing property does break in reality and packets can be
-%% rerouted with a non negligible probability.
-%% 
-%% Our measurement works as follows. We instrument the servers to send out IP-in-IP
-%% packets to the high-layer switches. The outer source and destination IP
-%% addresses are set to the sending server and one of the high layer switches, and
-%% the inner source and destination IP addresses are set to the switch and the
-%% sending server, respectively. The high-layer switches are configured to
-%% decapsulate those IP-in-IP packets that are targeting themselves in hardware.
-%% 
-%% After decapsulation, the outer IP header is discarded, and the packet is then
-%% routed using its inner header. We set a TTL value, 64 in this paper, in the
-%% inner IP header. As the packet is forwarded back to the server, the TTL is
-%% decremented per hop. For a three-layer Clos network, there are three hops from
-%% the highest layer switches to the server. Hence normally the TTL value of the
-%% received packets should be 61.
-%% 
-%% If, however, the TTL value of a received packet is smaller than 61, say 59, we
-%% know the received packet was not taking the shortest path, and the packet must
-%% have taken a reroute path.
-%% 
-%% In this paper, for every measurement, a server sends out $n=100$ IP-in-IP
-%% probing packets, if the received TTL values are not equal, we know packet
-%% reroute happened for this measurement. We then calculate the reroute probability
-%% of the measurements as $\frac{M}{N}$, where $M$ is the number of measurements
-%% that experienced packet reroute, and $N$ is the total number of measurements. We
-%% carried out the measurements for one week in more than 20 data centers. The
-%% measurement results are shown in Table~\ref{fig:reroute}.
-%% 
-%% \begin{table}[t]
-%% \begin{small}
-%% \begin{center}
-%% \begin{tabular}{|r|r|r|c|}
-%% \hline    Date    & Total No.  & Rerouted No.   & Reroute probability \\
-%% \hline 11/01/2016 & 11381533570 & 148416 &  1.3e-5 \\
-%% \hline 11/02/2016 & 11056408780 & 130815 &  1.2e-5 \\
-%% \hline 11/03/2016 & 10316034165 & 104472 &  1.0e-5 \\
-%% \hline 11/04/2016 & 10273000622 & 92555  &  0.9e-5 \\
-%% \hline 11/05/2016 & 10230003382 & 102872 &  1.0e-5 \\
-%% \hline 11/06/2016 & 10491233987 & 106266 &  1.0e-5 \\
-%% \hline 11/07/2016 & 9608289622  & 100916 &  1.1e-5 \\
-%% \hline
-%% \end{tabular}
-%% \end{center}
-%% \caption{Packet reroute measurements in the data centers of a large cloud computing service provider.}\label{fig:reroute}
-%% \end{small}
-%% \end{table}
-%% 
-%% The most important conclusion we can draw from Table~\ref{fig:reroute} is that
-%% packet reroute does happen in data center networks. The reroute probability is
-%% around $10^{-5}$. Though $10^{-5}$ is not a big number, given the large traffic
-%% volume and the large scale data center networks, the deadlocks due to packet
-%% reroute as discussed in \cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks}
-%% do not just exist in paper designs. They are real!
-%% 
-%% Therefore how to address potential deadlocks due to packet reroute becomes a pressing challenge.
-
-%adding discussions on why packet reroute happen.
 
 \subsection{Limited Number of Lossless Queues}
 \label{subsec:pfcheadroom}

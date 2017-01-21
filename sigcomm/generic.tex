@@ -503,3 +503,12 @@ The reader may also dislike the possibility that we eventually push a wayward
 packet into a lossy queue. We stress that we do this only as a last resort, and
 we reiterate that it does not mean that the packets are automatically or
 immediately dropped. 
+
+\para{Dynamic topologies:} Recently, a number of researches have proposed
+changing the topology of the network in response to traffic patterns, using
+optical or wireless links~\cite{helios,flyways,projector,mirrormirror}.
+\sysname{} cannot be readily used for dynamic topologies, since we would need to
+recompute tags every time the topology changes. To the best of our knowledge, no
+modern data centers currently use dynamic topologies. Still, the problem of
+recomputing tags on-the-fly is an interesting research challenge, and we plan to
+work on it in future.

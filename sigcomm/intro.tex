@@ -77,14 +77,6 @@ While the greedy heuristic is not optimal, for popular data center topologies
 such as as FatTree, we show that we can reduce the number of priorities even
 further by exploiting special structure of the topology.
 
-%% takes the topology and routes that must be lossless as the input, and
-%% outputs the buffer configuration and ACL rules that guarantee no deadlock. Our
-%% key idea is to tag the packets along the path, and assign each packet to
-%% different lossless queues. Without any special assumptions about the topology,
-%% TTL is a type of tag that carries implicit information of what path the packet
-%% has taken.  Properly configured, we can avoid cyclic buffer dependency using
-%% this information.  We 
-
 We have implemented and tested \sysname{} on commodity Arista 7050 Switches that
 use the popular Broadcom chipsets.
 
