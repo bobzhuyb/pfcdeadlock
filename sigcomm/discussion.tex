@@ -21,18 +21,18 @@ The second lossless class starts with tag 2, and change tags in the same way as
 the first class.  That is, whenever it has a bounce, the tag will increase by
 one. The second lossless class uses tag from 2 to $M+2$. This goes on until the
 $N'th$ lossless class. The total number of tags and lossless classes required is
-$M + N$. The operator can further reduce the number of tags required by allowing
+$M + N -1$. The operator can further reduce the number of tags required by allowing
 some application classes to tolerate fewer bounces than others.
 
 We can prove that there is still no deadlock after such mix, by revisiting two
 properties described in \S\ref{subsec:specific_deadlock_free}. First, there is
 still no deadlock within each tag, because each tag is still a set of
 ``up-down'' routing. Second, the update of tags is still monotonical. We omit
-formal proof for brevity. 
+formal proof for brevity.
 
 The reduced isolation may be quite acceptable, since only a small
 fraction of packets experience one-bounce and may mix with traffic in the next
-lossless class. 
+lossless class.
 
 This technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
 We omit details.
@@ -46,12 +46,12 @@ as the routing is traffic agnostic, it is usually easy to determine what routes
 the routing algorithm will compute -- e.g. BGP will find shortest AS path etc.
 In case an SDN controller is used, the controller algorithm can be used to
 generate the paths under a variety of conditions. Even for traffic aware
-routing, the operator can run a variety of simulations. 
+routing, the operator can run a variety of simulations.
 
 The reader may also dislike the fact that we may eventually push a wayward
 packet into a lossy queue. We stress that we do this only as a last resort, and
 we reiterate that it does not mean that the packets are automatically or
-immediately dropped. 
+immediately dropped.
 
 \para{Dynamic topologies:} Recently, a number of researches have proposed
 changing the topology of the network in response to traffic patterns, using
