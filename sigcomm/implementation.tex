@@ -1,5 +1,9 @@
 \section{Implementation}\label{sec:implementation}
 
+To implement \sysname{}, we use the basic match-action functionality that is
+available in most modern commodity switches. However, correct implementation
+requires a key insight into the way PFC PAUSE frames are handled.
+
 \begin{figure}
 	\hspace{-0.2in}
 	\centering
@@ -8,16 +12,13 @@
 	
 \end{figure}
 
-\para {Math-Action rules:}
-\sysname{} needs to perform two operations at every hop in the network, i.e.,
-{\em tag-based priority queueing} and {\em tag rewriting}.  These two operations
-are implemented using a 3-step match-action pipelines shown in
-Figure~\ref{fig:tagger}.
- 
-In the first step, \sysname{} classifies packets into ingress queues based on
-the value of tags. In the second step, \sysname{} rewrites the value of tag
-based on (tag, inport, outport) information. These two steps form the core of
-\sysname{}.
+\para {Math-Action rules:} \sysname{} needs to perform two operations at every
+hop in the network, i.e., {\em tag-based priority queueing} and {\em tag
+rewriting}.  These two operations are implemented using a 3-step match-action
+pipelines shown in Figure~\ref{fig:tagger}.  In the first step, \sysname{}
+classifies packets into ingress queues based on the value of tags. In the second
+step, \sysname{} rewrites the value of tag based on (tag, inport, outport)
+information. These two steps form the core of \sysname{}.
  
 \begin{figure}[t]
  	\centering
@@ -31,9 +32,10 @@ based on (tag, inport, outport) information. These two steps form the core of
  	\caption{Decoupling ingress priority from egress priority at switch B is necessary for ensuring lossless priority transition.}\label{fig:prioritydecoupling}
 \end{figure}
 
-The third step, wherein the packet is placed in an egress queue based on the
+\para{Handling priority transition:}
+{\em The third step, wherein the packet is placed in an egress queue based on the
 {\em new} tag value, is needed to ensure correct PFC operation when priority
-values are rewritten.  
+values are rewritten.}
 
 Note that the tagged graph $G$ only defines the mapping between tags and ingress
 queues. By default, a switch will enqueue a departing packet in the egress queue
@@ -62,9 +64,17 @@ We have implemented \sysname{} on commodity switches based on Broadcom chipsets.
 We use DSCP field in IP header as the tag. DSCP rewriting is supported by most
 commodity chipsets available in the market today. DSCP-based priority queuing
 (step 1) is supported natively by all switch ASIC vendors. We implement step 2
-using ingress ACL rules that map (DSCP, inport, outport) to new DSCP. Step 3 is
-similarly implemented using ACLs, to ensure that the packet maps to the correct
-egress queue. None of this requires any changes to the switch ASIC.
+using ingress ACL rules that map (DSCP, inport, outport) to new DSCP. 
+
+Step 3 is similarly implemented using ACLs, although the implementation requires
+keen understanding how packets progress through the match-action pipeline. We
+omit these gritty details for brevity. While the implementation of this step is
+Broadcom-specific, we believe that ASICs from other vendors can also support
+this functionality.
+
+We stress that none of the three steps require any changes to the switch ASIC,
+and everything is implemented using publicly available and documented
+functionality.
 
 \begin{figure}[t]
 	%\vspace{-0.1in}

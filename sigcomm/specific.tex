@@ -2,44 +2,6 @@
 \section{\sysname{} for Clos Topology}
 \label{sec:specific}
 
-While \sysname{} works for any topology, we first describe the core ideas using
-the most popular data center topology, Clos, with common Clos
-routing\footnote{Clos routing can be implemented by BGP (Microsoft, Facebook) or
-by customized routing protocol (Google).}.  
-
-\subsection {Preliminaries}
-
-We first define a few terms and a logical switch model.
-
-\para{Expected Lossless routes:} The input to \sysname{}. It is a set of packet paths
-that network operators require to be lossless. For example, in the Clos network,
-the operator may want that all up-down paths are lossless. In the rest of the
-section, we refer to these routes simply as lossless routes.
-
-\para{Lossless class:} A lossless class is a service that we provide for
-applications.  Network guarantees that packets in a lossless class will not drop
-on lossless routes. 
-
-\para{Tag:} Tag is a small integer assigned / associated with a packet. The tag
-is embedded in a packet. A packet belonging to one lossless class may change its
-tag value, which means that a lossless class may have multiple tag values.
-
-\para{Switch model:} The architecture of modern data center switches is quite
-complex.  For ease of discussion, we use the following simplified
-model\footnote{See \S\ref{sec:implementation} for full implementation details.}
-in this section.  A switch has multiple ports. Each port has upto 7 lossless
-queues associated with it, and one lossy queue\footnote{Typically, there
-is just one shared buffer and ``queues'' are just counters and linked lists.}.
-The queue number corresponds to the PFC priority.  Switch classifies arriving
-packets into queues based on {\em tags}.  Typically, each tag maps to a single
-priority value. If a tag does not match any priority value, the packet is added
-to a lossy queue. Before forwarding a packet, the switch can rewrite the tag
-according to user-specified rules.
-
-We now describe the core idea behind \sysname{}.
-
-\subsection{Tagging on Bounce}\label{subsec:tag}
-
 \begin{figure}[t]
 	
 	\centering
@@ -47,24 +9,57 @@ We now describe the core idea behind \sysname{}.
 	\subfloat[short for lof][Basic Clos topology] {
 		\includegraphics[width=0.4\textwidth] {figs/updown_paths}
 	}
-%\vspace{-0.1in}
+
 	\subfloat[short for lof][1-bounce paths creates CBD.] {
-		\includegraphics[width=0.5\textwidth] {figs/cbd_a}
+		\includegraphics[width=0.4\textwidth] {figs/cbd_a}
 	}
 	
-%	\vspace{-0.15in}
 	\subfloat[short for lof][CBD is eliminated with path segmenting and prioritizing.]{
-		\includegraphics[width=0.5\textwidth] {figs/cbd_b}
+		\includegraphics[width=0.4\textwidth] {figs/cbd_b}
 	}
 	
 	\caption{Micropath based priority transition can eliminate CBD.}\label{fig:priority_transition}
 \end{figure}
 
+While \sysname{} works for any topology, we first describe the core ideas using
+the popular Clos network topology. 
+
+\subsection {Preliminaries}
+
+\para{Expected Lossless routes:} This is a set of packet paths that network
+operators requires to be lossless. For example, in a Clos network, the
+operator may want that all up-down paths are lossless. In the rest of the
+section, we refer to these routes simply as lossless routes. 
+
+\para{Lossless class:} A lossless class is a service that we provide for
+applications. The network guarantees that packets in a lossless class will
+not be dropped due to buffer overflow as long as they traverse lossless paths.
+
+\para{Tag:} Tag is a small integer assigned / associated with a packet. The tag
+is embedded in a packet. A packet belonging to one lossless class may change its
+tag value, which means that a lossless class may have multiple tag values.
+
+\para{Switch model:} For ease of discussion, we use the following simplified
+switch model\footnote{See \S\ref{sec:implementation} for full implementation
+details.} in this section.  A switch has multiple ports. Each port has upto 7
+lossless queues associated with it, and one lossy queue\footnote{Typically,
+there is just one shared buffer and ``queues'' are just ``views'' of this shared
+buffer.} The queue number corresponds to the PFC priority.  Switch classifies
+arriving packets into queues based on {\em tags}.  Typically, each tag maps to a
+single priority value. If a tag does not match any priority value, the packet is
+added to a lossy queue. Before forwarding a packet, the switch can rewrite the
+tag according to user-specified rules.
+
+We now describe the core idea behind \sysname{}.
+
+\subsection{Tagging on bounce}
+\label{subsec:tag}
+
 Consider Figure~\ref{fig:priority_transition}(a). Both the green and blue flows
 follow up-down routing and there is no deadlock. 
 
 Now, let's assume that as shown in Figure~\ref{fig:priority_transition}(b), two
-links fail, and both flows take paths that are not strictly up-down ( $L2$ to
+links fail, which forces both flows to deviate from up-down paths ($L2$ to
 $S1$ for green flow, $L3$ to $S2$ for blue flow). We call these paths 1-bounce
 paths, as the path violates the up-down rule once. As shown, this can lead to
 CBD, and hence may cause deadlock.
@@ -117,16 +112,17 @@ information, in presence of dynamic routing?
 
 Consider the green flow in Figure~\ref{fig:priority_transition}(b).  We want
 switch $S1$, the first switch after bounce, to detect the bounce and put the
-packet in a lossy queue. However, without additional information, $S1$ cannot
-differentiate bounced packets from normal up-going packets, {\em e.g.,} blue
-flow packets before bounce. 
-\fixme{Do we need to mention TTL here? How clever are reviewers?}
+packet in a lossy queue. 
 
-It turns out that $L2$ can provide this information.  In normal ``up-down''
-routing, $L2$ would never forward a packet that arrived from $S2$ to $S1$. So,
-if $L2$ ``tags'' packets that have arrived from $S2$ that it is forwarding to $S1$,
-then $S1$, {\em and all other switches along the path after $S1$} know that the
-packet has deviated from the up-down path.
+One way for $S1$ (and any other switch afterwards) to recognize a bounced packet
+is by TTL - a bounced packet will have ``lower than expected'' TTL. However, TTL
+values are set by end hosts~\footnote{TTL has other disadvantages as well,
+see \S\ref{subsec:caveats}}, so a more controllable way is for the switch $L2$
+to provide this information.  In normal ``up-down'' routing, $L2$ would never
+forward a packet that arrived from $S2$ to $S1$. So, if $L2$ ``tags'' packets
+that have arrived from $S2$ that it is forwarding to $S1$, then $S1$, {\em and
+all other switches along the path after $S1$} know that the packet has deviated
+from the up-down path.
 
 Note that $L2$ needs only local information to do the tagging. We can initially
 assign a $NoBounce$ tag to every packet. $L2$ then simply needs to check ingress
@@ -150,7 +146,7 @@ once before assigning it to a lossless queue. Third, we must ensure that we
 don't end up using more lossless queues than the switch can support. To this
 end, we show how to combine tags.
 
-\subsection{Combining Tags}
+\subsection{Reducing the number of lossless queues}
 \label{subsec:combine}
 
 In Clos network as shown in Figure~\ref{fig:priority_transition}(a), packets can
@@ -172,13 +168,16 @@ going up (therefore, bouncing) for any reasons, they increase the tag by one.
 Assuming there are $k$ available lossless queues, all switches put packets with
 tag $i$ to $i^{th}$ lossless queues. This means packets with up to $k-1$ bounces
 are all lossless. If a packet bounces more than $k-1$ times, it will carry a tag
-larger than $k$. All switches will put such packets into a lossy queue. 
+larger than $k$. All switches will put such packets into a lossy queue.
+Pseudocode of the algorithm, using notation developed in \S\ref{sec:generic}, is
+shown in Appendix~\ref{sec:clos_optimal}.
 
-\fixme{Figure~\ref{fig:priority_transition}(c) shows the scenario after
-we apply \sysname{} on Figure~\ref{fig:priority_transition}(b). The CBD is
-splited into two parts that are assigned to two different lossless queues.
-In \S\ref{subsec:specific_deadlock_free}, we will prove that all potential CBDs
-like Figure~\ref{fig:priority_transition}(b) are all eliminated.}
+Figure~\ref{fig:priority_transition}(c) illustrates the tagging algorithm in
+action.  Packets, when travelling on path segments before bounce carry a tag
+value of 1, and the tag is set to 2 after the bounce. This ensures that the
+packets are queued in separate lossless queues, and thus there is no CBD. In
+other words, we show a system for $k=2$. The lossy queue for packets that bounce
+more than once is omitted for clarity. 
 
 This design satisfies all three challenges described in
 \S\ref{sec:challenges}. We do not change the routing protocol. We work with
@@ -190,8 +189,6 @@ the number of available lossless queues.
 
 We now provide brief proof sketches to prove that the above algorithm is
 deadlock free, and optimal in terms of number of lossless priorities used.
-A more formal description of the algorithm, using notation developed in the next
-section, is shown in Appendix~\ref{sec:clos_optimal}.
 
 \begin{figure}[t]
 	%\vspace{-0.1in}
@@ -207,16 +204,16 @@ section, is shown in Appendix~\ref{sec:clos_optimal}.
 	\caption{DAG across subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
 \end{figure}
 
-\para{\sysname{} is deadlock-free for Clos networks:} \sysname{} has two important
-properties. First, for any given tag and its corresponding priority queue, there
-is no CBD because each tag only has a set of ``up-down'' routing paths.  Second,
-every time the tag changes, it changes monotonically. This means that the packet
-is going unidirectionally in a DAG of priority queues. This is important because
-otherwise CBD may still happen across subspaces (Figure~\ref{fig:subspace}).  We
-conclude that no CBD can form either within a tag or across different tags. 
-\fixme{A more formal proof, which also applies for generic topology, is in 
-\S\ref{sec:generic}}. The network is deadlock-free since CBD is a necessary 
-condition of deadlock~\cite{our_hotnets_paper}.
+\para{\sysname{} is deadlock-free for Clos networks:} \sysname{} has two
+important properties. First, for any given tag and its corresponding priority
+queue, there is no CBD because each tag only has a set of ``up-down'' routing
+paths.  Second, every time the tag changes, it changes monotonically. This means
+that the packet is going unidirectionally in a DAG of priority queues. This is
+important because otherwise CBD may still happen across subspaces
+(Figure~\ref{fig:subspace}).  We conclude that no CBD can form either within a
+tag or across different tags.  The network is deadlock-free since CBD is a
+necessary condition of deadlock~\cite{our_hotnets_paper}.  A formal proof, which
+also applies for generic topology, is given in \S\ref{sec:generic}. 
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k-1$ bounces paths lossless and deadlock-free, at least $k$
@@ -238,4 +235,3 @@ routing protocol. We also showed that this system is optimal, in the sense that
 we cannot prevent deadlock with fewer lossless queues.
 
 We now show how to generalize \sysname{} for any topology.
-
