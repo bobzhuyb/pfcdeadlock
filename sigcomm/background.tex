@@ -1,13 +1,13 @@
 \section{Background}
 \label{sec:background}
-{\bf RDMA and RoCE:} Remote Direct Memory Access (RDMA) technology offers high
+\para {RDMA and RoCE:} Remote Direct Memory Access (RDMA) technology offers high
 throughput, low latency and low CPU overhead, by bypassing end-host networking
 stacks. Instead, Network Interface Cards(NICS) transfer data in and out of
 pre-registered memory buffers at the two end hosts.  In modern data centers,
 RDMA is deployed using RDMA over Converged Ethernet V2 (RoCE)
 standard~\cite{roce,rroce}
 
-{\bf PFC:} RoCE needs a lossless L2 layer for optimal performance. This is
+\para {PFC:} RoCE needs a lossless L2 layer for optimal performance. This is
 accomplished in Ethernet networks using the Priority Flow Control (PFC)
 mechanism~\cite{pfc}.  Using PFC, a switch can pause an incoming link when its
 ingress buffer occupancy reaches a preset threshold. As long as sufficient
@@ -25,16 +25,7 @@ switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$ until a resume
 message (XOFF) with priority $j$ is received.
 
-
-%% Since PAUsing is carried out
-%% on a per-ingress port, and not on a per-flow basis, problems such as unfairness
-%% and head-of-the-line blocking may occur~\cite{dcqcn}. The PFC standard defines 8
-%% classes (called priorities), where packets in class are buffered separately, to
-%% mitigate these problems~\cite{dcqcn}. However, sine each priority needs its own
-%% dedicated headroom, typically, no more than two or three priorities are
-%% used~\cite{rdmaatscale}.
-
-{\bf Deadlock:} PFC prevents buffer overflow, but it can lead to deadlocks.
+\para{Deadlock:} PFC prevents buffer overflow, but it can lead to deadlocks.
 Deadlock forms when paused links form a cycle
 (Figure~\ref{fig:deadlock_example}). Once formed, deadlock is ``permanent'' in
 the sense that it will continue to exist even if no new traffic is injected into
@@ -42,15 +33,16 @@ the loop. Deadlocks in PFC-based networks (or more generally, in credit-flow
 networks) are a well-known problem. It is not merely a theoretical problem -- it
 has been reported in practice~\cite{rdmaatscale}.
 
-It is well known that Circular Buffer Dependency (CBD) is a {\em necessary}
-condition for deadlock formation~\cite{tcp-bolt,hu2016deadlocks}. {\em
-Sufficient} condition for deadlock formation in PFC networks have yet to be
-fully understood~\cite{hu2016deadlocks}. 
+\para {Conditions for deadlock formation:} It is well known that Circular Buffer
+Dependency (CBD) is a {\em necessary} condition for deadlock
+formation~\cite{tcpbolt,hu2016deadlocks}. However, {\em
+sufficient} conditions for deadlock formation in PFC networks have not yet been
+fully characterized~\cite{hu2016deadlocks}. 
 
-{\bf Prior work on deadlock avoidance:} Prior work on deadlock management falls
+\para {Prior work on deadlock avoidance:} Prior work on deadlock management falls
 in two categories: deadlock avoidance, or deadlock detection and resolution. Our
 focus in this paper is on deadlock avoidance.  Since {\em sufficient} conditions
-for deadlock formation are not well characterized, deadlock avoidance schemes
+for deadlock formation are not well understood, deadlock avoidance schemes
 focus on preventing CBD for occurring. This is done either by limiting or
 modifying routing~\cite{tcpbolt} to avoid CBD, or by careful buffer
 management~\cite{xxx}. 
@@ -62,40 +54,4 @@ switch buffers or number of priorities.
 
 We now describe these three challenges in more detail. See \S\ref{sec:related}
 for a detailed review of prior work.
-
-%% Prior work on deadlock formation fails to meet the three challanges: first, they
-%% do not work with To avoid such deadlocks, {\em deadlock-free
-%% routing}~\cite{tcpbolt} has been proposed. It guarantees that (if the routing
-%% configuration is correct,) any traffic does not cause deadlock.
-%% 
-%% Unfortunately, achieving deadlock-free routing is inefficient, and may not even
-%% be viable. Deadlock-free routing is achieved by eliminating Cyclic Buffer
-%% Dependency (CBD)~\cite{deadlockfree}.  However, ensuring that there is never any
-%% CBD is challenging.
-%% 
-%% First, deadlock-free routing largely limits the choice of topology. For example,
-%% Stephens et al. \cite{tcpbolt} proposes to only use tree-based topology and
-%% routing, and shows that it is deadlock-free.  However, there are a number of
-%% other datacenter topologies and routing schemes that are not
-%% tree-based~\cite{bcube, camcube, jellyfish}, and do not have deadlock-free
-%% guarantee.
-%% 
-%% Second, due to bugs or misconfiguration, deadlock-free routing configuration may
-%% turn into deadlock-vulnerable. In fact, recent work has observed a PFC deadlock
-%% case in real-world tree-based datacenter\cite{rdmascale}, caused by the
-%% (unexpected) flooding of lossless class traffic.  Furthermore, there are
-%% multiple reports of routing loops due to misconfiguration in today's production
-%% datacenters~\cite{everflow, libra}. If lossless traffic encounters any of these
-%% loops, CBD is unavoidable.  
-%% 
-%% Indeed, a recent paper~\cite{hu2016deadlocks} argued that preventing CBD is
-%% quite difficult, so instead we should focus on defining and preventing
-%% ``simpler''{\em sufficient} conditions to avoid deadlock. 
-%% 
-%% In this paper, we show that it is indeed possible to prevent CBD, in any
-%% topology, without any changes to the underlying routing protocol, using existing
-%% data center hardware. 
-
-
-
 

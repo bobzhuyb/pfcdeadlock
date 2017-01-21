@@ -394,7 +394,7 @@ In Figure~\ref{fig:greedy} we see Algorithm~\ref{alg:greedy} in action to
 minimize the $G(V,E)$ from Figure~\ref{fig:three_node}. We see that the number
 of tags is reduced to {\em two}.
 
-\subsection {Discussion}
+\subsection {Analysis}
 \label{subsec:caveats}
 
 \para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$ 
@@ -453,62 +453,3 @@ However, if we know that the smallest cycle in lossless routes is longer than
 $l$, the output number of tags is bounded by $\lceil T/l \rceil$. We omit the
 proof for brevity.
 
-\para{Multiple application classes:} Sometimes, system administrators need to
-use multiple lossless priorities to keep different traffic classes from impacting each
-other. For example, in~\cite{dcqcn} congestion notification packets were
-assigned a separate lossless class from data traffic to ensure that they would
-not just be delivered losslessly, but also would not be held up behind data
-traffic.
-
-A n{\"a}ive way to use \sysname{} in such cases is to treat each application (or
-traffic class) separately.  For example, in \S\ref{subsec:combine}, we showed
-that for the Clos network, if we want to make  all paths with no more than $M$
-bounces lossless, we need $M+1$ priorities. If there are $N$ applications, the
-n{\"a}ive approach would use $N*(M+1)$ priorities.  However, the switches may
-not have sufficient buffer to support this large number of lossless queues
-(\S\ref{subsec:pfcheadroom}.
-
-However, if we are willing to trade off some isolation, we can proceed as
-follows.  We start the first lossless class with tag 1, and uses tag upto $M+1$.
-The second lossless class starts with tag 2, and change tags in the same way as
-the first class.  That is, whenever it has a bounce, the tag will increase by
-one. The second lossless class uses tag from 2 to $M+2$. This goes on until the
-$N'th$ lossless class. The total number of tags and lossless classes required is
-$M + N$. The operator can further reduce the number of tags required by allowing
-some application classes to tolerate fewer bounces than others.
-
-We can prove that there is still no deadlock after such mix, by revisiting two
-properties described in \S\ref{subsec:specific_deadlock_free}. First, there is
-still no deadlock within each tag, because each tag is still a set of
-``up-down'' routing. Second, the update of tags is still monotonical. We omit
-formal proof for brevity. 
-
-The reduced isolation may be quite acceptable, since only a small
-fraction of packets experience one-bounce and may mix with traffic in the next
-lossless class. 
-
-This technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
-We omit details.
-
-\para{The need to specify expected lossless paths:} The need to specify expected
-lossless paths is not a problem in practice. For Clos networks, it is easy to
-enumerate paths with any given limit on bouncing. For a general topology, as long
-as the routing is traffic agnostic, it is usually easy to determine what routes
-the routing algorithm will compute -- e.g. BGP will find shortest AS path etc.
-In case an SDN controller is used, the controller algorithm can be used to
-generate the paths under a variety of conditions. Even for traffic aware
-routing, the operator can run a variety of simulations. 
-
-The reader may also dislike the possibility that we eventually push a wayward
-packet into a lossy queue. We stress that we do this only as a last resort, and
-we reiterate that it does not mean that the packets are automatically or
-immediately dropped. 
-
-\para{Dynamic topologies:} Recently, a number of researches have proposed
-changing the topology of the network in response to traffic patterns, using
-optical or wireless links~\cite{helios,flyways,projector,mirrormirror}.
-\sysname{} cannot be readily used for dynamic topologies, since we would need to
-recompute tags every time the topology changes. To the best of our knowledge, no
-modern data centers currently use dynamic topologies. Still, the problem of
-recomputing tags on-the-fly is an interesting research challenge, and we plan to
-work on it in future.
