@@ -1,14 +1,12 @@
 %\vspace{-0.1in}
 \section{Related Work}\label{sec:related}
 
-\para{RoCE and the need for PFC.}
-Here we emphasize that (at least current) RoCE cannot work well without PFC.
-The results in DCQCN and RDMA at scale (SIGCOMM'16) paper show packet drops
-are very harmful for RoCE performance.
+\para{The need for RoCE.}
+Many deep learning frameworks including Tensorflow \cite{tensorflow} and Microsoft Cognitive Toolkit \cite{cntk} support RDMA and RoCE for better performance as RDMA provides the needed communications latency and low CPU overhead. These deep learning frameworks are on their way into data centers. 
 
-We may add a note saying that PFC has its fundamental advantage (e.g., no retransmission),
-if we could make it work well in practice, using PFC would be the right approach
-for RoCE. Our paper is trying to make this happen.
+RoCE, however, does not work well without PFC to provide a lossless network fabric, as the RDMA transport protocol cannot well handle packet drops \cite{dcqcn,rdmaatscale}.
+
+Our work in this paper showed that we can make PFC work with guaranteed deadlock-free with existing data center networks. Tagger works seamlessly with any existing routing protocols and network topologies. 
 
 \para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
 work by preemption. This does not work in Ethernet and in practice.
@@ -17,5 +15,5 @@ work by preemption. This does not work in Ethernet and in practice.
 has discussed how they can be implemented in reality.
 
 \para{Summary: our differences.}
-We believe that deciding the priority of packets along the path is better than changing 
+We believe that deciding the priority of packets along the path is better than changing
 routing configuratoins.
