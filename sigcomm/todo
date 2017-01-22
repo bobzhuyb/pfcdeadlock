@@ -14,3 +14,4 @@ random routing for clos
 One interesting observation: when I looked at figure 7, my first feeling is that why it always choose C for tag 1? It should choose A and B as well by symmetry. 
 Then I realized that we have total 30 solutions (C_6^2) instead of 3 solutions. So it may be worth noting that figure 7 just show one of the solutions. 
 
+runtime numbers (e.g., how many seconds) for fat-tree and jelly fish
