@@ -59,6 +59,23 @@ based on its new priority.  This avoids packet loss, since the PFC from switch C
 correctly pauses the queue on which the packet with the new tag would be
 exiting. This example thus demonstrates the necessity of the third step.
 
+\para{Rule compression with bit masking technique:}  The match-action rules of \sysname{} can be implemented with TCAM. Entries in TCAM are bit masking based and consist of three parts ({\em Value}, {\em Mask}, {\em Result}). {\em Value} refers to the pattern to be matched, {\em Mask} refers to the mask bits associated with the pattern and {\em Result} refers to the action that occurs when a lookup hits the pattern. For example, (Value = 1000$_{(2)}$, Mask = 1100$_{(2)}$, Result = Deny) can match pattern ``$10**$'' and perform {\em Deny} action. One TCAM entry can have several Value-Mask pairs to match multiple packet header fields simultaneously, e.g., we can configure a TCAM entry like (Value-1, Mask-1, Value-2, Mask-2, Result) to match two fields simultaneously.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.45\textwidth] {figs/compression_with_bitmasking}
+	\caption{An example to show rule compression with bit masking.}\label{fig:compression}
+	
+\end{figure}
+
+
+Bit masking feature of TCAM provides an opportunity for compressing rules of \sysname{}: rules that have the same action can be compressed into one TCAM entry if the patterns to be matched can be aggregated using bit masking. An example is shown in Figure~\ref{fig:compression}. As we can see, these four rules share the same tag rewriting action, and the ingress ports to be matched can be aggregated using a prefix ``00**''. So these four rules can be compressed into one TCAM entry by doing aggregation on ingress port.
+
+As discussed in Section~\ref{sec:generic}, without any compression, we will need $n^2\times m$ rules per switch. The number of rules can be compressed to $n\times m$ by aggregating ingress ports with bit masking. Note that the result can be further improved by doing aggregation on tag, ingress port and egress port together. 
+
+%But $n\times m$ is already good enough as modern commodity switches typically have less than 100 ports, but can support 1-4K
+%TCAM based ACL rules~\cite{xx}.
+
 \para{Broadcom implementation:}
 We have implemented \sysname{} on commodity switches based on Broadcom chipsets.
 We use DSCP field in IP header as the tag. DSCP rewriting is supported by most
