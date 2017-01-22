@@ -70,7 +70,7 @@ specific to Clos networks.
 		\For{each hop $h$ in $r$} {
 			$V \gets V \cup \{(h, tag)\}$\;
 			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
-			\If{$h$ is up-facing \&\& nextHop is down-facing} {
+			\If{$h$ is going down \&\& nextHop is going up} {
 				$tag \gets tag+1$\;
 			}
 		}

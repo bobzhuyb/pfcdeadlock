@@ -281,9 +281,9 @@ from combining the nodes with smallest tag, 0 and proceed linearly.
 			}
 		}
 		\uIf{$V'$ contains nodes of tag $t'+1$} {
-			$t' \gets t'+1$\;
 			$V_{tmp} \gets \{$nodes in $V'$ with tag $t'+1\}$\;
 			$E_{tmp} \gets \{$edges in $V'$, both ends have tag $t'+1\}$\;
+			$t' \gets t'+1$\;
 		}
 	}
 	\Return{$G'(V', E')$}\;
