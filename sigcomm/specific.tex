@@ -10,14 +10,14 @@
 \end{figure}
 
 While \sysname{} works for any topology, we first describe the core ideas using
-the popular Clos network topology. 
+the popular Clos network topology.
 
 \subsection {Preliminaries}
 
 \para{Expected Lossless routes:} This is a set of packet paths that network
 operators requires to be lossless. For example, in a Clos network, the
 operator may want that all up-down paths are lossless. In the rest of the
-section, we refer to these routes simply as lossless routes. 
+section, we refer to these routes simply as lossless routes.
 
 \para{Lossless class:} A lossless class is a service that we provide for
 applications. The network guarantees that packets in a lossless class will
@@ -51,7 +51,7 @@ We now describe the core idea behind \sysname{}.
 \end{figure}
 
 Recall Figure~\ref{fig:basic_clos}. Both the green and blue flows follow up-down
-routing and there is no deadlock. 
+routing and there is no deadlock.
 
 Now, let's assume that as shown in Figure~\ref{fig:clos_1_bounce}, two
 links fail, which forces both flows to deviate from up-down paths ($L2$ to
@@ -80,7 +80,7 @@ information, in presence of dynamic routing?
 
 Consider the green flow in Figure~\ref{fig:clos_1_bounce}.  We want switch $S1$,
 the first switch after bounce, to detect the bounce and put the packet in a
-lossy queue. 
+lossy queue.
 
 One way for $S1$ (and any other switch afterwards) to recognize a bounced packet
 is by TTL - a bounced packet will have ``lower than expected'' TTL. However, TTL
@@ -98,7 +98,7 @@ and egress port for each packet: it changes the tag from $NoBounce$ to $Bounced$
 if a packet arriving from ingress port connected to $S2$ exits on egress port
 connected to $S1$.  It is easy to see that these rules can be pre-computed since
 we know the topology, and the set of routes that we want to be ``lossless''
-(i.e. the up-down routes). 
+(i.e. the up-down routes).
 
 This, in essence, is the core idea behind \sysname{} -- leveraging the knowledge of
 topology, and the paths that need to be lossless, we can create a system of tags
@@ -127,7 +127,7 @@ end, we show how to combine tags.
 In Clos network as shown in Figure~\ref{fig:basic_clos}, packets can
 bounce at any $L$ layer, or called Leaf, switches. In addition, packets can also
 bounce at any $T$ layer, or ToR switches. Do we need to assign a distinct tag
-and a corresponding priority queue for each bouncing point? 
+and a corresponding priority queue for each bouncing point?
 
 Again, we leverage our knowledge of Clos topology and routing. Consider a packet
 that bounces twice. The path between the first bounce and the second bounce is a
@@ -152,7 +152,7 @@ action.  Packets, when travelling on path segments before bounce carry a tag
 value of 1, and the tag is set to 2 after the bounce. This ensures that the
 packets are queued in separate lossless queues, and thus there is no CBD. In
 other words, we show a system for $k=2$. The lossy queue for packets that bounce
-more than once is omitted for clarity. 
+more than once is omitted for clarity.
 
 This design satisfies all three challenges described in
 \S\ref{sec:challenges}. We do not change the routing protocol. We work with
@@ -188,7 +188,7 @@ important because otherwise CBD may still happen across subspaces
 (Figure~\ref{fig:subspace}).  We conclude that no CBD can form either within a
 tag or across different tags.  The network is deadlock-free since CBD is a
 necessary condition of deadlock~\cite{our_hotnets_paper}.  A formal proof, which
-also applies for generic topology, is given in \S\ref{sec:generic}. 
+also applies for generic topology, is given in \S\ref{sec:generic}.
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k-1$ bounces paths lossless and deadlock-free, at least $k$
@@ -209,4 +209,7 @@ be implemented with existing hardware, without requiring any changes to the
 routing protocol. We also showed that this system is optimal, in the sense that
 we cannot prevent deadlock with fewer lossless queues.
 
+One thing we did not discuss in this section is the number of rules needed for Tag mapping. 
+We will show in \S~\ref{sec:implementation} that we need at most 4 rules per switch 
+(note that no rule is needed for the spine switches).
 We now show how to generalize \sysname{} for any topology.

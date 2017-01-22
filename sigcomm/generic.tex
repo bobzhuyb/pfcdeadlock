@@ -7,23 +7,23 @@ Table~\ref{tab:symbols}.
 Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch
 $A$'s $i^{th}$ ingress port.  We use a {\em tagged graph} $G(V,E)$ to uniquely
 represent a tagging scheme.  Given a tagging scheme, the {\em tagged graph}
-$G(V,E)$ is defined as: 
+$G(V,E)$ is defined as:
 
 \begin{enumerate}
-\item $G$ contains a node, $(A_i, x)$, {\em iff.} port $A_i$ may receive packets with tag $x$, and these packets must 
+\item $G$ contains a node, $(A_i, x)$, {\em iff.} port $A_i$ may receive packets with tag $x$, and these packets must
 be lossless. $V$ is the set of all such nodes.
 
-\item $G$ contains an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are 
+\item $G$ contains an edge $(A_i, x)\rightarrow(B_j, y)$ {\em iff.} switch $A$ and $B$ are
 connected, {\em and} switch $A$ may change a packet's tag from $x$ to $y$ before sending to $B$ (the case $x=y$ also counts).
 $E$ is the set of all such edges.
 
 \end{enumerate}
 
 Given a tag $k$, we also define $\{G_k\}$, with vertices $V(G_k)$ and edges
-$E(G_k)$: 
+$E(G_k)$:
 $$V(G_k) = \{(A_i, k) | \forall A, i\} $$
 $$E(G_k) = \{v_0 \rightarrow v_1 | \forall v_0, v_1 \in V(G_k),  v_0 \rightarrow v_1 \in E(G)\} $$
-Each tag $k$ is mapped to a unique lossless priority.  
+Each tag $k$ is mapped to a unique lossless priority.
 
 Each node has a rule to match on a tag on an ingress port, and assign the packet
 to corresponding lossless queue.  In addition, each edge corresponds to a switch
@@ -52,7 +52,7 @@ If a packet arrives at $A_i$ with tag $x$, and is destined for port $B_j$, and
 there is no corresponding edge in $G(V,E)$, it means that the packet has
 traversed on a path that is not expected to be lossless.  Such packets are
 assigned a special tag, and all switches assign this tag to lossy
-priority\footnote{This rule is always the last one in the 
+priority\footnote{This rule is always the last one in the
 TCAM rule list, acting as a safeguard to avoid unexpected buffer dependency.
 See \S\ref{sec:implementation}.}.
 
@@ -60,20 +60,20 @@ In the rest of the section, we will describe how to generate the tagging graph
 -- i.e. the tagging rules. But first, we prove that the tagging scheme described
 by such a graph is deadlock free, as long as the graph meets two requirements.
 
-\begin{enumerate} 
+\begin{enumerate}
 
 		\item  Any $G_k$ for $G$ {\em must not} have a cycle.  This is
 				because each edge in $G_k$ is essentially a buffer dependency --
 				whether $A_i$ can dequeue packets depending on whether $B_j$ has
 				paused upstream. A cycle in $G_k$ means cyclic buffer
-				dependency.  
+				dependency.
 		\item There must be no link going from
 				$G_x$ to $G_y$ if $x>y$.  This means we enforce the order of
 				$G_x$.
 \end{enumerate}
 
 These requirements are essentially generalization of the properties
-discussed in \S\ref{subsec:specific_deadlock_free}. 
+discussed in \S\ref{subsec:specific_deadlock_free}.
 
 \begin{theorem}
 Any tag system, defined by $G(V,E)$, that satisfies the above two requirements is deadlock-free.
@@ -82,7 +82,7 @@ Any tag system, defined by $G(V,E)$, that satisfies the above two requirements i
 \begin{proof}
 We prove by contradiction. Suppose there exists a tag system,
 whose $G(V,E)$ satisfies the above two requirements, but is not deadlock-free. This means
-$G(V,E)$ has a cycle $v_0 \rightarrow v_1 \rightarrow ... \rightarrow v_0$. With certain 
+$G(V,E)$ has a cycle $v_0 \rightarrow v_1 \rightarrow ... \rightarrow v_0$. With certain
 traffic that covers all hops in the circle, the cycle turns into a CBD and can form deadlock.
 
 \textbf{Case 1:} All the nodes in the cycle has the same tag $t$. According to
@@ -90,19 +90,19 @@ the first requirement, $G_t$ does {\em not} have a cycle. Contradicted.
 
 \textbf{Case 2:} The nodes in the cycle have at least two different tags, $t_0$ and $t_1$.
 Without loss of generality, we assume $t_0 < t_1$, and $v_i$ has tag $t_0$, $v_j$
-has tag $t_1$. Because $v_i$ and $v_j$ belongs to a circle, there must exists 
-a path going from $v_j$ to $v_i$. Since $t_0 < t_1$, along the path there must exist 
-a hop where the tag decreases. However, according to the second requirement, such a hop 
+has tag $t_1$. Because $v_i$ and $v_j$ belongs to a circle, there must exists
+a path going from $v_j$ to $v_i$. Since $t_0 < t_1$, along the path there must exist
+a hop where the tag decreases. However, according to the second requirement, such a hop
 cannot exist. Contradicted.
 
-Case 1 and Case 2 cover all possible scenarios. Thus, we conclude that there does not 
+Case 1 and Case 2 cover all possible scenarios. Thus, we conclude that there does not
 exist a $G(V,E)$ that satisfies the two requirements but is not deadlock-free.
 \end{proof}
 
 We now describe the algorithm to generate $G(V,E)$ for any given topology, and set of
-paths that need to be lossless. 
+paths that need to be lossless.
 
-\subsection{Generating $G(V,E)$} 
+\subsection{Generating $G(V,E)$}
 \begin{figure*}[t]
 	\centering
 	\subfloat[short for lof][Input topology and lossless routes.] {
@@ -216,14 +216,14 @@ As in \S\ref{sec:specific}, we will first design a tagging scheme that avoids
 deadlock, then combine tags to reduce the number of required lossless queues.
 For general graph without structure information, a straightforward tagging
 system is to monotonically increase the tag (thus, the priority) at every hop,
-as described in Algorithm~\ref{alg:ttl}. 
+as described in Algorithm~\ref{alg:ttl}.
 
 \begin{algorithm}[t]
 	\small
     \KwIn{Topology and expected lossless routes $R$}
 	\KwOut{A tagged graph $G(V, E)$}
 	$V \gets Set()$\;
-	$E \gets Set()$\; 
+	$E \gets Set()$\;
 	\For{each path $r$ in $R$} {
 		$tag \gets 0$\;
 		\For{each hop $h$ in $r$} {
@@ -241,7 +241,7 @@ It is easy to verify that the graph generated by this algorithm meets the two
 requirements specified earlier, and thus it guarantees deadlock freedom.
 Figure~\ref{fig:three_node} shows a small example, including the topology, the
 set of desired lossless paths, the generated graph, and the corresponding rule
-lists for each node.  
+lists for each node.
 
 Of course, with just this basic algorithm, we may end up with too many tags
 (i.e. lossless priorities) -- in fact, as many as the longest path length in
@@ -251,7 +251,7 @@ network, the longest up-down path has 5 hops, so Algorithm~\ref{alg:ttl} will us
 priorities just to support up-down routing. We now show how to combine tags to
 reduce the number of lossless queues needed.
 
-\subsection{Reducing the number of lossless queues} 
+\subsection{Reducing the number of lossless queues}
 
 Algorithm~\ref{alg:greedy} uses a greedy heuristic to combine the tags generated
 by Algorithm~\ref{alg:ttl} to reduce the number of lossless queues required.  It
@@ -271,7 +271,7 @@ from combining the nodes with smallest tag, 0 and proceed linearly.
 			$E_{tmp} \gets E_{tmp} \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
 			\uIf{$G_{tmp}(V_{tmp}, E_{tmp})$ is acyclic} {
 				$V' \gets V' \cup \{(A_i, t')\}$\;
-				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\; 
+				$E' \gets E' \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
 			}
 			\Else{
 				$V' \gets V' \cup \{(A_i, t'+1)\}$\;
@@ -397,7 +397,7 @@ of tags is reduced to {\em two}.
 \subsection {Analysis}
 \label{subsec:caveats}
 
-\para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$ 
+\para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Given $maxTag$
 (denoted as $T$ below), which equals to the longest path in {\em lossless routes} and
 total number of switches $S$, $G(V,E)$ can have at most have $S \times T$ nodes.
 Each node will be examined exactly once for checking whether $G_{tmp}$ is acyclic.
@@ -422,14 +422,22 @@ routing. See \S\ref{sec:eval} for details.
 	\label{fig:nonoptimal}
 \end{figure}
 
+\para{Number of rules:}
+From the conceptual switch model, a switch needs ingress port number, egress port number, and the current Tag 
+to decide the next Tag. Hence it seems the number of rules needed per switch is $n^2\times m$, where $n$ is 
+the number of switch ports and $m=|G'_{k}|$ is the number of Tags. We will show in \S~\ref{sec:implementation} that the 
+number of rules can be compressed to $n\times m$, by taking advantage of the bit masking technique which is 
+widely supported in commodity switching ASICs. Hence Table~\ref{table:tagging_table2} is to show the 
+conceptual rules only. It can be compressed.
+
 \para{Optimality:}
-Algorithm~\ref{alg:greedy} may not always return the optimal solution. For example, 
-consider the simple three-layer Clos network in Figure~\ref{fig:nonoptimal}. 
-Assuming ``normal'' and ``1-bounce'' paths must be lossless,  
-we know the optimal tagging system only requires {\em two} lossless queues. However, the 
-greedy algorithm will output {\em three} lossless queues. The reason is that 
+Algorithm~\ref{alg:greedy} may not always return the optimal solution. For example,
+consider the simple three-layer Clos network in Figure~\ref{fig:nonoptimal}.
+Assuming ``normal'' and ``1-bounce'' paths must be lossless,
+we know the optimal tagging system only requires {\em two} lossless queues. However, the
+greedy algorithm will output {\em three} lossless queues. The reason is that
 Algorithm~\ref{alg:greedy} does not combine bounces that happen when the packet is going up
-and when the packet is coming down. 
+and when the packet is coming down.
 
 For example, as shown in Figure~\ref{fig:nonoptimal}, the bounce of green flow
 will force the algorithm to create a new tag subspace for the first two hops,
