@@ -130,33 +130,14 @@ ACL~\cite{xx}, so this is not a bottleneck.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/overhead_avgthrpt}
-	\caption{Measurement of throughput overhead.}\label{fig:thrpt_overhead}
+	\caption{Measurement of throughput when installing different number of rules.}\label{fig:thrpt_overhead}
 \end{figure}
 
-\begin{table}[t]
+\begin{figure}
 	\centering
-	\scalebox{0.9}{
-	\begin{tabular}{|r|r|r|r|r|r|}
-		\hline
-		$\#$ of rules & Average RTT (us) &   \multicolumn{1}{c|}{\tabincell{c}{\text{50th percentile} \\ \text{RTT (us)}}}   & \multicolumn{1}{c|}{\tabincell{c}{\text{99th percentile} \\ \text{RTT (us)}}} \\
-		\hline
-		\hline
-		10 & 77 & 81 & 104  \\
-		\hline
-		20 & 79 & 77 & 99  \\
-		\hline
-		40 & 77 & 74 & 106 \\
-		\hline
-		80 & 81 & 82 & 101 \\
-		\hline
-		160 & 75 & 77 & 104 \\
-		\hline
-		
-	\end{tabular}
-     }
-	\caption{Measurement of latency overhead.}
-	\label{table:latency_overhead}
-\end{table}
+	\includegraphics[width=0.45\textwidth] {figs/RDMAlatency_overhead}
+	\caption{Measurement of RDMA latency when installing different number of rules.}\label{fig:latency_overhead}
+\end{figure}
 
 At run time, the only performance penalty of \sysname{} is that the packet has
 to traverse the ACL rules. These are installed in TCAM, and hence induce
@@ -169,5 +150,31 @@ throughput is not affected.
 
 \textbf{Latency penalty}: We install different number of \sysname{} rules in T1
 and collect 5000 RTT samples between H1 and H2.
-Table~\ref{table:latency_overhead} shows that the number of installed rules does
-not have significant impact on network latency.
+Table~\ref{fig:latency_overhead} shows that the number of installed rules does
+not have significant impact on network latency of RDMA flows.
+
+%\begin{table}[t]
+%	\centering
+%	\scalebox{0.9}{
+%		\begin{tabular}{|r|r|r|r|r|r|}
+%			\hline
+%			$\#$ of rules & Average RTT (us) &   \multicolumn{1}{c|}{\tabincell{c}{\text{50th percentile} \\ \text{RTT (us)}}}   & \multicolumn{1}{c|}{\tabincell{c}{\text{99th percentile} \\ \text{RTT (us)}}} \\
+%			\hline
+%			\hline
+%			10 & 77 & 81 & 104  \\
+%			\hline
+%			20 & 79 & 77 & 99  \\
+%			\hline
+%			40 & 77 & 74 & 106 \\
+%			\hline
+%			80 & 81 & 82 & 101 \\
+%			\hline
+%			160 & 75 & 77 & 104 \\
+%			\hline
+%			
+%		\end{tabular}
+%	}
+%	\caption{Measurement of latency overhead.}
+%	\label{table:latency_overhead}
+%\end{table}
+
