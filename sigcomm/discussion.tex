@@ -27,17 +27,20 @@ some application classes to tolerate fewer bounces than others.
 We can prove that there is still no deadlock after such mix, by revisiting two
 properties described in \S\ref{subsec:specific_deadlock_free}. First, there is
 still no deadlock within each tag, because each tag is still a set of
-``up-down'' routing. Second, the update of tags is still monotonical. We omit
+``up-down'' routing. Second, the update of tags is still monotonic. We omit
 formal proof for brevity.
 
-The reduced isolation may be quite acceptable, since only a small
-fraction of packets experience one-bounce and may mix with traffic in the next
-lossless class.
+The reduced isolation may be quite acceptable, since only a small fraction of
+packets experience one-bounce and may mix with traffic in the next lossless
+class.  This technique can be generalized for the output of
+Algorithm~\ref{alg:greedy}.  We omit details.
 
-This technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
-We omit details.
-
-\para{Why not use TTL as a tag:} \fixme{Yibo ... write this.}
+\para{Why not use TTL as a tag:} In \S\ref{sec:specific}, we initially
+considered the possibility of using TTL as a tag, instead of DSCP. The reason is
+that TTL values are always decremented by the forwarding pipeline in the switch.
+Using DSCP for this purpose allows us to avoid having to interfere with this key
+step. Thus, while it is possible to use TTL for tagging, use of DSCP simplifies
+implementation.
 
 \para{The need to specify expected lossless paths:} The need to specify expected
 lossless paths is not a problem in practice. For Clos networks, it is easy to
@@ -53,14 +56,16 @@ packet into a lossy queue. We stress that we do this only as a last resort, and
 we reiterate that it does not mean that the packets are automatically or
 immediately dropped.
 
+\para{Dealing with topology changes:} \sysname{} has to generate a new set of
+tags when network topology is updated -- e.g. if a FatTree is expanded by adding
+more switches at the spine layer. Under certain conditions (and especially for
+Jellyfish-like random topologies), \sysname{} may require a updating tagging
+rules in all switches. We are currently studying this problem further. 
+
 \para{Dynamic topologies:} Recently, a number of researches have proposed
 changing the topology of the network in response to traffic patterns, using
 optical or wireless links~\cite{helios,flyways,projector,mirrormirror}.
-\sysname{} cannot be readily used for dynamic topologies, since we would need to
-recompute tags every time the topology changes. To the best of our knowledge, no
-modern data centers currently use dynamic topologies. Still, the problem of
-recomputing tags on-the-fly is an interesting research challenge, and we plan to
-work on it in future.
+Currently, \sysname{} is not suitable for such situations. 
 
 \para{PFC alternatives:} The reader may wonder if PFC is worth all the trouble
 it causes. We are sympathetic to this view, and are actively investigating
@@ -70,10 +75,5 @@ transport layer~\cite{xxx}, as well as other more novel schemes.  It is not yet
 clear to us that need for something akin to PFC can be completely obviated for
 high performance RDMA networks. More importantly, we must ensure proper
 operation of currently deployed RDMA hardware, which is reliant on PFC, and in
-which we and our customers have made substantial investments.
+which we (and others) have made substantial investments.
 
-\para{Management issues:} Using \sysname{} may add to network management
-overhead. If network topology or routing requirements change (e.g. network
-expansion), ACLs must be recomputed and reinstalled. Presence of ACLs may
-complicate network debugging and tracing. However, we believe that overall, the
-benefits of \sysname{} outweigh the costs.

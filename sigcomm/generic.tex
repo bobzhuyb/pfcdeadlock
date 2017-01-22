@@ -64,8 +64,8 @@ by such a graph is deadlock free, as long as the graph meets two requirements.
 
 		\item  Any $G_k$ for $G$ {\em must not} have a cycle.  This is
 				because each edge in $G_k$ is essentially a buffer dependency --
-				whether $A_i$ can dequeue packets depending on whether $B_j$ has
-				paused upstream. A cycle in $G_k$ means cyclic buffer
+				whether $A_i$ can dequeue packets depends on whether $B_j$ has
+				paused it. A cycle in $G_k$ means cyclic buffer
 				dependency.
 		\item There must be no link going from
 				$G_x$ to $G_y$ if $x>y$.  This means we enforce the order of

@@ -31,13 +31,10 @@ Deadlock forms when paused links form a cycle
 the sense that it will continue to exist even if no new traffic is injected into
 the loop. Deadlocks in PFC-based networks (or more generally, in credit-flow
 networks) are a well-known problem. It is not merely a theoretical problem -- it
-has been reported in practice~\cite{rdmaatscale}.
-
-\para {Conditions for deadlock formation:} It is well known that Circular Buffer
-Dependency (CBD) is a {\em necessary} condition for deadlock
-formation~\cite{tcpbolt,hu2016deadlocks}. However, {\em
-sufficient} conditions for deadlock formation in PFC networks have not yet been
-fully characterized~\cite{hu2016deadlocks}. 
+has been reported in practice~\cite{rdmaatscale}.  Circular Buffer Dependency
+(CBD) is a necessary condition for deadlock formation, but sufficient conditions
+for deadlock formation in PFC networks are yet to be fully
+characterized~\cite{hu2016deadlocks}. 
 
 \para {Prior work on deadlock avoidance:} Prior work on deadlock management falls
 in two categories: deadlock avoidance, or deadlock detection and resolution. Our
