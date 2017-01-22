@@ -1,0 +1,16 @@
+np hard
+
+how we compress ACL rules
+
+change green/blue to blue/red
+
+large experiment
+
+other topologies (f1 etc.)
+
+random routing for clos
+
+(cx comment)
+One interesting observation: when I looked at figure 7, my first feeling is that why it always choose C for tag 1? It should choose A and B as well by symmetry. 
+Then I realized that we have total 30 solutions (C_6^2) instead of 3 solutions. So it may be worth noting that figure 7 just show one of the solutions. 
+
