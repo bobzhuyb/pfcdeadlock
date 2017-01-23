@@ -132,7 +132,7 @@ end, we show how to combine tags.
 		\end{tabular}
 		\caption{Tag rewriting rules for Figure~\ref{fig:clos_tagger} to support
 		ELR of up-down paths, and one bounce paths}
-		\label{fig:tab_tag_rules}
+		\label{tab:clos_tag_rules}
 		\vspace{-1em}
 \end{table}
 
@@ -173,7 +173,7 @@ show a system for $k=2$. The lossy queue for packets that bounce more than once
 is omitted for clarity.
 
 The tag rewriting rules to support ELR consisting of all up-down paths plus all
-1-bounce paths are shown in Table~\ref{tab:fig_clos_rules}. We only show rules
+1-bounce paths are shown in Table~\ref{tab:clos_tag_rules}. We only show rules
 for $T1$ and $L1$. Rules for other switches are similar. In
 \S\ref{sec:implementation} we will show how to implement these rules compactly
 using TCAM match-action tables. 
@@ -220,8 +220,8 @@ lossless priorities are required. We use contradiction.  Assume there exists a
 system with only $k$ lossless priorities. Consider a flow that loops between
 $T1$ and $L1$ for $k+1$ times, which means it bounces $k$ times at $T1$. With
 Pigeonhole principle, we know that at least two times during the looping, the
-packet must have the same lossless priority. This is already sufficient to cause
-a deadlock~\cite{our_hotnets_paper}. Contradiction.
+packet must have the same lossless priority. This is sufficient to cause
+a deadlock~\cite{hu2016deadlocks}. Contradiction.
 
 \subsection {Summary}
 

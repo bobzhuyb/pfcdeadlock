@@ -3,7 +3,7 @@
 We evaluate \sysname{} using a combination of testbed experiments and numerical
 experiments. Our evaluation focuses on three key questions: $(i)$ Can \sysname{}
 prevent deadlock? $(ii)$ Is \sysname{} scalable for large data center networks?,
-and $(iii)$ Is there a performance penalty with \sysname{}?
+and $(iii)$ Does \sysname{} have a performance penalty?
 
 In this section, we answer these questions using a mix of tetsbed experiments
 and numerical analysis.
@@ -84,7 +84,7 @@ routing loop.
 \subsection{Scalability}
 \label{subsec:exp_overhead}
 
-As discussed in \S\ref{sec:challanges}, commodity switches can support only a
+As discussed in \S\ref{sec:challenges}, commodity switches can support only a
 limited number of lossless queues.  We have already shown that on a Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
 upto $k$ bounces. In this section, we consider other topologies. 
@@ -127,8 +127,7 @@ only three classes even for a network with 2000 switches.
 The table also shows the maximum number of rules needed at a switch for various
 configurations~\footnote{Different switches require different number of rules
 due to the random nature of the topology.}. Even with 2000 switches, we need
-just 98 ACLs at a switch. Modern commodity switches can support 1-4K
-ACL~\cite{xx}, so this is not a bottleneck. 
+just 98 ACLs at a switch. Modern commodity switches can support 1-4K ACLs.
 
 \subsection{Performance penalty}\label{subsec:exp_performanceoverhead}
 
@@ -146,7 +145,7 @@ ACL~\cite{xx}, so this is not a bottleneck.
 
 At run time, the only impact of \sysname{} is that the packet has
 to traverse the ACL rules. These are installed in TCAM, and hence induce
-no penalty, as illustrated by the following experiments.
+no discernible penalty, as illustrated next.
 
 \textbf{Throughput penalty}: We generate one flow from H1 to H2, and observe
 its average throughput over 100 seconds under varying number of \sysname{} rules

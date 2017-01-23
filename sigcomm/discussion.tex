@@ -77,7 +77,7 @@ FatTree-like topology is expanded by adding new ``pods'' under existing spines
 any rule changes.
 
 \para{Dynamic topologies:} Given the above limitation, it follows that \sysname{}
-is not currently suitable for networking architectures that use dynamic
+is not currently suitable for networking architectures that use flexible 
 topologies -- e.g. Helios~\cite{helios}, Flyways~\cite{flyways} or
 Projector~\cite{projector}. 
 
@@ -85,7 +85,7 @@ Projector~\cite{projector}.
 better way of preventing deadlocks.  We are sympathetic to this view, and are
 actively investigating numerous schemes, including minimizing PFC generation
 (e.g.  using DCQCN~\cite{dcqcn} or Timely~\cite{timely}, better retransmission
-schemes for IB transport layer~\cite{xxx}, as well as other more novel schemes.
+schemes for IB transport layer~\cite{roce}, as well as other more novel schemes.
 For now, we need \sysname{} ensure proper operation of currently deployed RDMA
 hardware, which is reliant on PFC, and in which we and others have made
 substantial investments.

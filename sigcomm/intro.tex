@@ -6,12 +6,12 @@ Public cloud providers like Microsoft~\cite{dcqcn} and Google~\cite{timely} are
 deploying RoCE in their data centers to enable low latency, high throughput data
 transfers with minimal CPU overhead~\cite{dcqcn}. Systems like
 Pilaf~\cite{pilaf}, Farm~\cite{farm}, TesnorFlow~\cite{tensorflow}, and
-CNTK~\cite{xxx} rely on RoCE for enhanced performance.
+CNTK~\cite{cntk} rely on RoCE for enhanced performance.
 
 RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
 overflow at the switches. PFC allows a switch to temporarily pause its upstream
-neighbor. While PFC is effective, it can cause numerous problems~\cite{dcqcn},
-including deadlocks~\cite{rdmaatscale,tcp-bolt,hu2016deadlocks}.
+neighbor. While PFC is effective, it can cause numerous problems,
+including deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks,dcqcn}.
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in

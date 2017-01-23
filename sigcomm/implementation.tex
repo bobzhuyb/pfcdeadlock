@@ -12,7 +12,7 @@ requires a key insight into the way PFC PAUSE frames are handled.
 	
 \end{figure}
 
-\para {Math-Action rules:} \sysname{} needs to perform two operations at every
+\para {Match-Action rules:} \sysname{} needs to perform two operations at every
 hop in the network, i.e., {\em tag-based priority queueing} and {\em tag
 rewriting}.  These two operations are implemented using a 3-step match-action
 pipelines shown in Figure~\ref{fig:tagger}.  In the first step, \sysname{}
@@ -60,53 +60,49 @@ based on its new priority.  This avoids packet loss, since the PFC from switch C
 correctly pauses the queue on which the packet with the new tag would be
 exiting. This example thus demonstrates the necessity of the third step.
 
-\para{Rule compression with bit masking:}  The match-action rules of
-\sysname{} can be implemented with TCAM. Entries in TCAM are bit masking based
-and consist of three parts ({\em Value}, {\em Mask}, {\em Result}). {\em Value}
-refers to the pattern to be matched, {\em Mask} refers to the mask bits
-associated with the pattern and {\em Result} refers to the action that occurs
-when a lookup hits the pattern. For example, (Value = 1000$_{(2)}$, Mask =
-1100$_{(2)}$, Result = Deny) can match pattern ``$10**$'' and perform {\em Deny}
-action. One TCAM entry can have several Value-Mask pairs to match multiple
-packet header fields simultaneously, e.g., we can configure a TCAM entry like
-(Value-1, Mask-1, Value-2, Mask-2, Result) to match two fields simultaneously.
+\para{Rule compression:}  The match-action rules of \sysname{}
+are implemented with TCAM. TCAM entries consist of three parts ({\em Value},
+{\em Mask}, {\em Result}). {\em Value} refers to the pattern to be matched, {\em
+Mask} refers to the mask bits associated with the pattern and {\em Result}
+refers to the action that occurs when a lookup hits the pattern.  One TCAM entry
+can have several Value-Mask pairs to match multiple packet header fields
+simultaneously, e.g., an entry like (Value-1, Mask-1, Value-2, Mask-2, Result)
+matches two fields simultaneously and fires only if both matches succeed.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/compression_with_bitmasking}
 	\caption{Rule compression with bit masking.}\label{fig:compression}
-	
+    \vspace{-1em}	
 \end{figure}
 
-Bit masking feature of TCAM can be leveraged to do rule compression. Rules that
-have the same action can be compressed into one TCAM entry, if the patterns to
-be matched can be aggregated using bit masking. An example is shown in
-Figure~\ref{fig:compression}.  As we can see, these three rules share the same
-tag value, egress port and tag rewriting action. Note that most commodity
-switches internally use the format of port bitmap for port matching. Hence we
-can aggregate all the ingress ports to be matched with a value that sets all the
-corresponding bits to be ``1'', as shown in Figure~\ref{fig:compression}(colored
-as red). The observation here is that we can always aggregate the ingress ports
-for rules share the same tag value, egress port and tag rewriting action.
+Rules that have the same action can be compressed into one TCAM entry, if the
+patterns to be matched can be aggregated using bit masking. Consider the three
+rules in Figure~\ref{fig:compression}. These rules share the same tag value,
+egress port and tag rewriting action. 
 
-As discussed in Section~\ref{sec:generic}, without any compression, we will need
-$n(n-1)\times \frac{m(m-1)}{2}$ rules per switch. The number of rules can be
-compressed to $n\times \frac{m(m-1)}{2}$ by aggregating ingress ports.  The
+Note that port numbers in TCAM are bitmaps, and not binary values. Thus, we can
+aggregate ingress ports for rules that share the same tag, egress port and
+action, by simply setting corresponding bits in the inport value to 1, and
+setting the mask to all 1s. Thus, the three \sysname{} rules are compressed into
+a single TCAM entry.
+
+Recall from \S\ref{sec:generic} that without any compression, we need
+$n(n-1)m(m-1)/2$ rules per switch. The number of rules can be
+compressed to $nm(m-1)/2$ by aggregating ingress ports.  The
 result can further improved by doing joint aggregation on tag, ingress port and
 egress port.
 
-\para{Broadcom implementation:}
-We have implemented \sysname{} on commodity switches based on Broadcom chipsets.
-We use DSCP field in IP header as the tag. DSCP rewriting is supported by most
-commodity chipsets available in the market today. DSCP-based priority queuing
-(step 1) is supported natively by all switch ASIC vendors. We implement step 2
-using ingress ACL rules that map (DSCP, inport, outport) to new DSCP. 
+\para{Broadcom implementation:} We have implemented \sysname{} on commodity
+switches based on Broadcom chipsets.  We use DSCP field in IP header as the tag.
+DSCP rewriting is supported by all commodity chipsets. DSCP-based priority
+queuing (step 1) is supported natively by all switch ASIC vendors. Step 2 uses
+ingress ACL rules to map (DSCP, inport, outport) to new DSCP. 
 
-Step 3 is similarly implemented using ACLs, although the implementation requires
-keen understanding how packets progress through the match-action pipeline. We
-omit these gritty details for brevity. While the implementation of this step is
-Broadcom-specific, we believe that ASICs from other vendors can also support
-this functionality.
+Step 3 also uses ACLs, although it relies on certain details that are specific
+to Broadcom's match-action pipeline. We omit these gritty details for brevity.
+While the implementation of this step is Broadcom-specific, we believe that
+ASICs from other vendors can also support this functionality.
 
 We stress that none of the three steps require any changes to the switch ASIC,
 and everything is implemented using publicly available and documented
