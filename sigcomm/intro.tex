@@ -10,8 +10,13 @@ CNTK~\cite{cntk} rely on RoCE for enhanced performance.
 
 RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
 overflow at the switches. PFC allows a switch to temporarily pause its upstream
-neighbor. While PFC is effective, it can cause numerous problems,
-including deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks,dcqcn}.
+neighbor. While PFC is effective, it can lead to
+deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}.
+
+Deadlocks in PFC-enabled network are caused by circular buffer dependency
+(CBD)~\cite{hu2016deadlocks}. Figure~\ref{fig:deadlock_example}
+illustrates a 3-node CBD: switch A is blocked by switch B, which is blocked by
+C, which is paused by A. 
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in
@@ -21,23 +26,17 @@ deadlock forms, it does not go away even after the conditions (e.g. a temporary
 routing loop due to link failure) that caused its formation have
 abated~\cite{rdmaatscale}.
 
-Deadlock in PFC-enabled network can occur in numerous
-scenarios~\cite{hu2016deadlocks}, although circular buffer dependency (CBD) is a
-necessary condition for deadlock formation.  Figure~\ref{fig:deadlock_example}
-illustrates a 3-node CBD: switch A is blocked by switch B, which is blocked by
-C, which is paused by A. 
-
 Current solutions to the deadlock problem fall in two categories. The first
 category consists of solutions that {\em detect} the formation of the deadlock
 and then use various techniques to {\em break} it~\cite{shpiner2016unlocking}.
 These solutions do not address the root cause of the problem, and hence cannot
 guarantee that the deadlock would not immediately reappear. 
 
-The second category of solutions are designed to {\em prevent} deadlocks.  While
-CBD is just a {\em necessary} condition for deadlock formation, {\em sufficient}
-conditions for deadlock formation are not well
-understood~\cite{hu2016deadlocks}. Thus, currently, preventing CBD is the only
-practical way to prevent deadlocks. 
+The second category of solutions are designed to {\em prevent} deadlocks.  For
+deadlock formation, CBD is {\em necessary}, but not {\em
+sufficient}~\cite{hu2016deadlocks}. Unfortunately, {\em sufficient} conditions
+for deadlock formation are not well understood~\cite{hu2016deadlocks}. Thus,
+currently, preventing CBD is the only practical way to prevent deadlocks. 
 
 In \S\ref{sec:challenges}, using data from a large cloud provider's data
 centers, we show that any practical deadlock prevention scheme must meet three

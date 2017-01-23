@@ -15,3 +15,5 @@ Then I realized that we have total 30 solutions (C_6^2) instead of 3 solutions. 
 runtime numbers (e.g., how many seconds) for fat-tree and jelly fish
 
 rules for jellyfish with 8-shortest paths
+
+intro needs to say that deadlock spreads
