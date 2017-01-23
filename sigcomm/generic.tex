@@ -423,11 +423,11 @@ routing. See \S\ref{sec:eval} for details.
 \end{figure}
 
 \para{Number of rules:}
-From the conceptual switch model, a switch needs ingress port number, egress port number, and the current Tag 
-to decide the next Tag. Hence it seems the number of rules needed per switch is $n^2\times m$, where $n$ is 
-the number of switch ports and $m=|G'_{k}|$ is the number of Tags. We will show in \S~\ref{sec:implementation} that the 
-number of rules can be compressed to $n\times m$, by taking advantage of the bit masking technique which is 
-widely supported in commodity switching ASICs. Hence Table~\ref{table:tagging_table2} is to show the 
+From the conceptual switch model, a switch needs ingress port number, egress port number, and the current Tag
+to decide the next Tag. Hence it seems the number of rules needed per switch is $n(n-1)\times \frac{m(m-1)}{2}$, where $n$ is
+the number of switch ports and $m=|G'_{k}|$ is the number of Tags. Typically $m\ll n$.  We will show in \S~\ref{sec:implementation} that the
+number of rules can be compressed to $n\times \frac{m(m-1)}{2}$, by taking advantage of the bit masking technique which is
+widely supported in commodity switching ASICs. Hence Table~\ref{table:tagging_table2} is to show the
 conceptual rules only. It can be compressed.
 
 \para{Optimality:}
