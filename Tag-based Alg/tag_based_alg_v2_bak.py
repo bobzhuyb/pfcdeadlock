@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from time import time
+
 import sys
 from copy import deepcopy
 from igraph import *
@@ -57,12 +57,6 @@ for switch in switch_map:
 
 porttag_edges = {}
 
-outedges_connectwith_porttag = {}
-inedges_connectwith_porttag = {}
-for i in range(count):
-    outedges_connectwith_porttag[i] = {}
-    inedges_connectwith_porttag[i] = {}
-
 for i in range(count):
     for j in range(count):
         if i==j:
@@ -71,8 +65,6 @@ for i in range(count):
             id_porttag_map[i][1], id_porttag_map[i][2],
             switch_map[id_porttag_map[j][0]], id_porttag_map[j][1], id_porttag_map[j][2]):
             porttag_edges[(i, j)] = 1
-            outedges_connectwith_porttag[i][j] = 1
-            inedges_connectwith_porttag[j][i] = 1
 
 output = []
 porttag_priority_map = {}
@@ -80,15 +72,10 @@ inter_s_edges = {}
 v = deepcopy(porttag_id_map)
 t = INIT_TAG
 
-starttime = time()
-
 s = {}
 output.append(s)
 pdg_v = {}
 pdg_e = {}
-ptid_in_s = {}
-for i in range(count):
-    ptid_in_s[i] = 0
 while t>=0:
     left_over = False
     porttag_list = v.keys()
@@ -100,7 +87,6 @@ while t>=0:
         # try this port_tag #
         #####################
         s[porttag] = 1
-        ptid_in_s[porttag_id_map[porttag]] = 1
         
         ###############################
         # build port dependency graph #
@@ -113,82 +99,35 @@ while t>=0:
         #print "s= ", s
         #print "pdg_v= ", pdg_v
         #print "porttag= ", porttag
-        #t0 = time()
-        porttag_id = porttag_id_map[porttag]
-        for pt_id in outedges_connectwith_porttag[porttag_id]:
-            if ptid_in_s[pt_id] == 1:
-                pt = id_porttag_map[pt_id]
-                if pdg_v[(pt[0], pt[1])] == pdg_v[(porttag[0], porttag[1])]:
-                    continue
-                pdg_e[(pdg_v[(porttag[0], porttag[1])], pdg_v[(pt[0], pt[1])])] = 1
-        
-        for pt_id in inedges_connectwith_porttag[porttag_id]:
-            if ptid_in_s[pt_id] == 1:
-                pt = id_porttag_map[pt_id]
-                if pdg_v[(pt[0], pt[1])] == pdg_v[(porttag[0], porttag[1])]:
-                    continue
-                pdg_e[(pdg_v[(pt[0], pt[1])], pdg_v[(porttag[0], porttag[1])])] = 1
+        for pt0 in s:
+            if pdg_v[(pt0[0], pt0[1])] == pdg_v[(porttag[0], porttag[1])]:
+                continue
+            if (porttag_id_map[pt0], porttag_id_map[porttag]) in porttag_edges:
+                pdg_e[(pdg_v[(pt0[0], pt0[1])], pdg_v[(porttag[0], porttag[1])])] = 1
+            if (porttag_id_map[porttag], porttag_id_map[pt0]) in porttag_edges:
+                pdg_e[(pdg_v[(porttag[0], porttag[1])], pdg_v[(pt0[0], pt0[1])])] = 1
 
- 
-            
-        #for pt0 in s:
-        #    if pt0[2] != t-1:
-        #        continue
-        #    if pdg_v[(pt0[0], pt0[1])] == pdg_v[(porttag[0], porttag[1])]:
-        #        continue
-        #    if (porttag_id_map[pt0], porttag_id_map[porttag]) in porttag_edges:
-        #        pdg_e[(pdg_v[(pt0[0], pt0[1])], pdg_v[(porttag[0], porttag[1])])] = 1
-        #    if (porttag_id_map[porttag], porttag_id_map[pt0]) in porttag_edges:
-        #        pdg_e[(pdg_v[(porttag[0], porttag[1])], pdg_v[(pt0[0], pt0[1])])] = 1
-
-        #t1 = time()
-        #print "add edges time t1-t0 = ", t1 - t0 
         pdg = Graph(pdg_e.keys(), directed=True)
-        #t2 = time()
-        #print "create graph time t2-t1 = ", t2 - t1
+
         ###############################
         # check port dependency graph #
         ###############################
         if not pdg.is_dag():
-            #t3 = time()
-            #print "detecion of cycle time t3-t2 = ", t3 - t2
             s.pop(porttag)
-            ptid_in_s[porttag_id_map[porttag]] = 0
             left_over = True
             need_del_node = 1
             for pt in s:
                 if (pt[0] == porttag[0]) and (pt[1] == porttag[1]):
                     need_del_node = 0
                     break
-
-            porttag_id = porttag_id_map[porttag]
-            for pt_id in outedges_connectwith_porttag[porttag_id]:
-                if ptid_in_s[pt_id] == 1:
-                    pt = id_porttag_map[pt_id]
-                    if pdg_v[(pt[0], pt[1])] == pdg_v[(porttag[0], porttag[1])]:
-                        continue
-                    pdg_e.pop((pdg_v[(porttag[0], porttag[1])], pdg_v[(pt[0], pt[1])]))
-
-            for pt_id in inedges_connectwith_porttag[porttag_id]:
-                if ptid_in_s[pt_id] == 1:
-                    pt = id_porttag_map[pt_id]
-                    if pdg_v[(pt[0], pt[1])] == pdg_v[(porttag[0], porttag[1])]:
-                        continue
-                    pdg_e.pop((pdg_v[(pt[0], pt[1])], pdg_v[(porttag[0], porttag[1])]))
-
-            #for pt0 in s:
-            #    if pt0[2] != t-1:
-            #        continue
-            #    if pdg_v[(pt0[0], pt0[1])] == pdg_v[(porttag[0], porttag[1])]:
-            #        continue
-            #    if (porttag_id_map[pt0], porttag_id_map[porttag]) in porttag_edges:
-            #        pdg_e.pop(pdg_v[(pt0[0], pt0[1])], pdg_v[(porttag[0], porttag[1])])
-            #    if (porttag_id_map[porttag], porttag_id_map[pt0]) in porttag_edges:
-            #        pdg_e.pop(pdg_v[(porttag[0], porttag[1])], pdg_v[(pt0[0], pt0[1])])
-            
-            #t4 = time()
-            #print "delete edges time t4 - t3", t4 - t3
             if need_del_node == 1:
+                for pt0 in s:
+                    if pdg_v[(pt0[0], pt0[1])] == pdg_v[(porttag[0], porttag[1])]:
+                        continue
+                    if (pdg_v[(pt0[0], pt0[1])], pdg_v[(porttag[0], porttag[1])]) in pdg_e:
+                        pdg_e.pop((pdg_v[(pt0[0], pt0[1])], pdg_v[(porttag[0], porttag[1])]))
+                    if (pdg_v[(porttag[0], porttag[1])], pdg_v[(pt0[0], pt0[1])]) in pdg_e:
+                        pdg_e.pop((pdg_v[(porttag[0], porttag[1])], pdg_v[(pt0[0], pt0[1])]))
                 pdg_v.pop((porttag[0], porttag[1]))
             #print "*****delete phase*****"
             #print "len(s)= ", len(s.keys())
@@ -198,15 +137,12 @@ while t>=0:
             #print "porttag= ", porttag
             continue
         
-        #t5 = time()
-        #print "detection of cycle time (not hit) t5 - t2", t5 - t2
         ######################
         # accept this vertex #
         ######################
         v.pop(porttag)
         porttag_priority_map[porttag] = len(output) - 1
 
-    #t6 = time()
     if left_over:
         #####################
         # add inter_s_edges #
@@ -224,13 +160,9 @@ while t>=0:
         output.append(s)
         pdg_v = {}
         pdg_e = {}
-        for i in range(count):
-            ptid_in_s[i] = 0
     else:
         t -= 1
 
-    #t7 = time()
-    #print "add inter subspace edges t7 - t6", t7-t6
 #print "Required Traffic Classes"
 #print "############################"
 
@@ -259,9 +191,7 @@ for priority in range(len(output)):
         if switchrulecount[porttag[0]] > maxswitchrulecount:
             maxswitchrulecount = switchrulecount[porttag[0]]
 #print "# of acl rules = ", aclcount, ", maximum switch rule count= ", maxswitchrulecount
-
-endtime = time()
-print aclcount, maxswitchrulecount, " runtime = ", endtime-starttime
+print aclcount, maxswitchrulecount
 
 #print ""
 #print "Special PFC Configurations"
