@@ -69,7 +69,7 @@ paths that need to carry lossless traffic. This task is straightforward for
 Bcube~\cite{bcube}, and not onerous even for randomized topologies like
 Jellyfish~\cite{jellyfish}.  Given these paths, we create a tagging and buffer
 management scheme that guarantees that there will no CBD, and even under
-unforeseen link failures or routing errors. The tagging scheme can be
+unforeseen link failures or routing errors (even loops!). The tagging scheme can be
 implemented using standard match-action rules.
 
 \sysname{} does not require any changes to the routing protocol. It prevents

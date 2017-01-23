@@ -29,7 +29,8 @@ information. These two steps form the core of \sysname{}.
  	\subfloat[short for lof][Ingress priority = 1, egress priority = 2 $\rightarrow$ no drop.]{
  		\includegraphics[width=0.43\textwidth] {figs/prioritydecoupling_2}
  	}
- 	\caption{Decoupling ingress priority from egress priority at switch B is necessary for ensuring lossless priority transition.}\label{fig:prioritydecoupling}
+ 	\caption{Decoupling ingress priority from egress priority at switch B is necessary for lossless priority transition.}\label{fig:prioritydecoupling}
+	\vspace{-1em}
 \end{figure}
 
 \para{Handling priority transition:}
@@ -73,23 +74,26 @@ packet header fields simultaneously, e.g., we can configure a TCAM entry like
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/compression_with_bitmasking}
-	\caption{An example to show rule compression with bit masking.}\label{fig:compression}
+	\caption{Rule compression with bit masking.}\label{fig:compression}
 	
 \end{figure}
 
-Bit masking feature of TCAM provides an opportunity for compressing rules of
-\sysname{}: rules that have the same action can be compressed into one TCAM
-entry if the patterns to be matched can be aggregated using bit masking. An
-example is shown in Figure~\ref{fig:compression}. As we can see, these four
-rules share the same tag rewriting action, and the ingress ports to be matched
-can be aggregated using a prefix ``00**''. So these four rules can be compressed
-into one TCAM entry by doing aggregation on ingress port.
+Bit masking feature of TCAM can be leveraged to do rule compression. Rules that
+have the same action can be compressed into one TCAM entry, if the patterns to
+be matched can be aggregated using bit masking. An example is shown in
+Figure~\ref{fig:compression}.  As we can see, these three rules share the same
+tag value, egress port and tag rewriting action. Note that most commodity
+switches internally use the format of port bitmap for port matching. Hence we
+can aggregate all the ingress ports to be matched with a value that sets all the
+corresponding bits to be ``1'', as shown in Figure~\ref{fig:compression}(colored
+as red). The observation here is that we can always aggregate the ingress ports
+for rules share the same tag value, egress port and tag rewriting action.
 
 As discussed in Section~\ref{sec:generic}, without any compression, we will need
-$n^2\times m$ rules per switch. The number of rules can be compressed to
-$n\times m$ by aggregating ingress ports with bit masking. Note that the result
-can be further improved by doing aggregation on tag, ingress port and egress
-port together. 
+$n(n-1)\times \frac{m(m-1)}{2}$ rules per switch. The number of rules can be
+compressed to $n\times \frac{m(m-1)}{2}$ by aggregating ingress ports.  The
+result can further improved by doing joint aggregation on tag, ingress port and
+egress port.
 
 \para{Broadcom implementation:}
 We have implemented \sysname{} on commodity switches based on Broadcom chipsets.

@@ -62,19 +62,24 @@ Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
 experiment, we start the green flow at time 0, and the blue flow at time 20.
 Figure~\ref{fig:exp_validation_nonloop} shows the rate of the two flows with and
 without \sysname{}.  Without \sysname{}, deadlock occurs and rate of both flows
-are reduced to 0. With \sysname{}, there is no deadlock and flow rates are not
-affected.
+are reduced to 0. With \sysname{}, and ELR set to include shortest paths and
+1-bounce paths, there is no deadlock and flow rates are not affected.
 
 \textbf{Deadlock due to routing loop:} As shown in
 Figure~\ref{fig:exp_validation_loop}(a), we generate 2 flows across different
-ToRs, i.e., flow 1 from H1 to H15 and flow 2 from H2 to H16. At time = 20s, we
-install a bad route at L1 to let flow 1 enter a routing loop between T1 and L1.
-The path taken by flow 2 also traverses link T1-L1. 
+ToRs, i.e.,  $F_1$ from H1 to H15 and $F_2$ from H2 to H16. At time = 20s, we
+install a bad route at L1 to let $F_1$ enter a routing loop between T1 and L1.
+The path taken by $F_2$ also traverses link T1-L1.  ELR is set to include
+shortest paths and 1-bounce paths.
 
-In Figure~\ref{fig:exp_validation_loop}(b), we plot the rate of flow 2 with and
+In Figure~\ref{fig:exp_validation_loop}(b), we plot the rate of $F_2$ with and
 without \sysname{}. As we can see, if \sysname{} is not used, deadlock occurs
-and flow 2 is paused due to propagation of PFC PAUSE. With \sysname{}, there is
-no deadlock and rate of flow 2 is not affected by the routing loop.
+and $F_2$ is paused due to propagation of PFC PAUSE. With \sysname{}, there is
+no deadlock and rate of $F_2$ is not affected by the routing loop. Note that
+throughput of $F_1$ is zero, as packets are dropped due to TTL expiration.
+
+The key takeaway here is that \sysname{} was able to successfully deal with a
+routing loop.
 
 \subsection{Scalability}
 \label{subsec:exp_overhead}
@@ -130,37 +135,18 @@ ACL~\cite{xx}, so this is not a bottleneck.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/overhead_avgthrpt}
-	\caption{Measurement of throughput overhead.}\label{fig:thrpt_overhead}
+	\caption{RDMA Throughput with different number of rules.}\label{fig:thrpt_overhead}
 \end{figure}
 
-\begin{table}[t]
+\begin{figure}
 	\centering
-	\scalebox{0.9}{
-	\begin{tabular}{|r|r|r|r|r|r|}
-		\hline
-		$\#$ of rules & Average RTT (us) &   \multicolumn{1}{c|}{\tabincell{c}{\text{50th percentile} \\ \text{RTT (us)}}}   & \multicolumn{1}{c|}{\tabincell{c}{\text{99th percentile} \\ \text{RTT (us)}}} \\
-		\hline
-		\hline
-		10 & 77 & 81 & 104  \\
-		\hline
-		20 & 79 & 77 & 99  \\
-		\hline
-		40 & 77 & 74 & 106 \\
-		\hline
-		80 & 81 & 82 & 101 \\
-		\hline
-		160 & 75 & 77 & 104 \\
-		\hline
-		
-	\end{tabular}
-     }
-	\caption{Measurement of latency overhead.}
-	\label{table:latency_overhead}
-\end{table}
+	\includegraphics[width=0.45\textwidth] {figs/RDMAlatency_overhead}
+	\caption{RDMA latency with different number of rules.}\label{fig:latency_overhead}
+\end{figure}
 
-At run time, the only performance penalty of \sysname{} is that the packet has
+At run time, the only impact of \sysname{} is that the packet has
 to traverse the ACL rules. These are installed in TCAM, and hence induce
-negligible penalty, as illustrated by the following experiments.
+no penalty, as illustrated by the following experiments.
 
 \textbf{Throughput penalty}: We generate one flow from H1 to H2, and observe
 its average throughput over 100 seconds under varying number of \sysname{} rules
@@ -169,5 +155,6 @@ throughput is not affected.
 
 \textbf{Latency penalty}: We install different number of \sysname{} rules in T1
 and collect 5000 RTT samples between H1 and H2.
-Table~\ref{table:latency_overhead} shows that the number of installed rules does
-not have significant impact on network latency.
+Table~\ref{fig:latency_overhead} shows that the number of installed rules does
+not impact the latency of RDMA flows.
+

@@ -14,14 +14,15 @@ the popular Clos network topology.
 
 \subsection {Definitions}
 
-\para{Expected Lossless routes:} This is a set of packet paths that network
-operators requires to be lossless. For example, in a Clos network, the
-operator may want that all up-down paths are lossless. In the rest of the
-section, we refer to these routes simply as lossless routes.
+\para{Expected Lossless routes (ELR):} This is a set of routes that network
+operators requires to be lossless. For example, in a Clos network, the operator
+may want that all up-down paths or all shortest paths to be lossless.  Any route
+can be included in ELR, as long as it does not have a loop\footnote{We can even
+handle loops, although we omit details in this paper for simplicity.}.
 
 \para{Lossless class:} A lossless class is a service that we provide for
-applications. The network guarantees that packets in a lossless class will
-not be dropped due to buffer overflow as long as they traverse lossless paths.
+applications. The network guarantees that packets in a lossless class will not
+be dropped due to buffer overflow as long as they traverse paths in ELR.
 
 \para{Tag:} Tag is a small integer assigned / associated with a packet. The tag
 is embedded in a packet. A packet belonging to one lossless class may change its
@@ -49,20 +50,21 @@ We now describe the core idea behind \sysname{}.
 	\label{fig:clos_1_bounce}
 \end{figure}
 
-Consider Figure~\ref{fig:basic_clos}. Both the green and blue flows follow up-down
-routing and there is no deadlock.
+Consider Figure~\ref{fig:basic_clos}. Lets assume that the operator defines ELR
+simply - just shortest up-down paths as they exist in this network.  Both the
+green and blue flows follow such paths and there is no deadlock.
 
-Now, let's assume that as shown in Figure~\ref{fig:clos_1_bounce}, two
-links fail, which forces both flows to deviate from up-down paths ($L2$ to
-$S1$ for green flow, $L3$ to $S2$ for blue flow). We call these paths 1-bounce
-paths, as the path violates the up-down rule once. As shown, this can lead to
-CBD, and hence may cause deadlock.
+Now, let's assume that as shown in Figure~\ref{fig:clos_1_bounce}, two links
+fail, which forces both flows to travel on paths that are not in the ELR. We
+call these paths 1-bounce paths, as the path violates the up-down rule once
+($L2$ to $S1$ for green flow, $L3$ to $S2$ for blue flow). As shown, this can
+lead to CBD, and hence may cause deadlock.
 
-One way to avoid such CBD is to put any packets that have deviated from the
-up-down routes in a lossy queue.  Being assigned to lossy queue means that such
-packets will not trigger PFC. Since the basic up-down paths are deadlock free,
-and the bounced packets do not trigger PFC, the network will stay deadlock free
-even if packets bounce.
+One way to avoid such CBD is to put any packets that have deviated from the ELR
+routes in a lossy queue.  Being assigned to lossy queue means that such packets
+will not trigger PFC. Since the paths in ELR are shortest up-down paths they are
+deadlock free, and the bounced packets won't trigger PFC, the network will stay
+deadlock free even if packets bounce.
 
 We stress that being assigned to lossy queue does not mean that the packets are
 immediately (or ever) dropped -- they are dropped {\em only if} they arrive at a
@@ -82,34 +84,36 @@ the first switch after bounce, to detect the bounce and put the packet in a
 lossy queue.
 
 One way for $S1$ (and any other switch afterwards) to recognize a bounced packet
-is by TTL - a bounced packet will have ``lower than expected'' TTL. However, TTL
-values are set by end hosts\footnote{TTL has other issues as well, see
-\S\ref{subsec:caveats}}, so a more controllable way is for the switch $L2$ to
-provide this information via a special tag (e.g. DSCP value) in the packet. In
-normal ``up-down'' routing, $L2$ would never forward a packet that arrived from
-$S2$ to $S1$. So, if $L2$ ``tags'' packets that have arrived from $S2$ that it
-is forwarding to $S1$, then $S1$, {\em and all other switches along the path
-after $S1$} know that the packet has deviated from the up-down path.
+is by TTL. Since the ELR consists of shortest paths, a bounced packet will have
+``lower than expected'' TTL. However, TTL values are set by end
+hosts\footnote{TTL has other issues as well, see \S\ref{subsec:caveats}}, so a
+more controllable way is for the switch $L2$ to provide this information via a
+special tag (e.g. DSCP value) in the packet. Note that for any ELR path, $L2$
+would have never forward any packet that arrived from $S2$ to $S1$. So, if $L2$
+``tags'' packets that have arrived from $S2$ that it is forwarding to $S1$, then
+$S1$, {\em and all other switches along the path after $S1$} know that the
+packet has deviated from the up-down path.
 
 Note that $L2$ needs only local information to do the tagging. We can initially
 assign a $NoBounce$ tag to every packet. $L2$ then simply needs to check ingress
 and egress port for each packet: it changes the tag from $NoBounce$ to $Bounced$
 if a packet arriving from ingress port connected to $S2$ exits on egress port
 connected to $S1$.  It is easy to see that these rules can be pre-computed since
-we know the topology, and the set of routes that we want to be ``lossless''
-(i.e. the up-down routes).
+we know the topology, and the set of routes that we want to be ``lossless''.
 
-This, in essence, is the core idea behind \sysname{} -- leveraging the knowledge of
-topology, and the paths that need to be lossless, we can create a system of tags
-and {\em static} rules that manipulate these tags to ensure that there will not
-be CBD, despite dynamic routing.
+This, in essence, is the core idea behind \sysname{} -- given a topology and ELR
+we can create a system of tags and {\em static} rules that manipulate these tags
+to ensure that there will not be CBD, even when the underlying routing system
+routes packets on paths that are not in the ELR.
 
 Of course, this basic idea is not enough. First of all, packets may bounce not
 just from the spine layer, but at any layer. Second, recall from
 \S\ref{sec:reroute} that ``bounces'' are a fact of life in data center networks.
 The operator may not want to put packets that have suffered just a single bounce
 into a lossy queue -- we may want to wait until the packet has bounced more than
-once before assigning it to a lossless queue. Third, we must ensure that we
+once before assigning it to a lossless queue. This means that ELR will consists
+of more than shortest paths, and the paths in ELR may be prone to CBD!
+Third, we must ensure that we
 don't end up using more lossless queues than the switch can support. To this
 end, we show how to combine tags.
 
@@ -120,43 +124,64 @@ end, we show how to combine tags.
 	\label{fig:clos_tagger}
 \end{figure}
 
+\begin{table}[t]
+		\centering
+		\footnotesize
+		\begin{tabular}{|c|c|c|} \hline
+				tag & rewriting | rules \\ \hline 
+		\end{tabular}
+		\caption{Tag rewriting rules for Figure~\ref{fig:clos_tagger} to support
+		ELR of up-down paths, and one bounce paths}
+		\label{fig:tab_tag_rules}
+		\vspace{-1em}
+\end{table}
+
 \subsection{Reducing the number of lossless queues}
 \label{subsec:combine}
 
-In Clos network as shown in Figure~\ref{fig:basic_clos}, packets can
-bounce at any $L$ layer, or called Leaf, switches. In addition, packets can also
-bounce at any $T$ layer, or ToR switches. Do we need to assign a distinct tag
-and a corresponding priority queue for each bouncing point?
+Consider again the network Figure~\ref{fig:basic_clos}.  Let's say the operator
+wants to make sure that in face of link failures, packets are not immediately
+put into a lossy queue. The operator is willing to tolerate upto $k$ bounces.
+So, the ELR consists of all shortest paths, and all paths with upto $k$ bounces.
+Do we need to assign a distinct tag and a corresponding priority queue for each
+bouncing point?
 
-Again, we leverage our knowledge of Clos topology and routing. Consider a packet
-that bounces twice. The path between the first bounce and the second bounce is a
-normal up-down path. Therefore, these path segments do not have CBD even if we
-combine them into a single priority queue. We can use a single tag to represent
-these segments altogether, and map the tag to a globally unique priority queue.
+To answer this question, we leverage our knowledge of Clos topology.  Consider a
+packet that bounces twice. The path between the first bounce and the second
+bounce is a normal up-down path. Therefore, these path segments do not have CBD
+even if we combine them into a single priority queue. We can use a single tag to
+represent these segments altogether, and map the tag to a globally unique
+priority queue.
 
-This completes the design of \sysname{} for Clos topology.  We first tag all
-packets following the normal ``up-down'' routing input with tag value of 1. All
-switches put these packets into first lossless queue. Then we configure all ToR
-and Leaf switches such that every time they see a packet coming down and then
-going up (therefore, bouncing) for any reasons, they increase the tag by one.
-Assuming there are $k$ available lossless queues, all switches put packets with
-tag $i$ to $i^{th}$ lossless queues. This means packets with up to $k-1$ bounces
-are all lossless. If a packet bounces more than $k-1$ times, it will carry a tag
-larger than $k$. All switches will put such packets into a lossy queue.
-Pseudocode of the algorithm, using notation developed in \S\ref{sec:generic}, is
-shown in Appendix~\ref{sec:clos_optimal}.
+This completes the design of \sysname{} for Clos topology. Packets start with
+tag of 1. We configure all ToR and Leaf switches such that every time they see
+a packet coming down and then going up (therefore, bouncing) for any reasons,
+they increase the tag by one. Spine switches do not change tags.
 
-Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in
-action.  Packets, when travelling on path segments before bounce carry a tag
-value of 1, and the tag is set to 2 after the bounce. This ensures that the
-packets are queued in separate lossless queues, and thus there is no CBD. In
-other words, we show a system for $k=2$. The lossy queue for packets that bounce
-more than once is omitted for clarity.
+All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELR
+includes paths with upto $k$ bounces, the switches need to have $k+1$ lossless
+queues. If a packet bounces more than $k$ times (e.g. due to numerous link
+failures, or loop), it will carry a tag larger than $k+1$. All switches will put
+such packets into a lossy queue.  Pseudocode of the algorithm, using notation
+developed in \S\ref{sec:generic}, is shown in Appendix~\ref{sec:clos_optimal}.
 
-This design satisfies all three challenges described in
-\S\ref{sec:challenges}. We do not change the routing protocol. We work with
-existing hardware. We deal with dynamic changes to routes, and we do not exceed
-the number of available lossless queues.
+Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in action.
+Packets, when travelling on path segments before bounce carry a tag value of 1,
+and the tag is set to 2 after the bounce. This ensures that the packets are
+queued in separate lossless queues, and thus there is no CBD. In other words, we
+show a system for $k=2$. The lossy queue for packets that bounce more than once
+is omitted for clarity.
+
+The tag rewriting rules to support ELR consisting of all up-down paths plus all
+1-bounce paths are shown in Table~\ref{tab:fig_clos_rules}. We only show rules
+for $T1$ and $L1$. Rules for other switches are similar. In
+\S\ref{sec:implementation} we will show how to implement these rules compactly
+using TCAM match-action tables. 
+
+This design satisfies all three challenges described in \S\ref{sec:challenges}.
+We do not change the routing protocol. We work with existing hardware. We deal
+with dynamic changes to routes, and we do not exceed the number of available
+lossless queues.
 
 \subsection {Deadlock freedom and optimality}
 \label{subsec:specific_deadlock_free}
@@ -190,26 +215,24 @@ necessary condition for deadlock.  A formal proof, which applies to any
 topology, is given in \S\ref{sec:generic}.
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
-to make all $k-1$ bounces paths lossless and deadlock-free, at least $k$
+to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$
 lossless priorities are required. We use contradiction.  Assume there exists a
-system with only $k-1$ lossless priorities. Consider a flow that loops between
-$T1$ and $L1$ for $k$ times, which means bounces $k-1$ times at $T1$. With
+system with only $k$ lossless priorities. Consider a flow that loops between
+$T1$ and $L1$ for $k+1$ times, which means it bounces $k$ times at $T1$. With
 Pigeonhole principle, we know that at least two times during the looping, the
 packet must have the same lossless priority. This is already sufficient to cause
 a deadlock~\cite{our_hotnets_paper}. Contradiction.
 
 \subsection {Summary}
 
-We showed that given a Clos topology and a set of routes (up-down, plus
-upto $k-1$ ``bounces'') that should be lossless, we can generate a system of
-tags and associated rules that ensure that packets are correctly classified
-into $k$ lossless queues to ensure that there is no deadlock.   This system can
-be implemented with existing hardware, without requiring any changes to the
-routing protocol. We also showed that this system is optimal, in the sense that
-we cannot prevent deadlock with fewer lossless queues.
+We showed that given a Clos topology and a set of routes (up-down, plus upto $k$
+``bounces'') that should be lossless, we can generate a system of tags and
+associated rules that ensure that packets are correctly classified into $k+1$
+lossless queues to ensure that there is no deadlock.   This system can be
+implemented with existing hardware, without requiring any changes to the routing
+protocol. We also showed that this system is optimal, in the sense that we
+cannot prevent deadlock with fewer lossless queues.
 
-In  \S~\ref{sec:implementation} we will show how to construct a compact system of
-match-action rules to implement the tagging. For Clos networks, we need at 
-most 4 rules per switch, and spine switches need no rules at all.
-
-We now show how to generalize \sysname{} for any topology.
+Much of the discussion in this section used the specific properties of Clos
+networks, and the specific ELR set. We now show how to generalize \sysname{} for
+any topology and any ELR set.
