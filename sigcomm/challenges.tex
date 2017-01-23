@@ -5,34 +5,33 @@
 \subsection{Working with existing routing protocols}
 \label{sec:incremental}
 
-Most of the current proposals~\cite{tcpbolt, karol2003prevention,
+Many current proposals~\cite{tcpbolt, karol2003prevention,
 sancho2004,lash,wu2003fault} for deadlock avoidance are based on custom routing
 protocols that go to great lengths to avoid CBD.  Unfortunately, this makes it
-very difficult, if not impossible to deploy them in existing data center
-networks. 
+very difficult to deploy them in existing data center networks. 
 
-Modern data centers are built atop Ethernet and IP. Routing is accomplished in a
-variety of ways, including BGP~\cite{vl2, facebookrouting} or using SDN-like
+Routing in modern data centers is accomplished in a variety of ways, including
+BGP~\cite{vl2, facebookrouting} or using SDN-like
 protocols~\cite{singh2015jupiter}.  No matter what routing protocols are used,
 data center operators tune them carefully satisfy numerous requirements such as
 manageability and fault tolerance.  In addition, operators invest heavily in
 tools and technologies to monitor and maintain their networks.
 
-Thus, it is very difficult for a data center operator to substantially change their routing
-infrastructure in order to avoid deadlocks. This task appears especially
-onerous because RoCEv2 itself can be deployed without any changes to routing
-protocols -- RoCEv2 packets are encapsulated in normal UDP packets are routed
-like any normal IP packets.
+Thus, data center operators are reluctant to deploy a brand-new routing protocol
+{\em just for} deadlocks avoidance. This task appears especially onerous because
+RoCEv2 itself can be deployed without any changes to routing protocols -- RoCEv2
+packets are encapsulated in normal UDP packets are routed like any normal IP
+packets.
 
 \subsection{Data Center Networks are Dynamic}\label{sec:reroute}
 
 Building a deadlock avoidance scheme that does not make any changes to routing
 protocols is easier said than done. The key problem is that the routing is
-dynamic -- paths can change in response to link failures or load.
+dynamic -- paths can change in response to link failures or other events.
 
 Figure~\ref{fig:basic_clos} shows a simplified (and small) version
-of network deployed in our data center, and an example of up-down routing (also
-called valley-free~\cite{qiu2007toward}).  In up-down routing, a packet first
+of network deployed in our data center, with commonly used up-down routing (also
+called valley-free~\cite{qiu2007toward}) scheme.  In up-down routing, a packet first
 goes UP from the source server to one of the common ancestor switches of the
 source and destination servers, then it goes DOWN from the common ancestor to
 the destination server.  In UP-DOWN routing, the following property holds: when
@@ -40,19 +39,19 @@ the packet is on its way UP, it should not go DOWN; when it is on its way DOWN,
 it should not go UP. Thus, with up-down routing, there can be no CBD and hence
 no deadlock.
 
-However, packets may deviate from the UP-DOWN paths due to many reasons,
+However, packets can deviate from the UP-DOWN paths due to many reasons,
 including link failures (leading to route flaps), which are quite common in data
-center networks~\cite{netpilot,f10}.  As have shown
-in~\cite{shpiner2016unlocking}, when the UP-DOWN property is broken and packets
-may reroute multiple times between two layers of switches, and deadlocks may
-form as a result, as shown in Figure~\ref{fig:priority_transition}(b).
+center networks~\cite{netpilot,f10}. When the up-down property is violated,
+packets ``bouncing'' between layers can cause
+deadlocks~\cite{shpiner2016unlocking}. See
+Figure~\ref{fig:clos_1_bounce}.
 
-Deviations from up-down routing are common in our data centers.  We
-see hundreds of such routes per day, and they can persist for minutes or even
-longer. Overall, we estimate that $0.001\%$ of the traffic is routed over such
-paths. This may sound tiny, but given that our network carries exabytes of
-traffic per day, the absolute amount of traffic affected by such routing is
-in tens of petabytes. This makes the threat of deadlocks, as discussed
+In our data centers, we see see hundreds of violations of up-down routing per
+day. Such routes can persist for minutes or even longer. Overall, we estimate
+that $0.001\%$ of the traffic is routed over such paths. This may sound tiny,
+but given that our network carries exabytes of traffic per day, the absolute
+amount of traffic affected by such routing is in tens of petabytes. This makes
+the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 \subsection{Limited Number of Lossless Queues}
@@ -64,31 +63,28 @@ each flow in its own class, and applying per-hop backpressure only within the
 class.  A more sophisticated scheme in~\cite{karol2003prevention} requires as
 many priorities as the diameter of the network. 
 
-One problem with this idea is that the PFC standard supports only 8 priority
-classes. But modern commodity switches can realistically support fewer than 8
-lossless classes.  The problem is that  to guarantee the lossless property, a
-switch needs to reserve certain amount of {\it headroom} from the memory pool.
-The size of the memory pool thus determines the number of lossless queues that
-the switch ASIC can support.
+The problem with this idea is that the PFC standard supports only 8 priority
+classes. Worse yet, modern commodity switches can realistically support fewer
+than 8 lossless classes.  The problem is that  to guarantee the lossless
+property, a switch needs to reserve certain amount of {\it headroom} per port,
+per lossless queue.
 
-The reserved headroom per port, per lossless queue is needed to absorb the
-packets in flight from the time a receiver decides to send a PFC pause frame to
-its upstream sender to the time the sender stops transmitting after receiving
-the pause frame. We describe how the
-headroom size is calculated in Appendix \ref{APPHEADROOM}.
+The headroom is needed to absorb the packets that are in flight between the time
+a receiver sends a PFC pause frame to its upstream sender to the time the sender
+stops transmitting.  The headroom size depends on many factors, including length
+of cables between the switches. See \ref{APPHEADROOM} for details.  A typical
+32-port 40GbE Ethernet switch with 12MB total buffer needs to reserve 2.76MB of
+headroom to support one lossless queue on all ports. That's 23\% of the total
+buffer the switch has\footnote{The memory used to build switch buffers needs to
+be extremely fast, and hence is extremely expensive. Adding more memory raises
+switch costs, and can lead to bufferbloat-like problems~\cite{dctcp}.}.
 
-From Appendix \ref{APPHEADROOM}, we can see that for a typical 32-port 40GbE
-Ethernet switch, it needs to reserve 2.76MB memory as the headroom to support
-one lossless queue. For a switch of 12MB memory, this is 23\% of the total
-memory.
-
-The headroom calculated in Appendix \ref{APPHEADROOM} ensures that  
-packets are not dropped. In practice, the reservation size needs to be larger to 
-ensure that the link is not under-utilized when the receiver un-pauses the
-sender. Furthermore, we need to reserve buffers for non-RDMA (i.e. lossy) traffic, which is
-still the dominating traffic in data centers. With these constrains, the
-current commodity switches can typically support just two or three lossless
-classes~\cite{rdmaatscale}.
+While this headroom is sufficient to avoid packet drops, in practice, we use a
+slightly larger value to avoid buffer under-flow when the receiver un-pauses the
+sender.  Furthermore, we need to reserve buffers for non-RDMA (i.e. lossy)
+traffic, which is still the dominating traffic in data centers. With these
+constrains, the current commodity switches can typically support just two or
+three lossless classes~\cite{rdmaatscale}.
 
 New switching ASICs may be able to support more lossless queues by adding more
 memory, using smaller cell size (64-byte) and by reducing the pause frame

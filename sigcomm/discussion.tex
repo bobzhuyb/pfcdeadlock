@@ -30,16 +30,14 @@ still no deadlock within each tag, because each tag is still a set of
 ``up-down'' routing. Second, the update of tags is still monotonic. We omit
 formal proof for brevity.
 
-The reduced isolation may be quite acceptable, since only a small fraction of
+The reduced isolation may be acceptable, since only a small fraction of
 packets experience one-bounce and may mix with traffic in the next lossless
 class.  This technique can be generalized for the output of
-Algorithm~\ref{alg:greedy}.  We omit details.
+Algorithm~\ref{alg:greedy}. 
 
-\para{Why not use TTL as a tag:} In \S\ref{sec:specific}, we initially
-considered the possibility of using TTL as a tag, instead of DSCP. The reason is
-that TTL values are always decremented by the forwarding pipeline in the switch.
-Using DSCP for this purpose allows us to avoid having to interfere with this key
-step. Thus, while it is possible to use TTL for tagging, use of DSCP simplifies
+\para{What to use for tag:} We use DSCP instead of TTL to tag packets. TTL
+values are always decremented by the forwarding pipeline in the switch. It's
+possible to work around this problem, but using DSCP simplifies the
 implementation.
 
 \para{The need to specify expected lossless paths:} The need to specify expected
@@ -51,10 +49,10 @@ In case an SDN controller is used, the controller algorithm can be used to
 generate the paths under a variety of conditions. Even for traffic aware
 routing, the operator can run a variety of simulations.
 
-The reader may also dislike the fact that we may eventually push a wayward
-packet into a lossy queue. We stress that we do this only as a last resort, and
-we reiterate that it does not mean that the packets are automatically or
-immediately dropped.
+\para{Use of lossy queue:} Some may dislike the fact that we may eventually push
+a wayward packet into a lossy queue. We stress that we do this only as a last
+resort, and we reiterate that it does not mean that the packets are
+automatically or immediately dropped.
 
 \para{Dealing with topology changes:} \sysname{} has to generate a new set of
 tags when network topology is updated -- e.g. if a FatTree is expanded by adding
@@ -62,18 +60,17 @@ more switches at the spine layer. Under certain conditions (and especially for
 Jellyfish-like random topologies), \sysname{} may require a updating tagging
 rules in all switches. We are currently studying this problem further. 
 
-\para{Dynamic topologies:} Recently, a number of researches have proposed
-changing the topology of the network in response to traffic patterns, using
-optical or wireless links~\cite{helios,flyways,projector,mirrormirror}.
-Currently, \sysname{} is not suitable for such situations. 
+\para{Dynamic topologies:} Given the above limitation, it follows that \sysname{}
+is not currently suitable for networking architectures that use dynamic
+topologies -- e.g. Helios~\cite{helios}, Flyways~\cite{flyways} or
+Projector~\cite{projector}. 
 
-\para{PFC alternatives:} The reader may wonder if PFC is worth all the trouble
-it causes. We are sympathetic to this view, and are actively investigating
-alternative schemes, including minimizing PFC generation (e.g.  using
-DCQCN~\cite{dcqcn} or Timely~\cite{timely}, better retransmission schemes for IB
-transport layer~\cite{xxx}, as well as other more novel schemes.  It is not yet
-clear to us that need for something akin to PFC can be completely obviated for
-high performance RDMA networks. More importantly, we must ensure proper
-operation of currently deployed RDMA hardware, which is reliant on PFC, and in
-which we (and others) have made substantial investments.
+\para{PFC alternatives:} One may ask whether getting rid of PFC altogether is a
+better way of preventing deadlocks.  We are sympathetic to this view, and are
+actively investigating numerous schemes, including minimizing PFC generation
+(e.g.  using DCQCN~\cite{dcqcn} or Timely~\cite{timely}, better retransmission
+schemes for IB transport layer~\cite{xxx}, as well as other more novel schemes.
+For now, we need \sysname{} ensure proper operation of currently deployed RDMA
+hardware, which is reliant on PFC, and in which we and others have made
+substantial investments.
 

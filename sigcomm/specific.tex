@@ -12,7 +12,7 @@
 While \sysname{} works for any topology, we first describe the core ideas using
 the popular Clos network topology.
 
-\subsection {Preliminaries}
+\subsection {Definitions}
 
 \para{Expected Lossless routes:} This is a set of packet paths that network
 operators requires to be lossless. For example, in a Clos network, the
@@ -27,16 +27,15 @@ not be dropped due to buffer overflow as long as they traverse lossless paths.
 is embedded in a packet. A packet belonging to one lossless class may change its
 tag value, which means that a lossless class may have multiple tag values.
 
-\para{Switch model:} For ease of discussion, we use the following simplified
+\para{Switch model:} For ease of discussion, we use a simplified
 switch model\footnote{See \S\ref{sec:implementation} for full implementation
 details.} in this section.  A switch has multiple ports. Each port has upto 7
-lossless queues associated with it, and one lossy queue\footnote{Typically,
-there is just one shared buffer and ``queues'' are just ``views'' of this shared
-buffer.} The queue number corresponds to the PFC priority.  Switch classifies
-arriving packets into queues based on {\em tags}.  Typically, each tag maps to a
-single priority value. If a tag does not match any priority value, the packet is
-added to a lossy queue. Before forwarding a packet, the switch can rewrite the
-tag according to user-specified rules.
+lossless queues associated with it, and one lossy queue\footnote{All queues
+share a single packet buffer.}. The queue number corresponds to the PFC priority.
+Switch classifies arriving packets into queues based on {\em tags}.  Typically,
+each tag maps to a single priority value. If a tag does not match any priority
+value, the packet is added to a lossy queue. Before forwarding a packet, the
+switch can rewrite the tag according to user-specified rules.
 
 We now describe the core idea behind \sysname{}.
 
@@ -50,7 +49,7 @@ We now describe the core idea behind \sysname{}.
 	\label{fig:clos_1_bounce}
 \end{figure}
 
-Recall Figure~\ref{fig:basic_clos}. Both the green and blue flows follow up-down
+Consider Figure~\ref{fig:basic_clos}. Both the green and blue flows follow up-down
 routing and there is no deadlock.
 
 Now, let's assume that as shown in Figure~\ref{fig:clos_1_bounce}, two
@@ -84,13 +83,13 @@ lossy queue.
 
 One way for $S1$ (and any other switch afterwards) to recognize a bounced packet
 is by TTL - a bounced packet will have ``lower than expected'' TTL. However, TTL
-values are set by end hosts~\footnote{TTL has other disadvantages as well,
-see \S\ref{subsec:caveats}}, so a more controllable way is for the switch $L2$
-to provide this information.  In normal ``up-down'' routing, $L2$ would never
-forward a packet that arrived from $S2$ to $S1$. So, if $L2$ ``tags'' packets
-that have arrived from $S2$ that it is forwarding to $S1$, then $S1$, {\em and
-all other switches along the path after $S1$} know that the packet has deviated
-from the up-down path.
+values are set by end hosts\footnote{TTL has other issues as well, see
+\S\ref{subsec:caveats}}, so a more controllable way is for the switch $L2$ to
+provide this information via a special tag (e.g. DSCP value) in the packet. In
+normal ``up-down'' routing, $L2$ would never forward a packet that arrived from
+$S2$ to $S1$. So, if $L2$ ``tags'' packets that have arrived from $S2$ that it
+is forwarding to $S1$, then $S1$, {\em and all other switches along the path
+after $S1$} know that the packet has deviated from the up-down path.
 
 Note that $L2$ needs only local information to do the tagging. We can initially
 assign a $NoBounce$ tag to every packet. $L2$ then simply needs to check ingress
@@ -187,8 +186,8 @@ that the packet is going unidirectionally in a DAG of priority queues. This is
 important because otherwise CBD may still happen across subspaces
 (Figure~\ref{fig:subspace}).  We conclude that no CBD can form either within a
 tag or across different tags.  The network is deadlock-free since CBD is a
-necessary condition of deadlock~\cite{our_hotnets_paper}.  A formal proof, which
-also applies for generic topology, is given in \S\ref{sec:generic}.
+necessary condition for deadlock.  A formal proof, which applies to any
+topology, is given in \S\ref{sec:generic}.
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k-1$ bounces paths lossless and deadlock-free, at least $k$
@@ -209,7 +208,8 @@ be implemented with existing hardware, without requiring any changes to the
 routing protocol. We also showed that this system is optimal, in the sense that
 we cannot prevent deadlock with fewer lossless queues.
 
-One thing we did not discuss in this section is the number of rules needed for Tag mapping. 
-We will show in \S~\ref{sec:implementation} that we need at most 4 rules per switch 
-(note that no rule is needed for the spine switches) for Clos networks.
+In  \S~\ref{sec:implementation} we will show how to construct a compact system of
+match-action rules to implement the tagging. For Clos networks, we need at 
+most 4 rules per switch, and spine switches need no rules at all.
+
 We now show how to generalize \sysname{} for any topology.

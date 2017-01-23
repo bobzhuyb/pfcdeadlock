@@ -2,18 +2,16 @@
 \section{Introduction}
 \label{sec:intro}
 
-In this paper, we present a simple and practical mechanism called \sysname{} to
-prevent deadlocks in datacenter deployments of Remote Direct Memory Access
-(RDMA) over Ethernet (RoCE).
-
 Public cloud providers like Microsoft~\cite{dcqcn} and Google~\cite{timely} are
-deploying RoCE in their data centers to provide low latency, high throughput
-network transfers with minimal CPU overhead~\cite{dcqcn}.  RoCE uses Priority
-Flow Control (PFC) to prevent packet drops due to buffer overflow at the
-switches. PFC allows a switch to temporarily pause its immediately upstream
-neighbor to prevent buffer overflow. While PFC is effective, it can cause
-numerous problems~\cite{dcqcn}, including
-deadlocks~\cite{rdmaatscale,tcp-bolt,hu2016deadlocks}.
+deploying RoCE in their data centers to enable low latency, high throughput data
+transfers with minimal CPU overhead~\cite{dcqcn}. Systems like
+Pilaf~\cite{pilaf}, Farm~\cite{farm}, TesnorFlow~\cite{tensorflow}, and
+CNTK~\cite{xxx} rely on RoCE for enhanced performance.
+
+RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
+overflow at the switches. PFC allows a switch to temporarily pause its upstream
+neighbor. While PFC is effective, it can cause numerous problems~\cite{dcqcn},
+including deadlocks~\cite{rdmaatscale,tcp-bolt,hu2016deadlocks}.
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in
@@ -24,57 +22,55 @@ routing loop due to link failure) that caused its formation have
 abated~\cite{rdmaatscale}.
 
 Deadlock in PFC-enabled network can occur in numerous
-scenarios~\cite{hu2016deadlocks}. Circular buffer dependency (CBD) is a
-necessary condition for formation of deadlock.
-Figure~\ref{fig:deadlock_example} shows an illustrative example of CBD: switch A
-is blocked by switch B, which is blocked by C, which is paused by A. 
+scenarios~\cite{hu2016deadlocks}, although circular buffer dependency (CBD) is a
+necessary condition for deadlock formation.  Figure~\ref{fig:deadlock_example}
+illustrates a 3-node CBD: switch A is blocked by switch B, which is blocked by
+C, which is paused by A. 
 
-Current solutions to the deadlock problem fall in two broad categories. The
-first category consists of solutions that {\em detect} the formation of the
-deadlock and then use various techniques to {\em break}
-it~\cite{shpiner2016unlocking}.  These solutions do not address the root cause
-of the problem, and hence cannot guarantee that the deadlock would not
-immediately reappear. 
+Current solutions to the deadlock problem fall in two categories. The first
+category consists of solutions that {\em detect} the formation of the deadlock
+and then use various techniques to {\em break} it~\cite{shpiner2016unlocking}.
+These solutions do not address the root cause of the problem, and hence cannot
+guarantee that the deadlock would not immediately reappear. 
 
-The second category of solutions are designed to {\em prevent} deadlock
-formation. While CBD is just a {\em necessary} condition for deadlock formation,
-{\em sufficient} conditions for deadlock formation are not well
+The second category of solutions are designed to {\em prevent} deadlocks.  While
+CBD is just a {\em necessary} condition for deadlock formation, {\em sufficient}
+conditions for deadlock formation are not well
 understood~\cite{hu2016deadlocks}. Thus, currently, preventing CBD is the only
 practical way to prevent deadlocks. 
 
-There are a number of ways to prevent CBD.  Some solutions require centralized,
-SDN-style routing.  These solutions are difficult to deploy in existing data
-centers, without wholesale infrastructure changes.  The second category of
-solutions require major changes to the routing protocols~\cite{tcpbolt}, and
-thus cannot be implemented using commodity switches. Many of these solutions
-also require carefully controlling the paths -- something that is simply not
-possible with decentralized routing in presence of link
-failures~\cite{netpilot}.  Finally, there are protocols that require creation of
-numerous priorities and buffer management according to those priorities. For
-example, if each of the flows in Figure~\ref{fig:deadlock_example} had its own
-priority and was buffered separately at each switch, there would be no deadlock.
-However, each priority class requires reservation of a certain amount of
-``headroom'' buffer space which depends, among other things, on cable lengths
-between switches (\S\ref{subsec:pfcheadroom}). Thus, modern data center
-networks, built using commodity switches, can realistically support only two or
-three lossless priorities~\cite{rdmaatscale}.
+In \S\ref{sec:challenges}, using data from a large cloud provider's data
+centers, we show that any practical deadlock prevention scheme must meet three
+key challenges. These include: $(i)$ require no changes to existing routing
+protocols or switch hardware, $(ii)$ ability deal with link failures and
+associated  route changes, and $(iii)$ availability of limited buffer in
+the switches.
 
-Given these shortcomings, to the best of our knowledge, no deadlock free routing
-solution has been deployed in production networks. In \S\ref{sec:challenges},
-using data from a large cloud provider's data centers, we will distill down to
-three the key practical challenges making RoCE deadlock-free in production
-networks.
+While a number of schemes for preventing deadlocks have been proposed, they fail
+to meet one or more of these challenges.  Some schemes require centralized,
+SDN-style routing.  These are difficult to deploy in existing data centers,
+without wholesale infrastructure changes.  Others are distributed, but brand-new
+routing protocols~\cite{tcpbolt} that are not supported by commodity switches.
+Many of these schemes also require carefully controlling the paths -- something
+that is simply not possible with decentralized routing in presence of link
+failures~\cite{netpilot}.  Finally, some schemes require creation of numerous
+priorities and buffer management according to those priorities. For example, if
+each of the flows in Figure~\ref{fig:deadlock_example} had its own priority and
+was buffered separately at each switch, there would be no deadlock.  However,
+modern data center networks, built using commodity switches, can realistically
+support only two or three lossless priorities~\cite{rdmaatscale}.
 
-To meet these challenges, we present \sysname{}. The key insight behind
+Thus, to the best of our knowledge, no deadlock free routing solution has been
+deployed in a production data center.  In this paper, we present \sysname{},
+which meets all three challenges described above, The key insight behind
 \sysname{} is that given a topology and a routing protocol, we can enumerate all
 paths that need to carry lossless traffic. This task is straightforward for
 ``structured'' topologies like Clos~\cite{clos}, FatTree~\cite{fattree} and
 Bcube~\cite{bcube}, and not onerous even for randomized topologies like
-Jellyfish~\cite{jellyfish}.  Given these paths, it is possible to create a
-tagging and buffer management scheme that guarantees that there is no CBD,
-without any changes to the routing protocol, and even under unforeseen link
-failures or routing errors. The tagging scheme can be implemented using standard
-match-action rules.
+Jellyfish~\cite{jellyfish}.  Given these paths, we create a tagging and buffer
+management scheme that guarantees that there will no CBD, and even under
+unforeseen link failures or routing errors. The tagging scheme can be
+implemented using standard match-action rules.
 
 \sysname{} does not require any changes to the routing protocol. It prevents
 deadlock under any failure condition. Even for a Jellyfish topology with 2000

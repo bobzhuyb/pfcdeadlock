@@ -1,52 +1,9 @@
-% !Mode:: "TeX:UTF-8"
-%\documentclass[twocolumn]{sig-alternate}
 \documentclass[letterpaper, twocolumn,fleqn]{sig-alternate-10pt}
-%\documentclass[twocolumn,10pt]{infocom}
-%\documentclass[twocolumn,10pt]{IEEEtran_v15}
-%\documentclass[twocolumn,10pt]{IEEEtran}
-%\documentclass[twocolumn,10pt]{article}
-%\usepackage[nocompress,space]{cite}
-%\documentclass{sig-alternate-10pt}
-%\documentclass[letterpaper,twocolumn,10pt]{article}
 \usepackage{epsfig,endnotes}
-%\usepackage[letterpaper]{geometry}
-
 \usepackage[export]{adjustbox}
 \usepackage{tabularx}
 \usepackage{appendix}
-
-%\usepackage{ifpdf}
-%\ifpdf
-%\setlength{\pdfpagewidth}{8.5in}
-%\setlength{\pdfpageheight}{11in}
-%\else
-%\fi
-
-%%%%%%%%%%%%%%%%%%%%%%
-% Set Compact Mode   %
-%%%%%%%%%%%%%%%%%%%%%%
-
-%\newcommand{\subparagraph}{}
-
 \newcommand{\sysname}{Tagger}
-
-%\usepackage[compact]{titlesec}
-%\titlespacing{\section}{0pt}{*0}{*0}
-%\titlespacing{\subsection}{0pt}{*0}{*0}
-%\titlespacing{\subsubsection}{0pt}{*0}{*0}
-%\setlength{\parskip}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\headsep}{0pt}
-%\setlength{\topskip}{0pt}
-%\setlength{\topmargin}{0pt}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-
-%%%%%%%%%%%%%%%%%%%%%%
-%
-%%%%%%%%%%%%%%%%%%%%%%
-
 
 \usepackage{url}
 \usepackage[space]{cite}
@@ -55,7 +12,6 @@
 \usepackage{pifont}
 \usepackage{epsfig,epsf,url,amssymb}
 \usepackage{tabularx}
-%\usepackage{algorithm2e}
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{amsmath}
 \usepackage{mathtools}
@@ -75,54 +31,18 @@
 \usepackage{multirow}
 \usepackage{rotating}
 \usepackage{epstopdf}
-%\usepackage{hyperref}
 \usepackage{url}
-\definecolor{mygray}{gray}{.9}
-\definecolor{mypink}{gray}{.9}
-\definecolor{mycyan}{cmyk}{.3,0,0,0}
-
-\usepackage{graphicx}
-%\usepackage{subfigure}
 \usepackage{subfig}
-\usepackage[font=bf]{caption}
-
-%\newcommand{\bbR}{\mathbb{R}}
-%\newcommand{\calN}{\mathcal{N}}
-%\newcommand{\calR}{\mathcal{R}}
-%\newcommand{\calV}{\mathcal{V}}
-%\newcommand{\eg}{{\it e.g.}}
-%\newcommand{\etal}{{\it et al.~}}
-%\newcommand{\etc}{{\it etc.}}
-%\newcommand{\ie}{{\it i.e.}}
-%\newcommand{\tablecapspace}{{\vspace{-0.1in}}}
-%\newcommand{\tablespace}{{\vspace{-0.05in}}}
-%\newcommand{\picspace}{{\vspace{-0.1in}}}
-%\renewcommand{\baselinestretch}{1}
-%\renewcommand{\arraystretch}{1.05}      % make the space between tabular lines larger
-%\newcommand{\capspace}{}           % control space between figure/table and caption
-
-\def\TODO#1{\textcolor{red}{}}
-%\setlength{\textheight}{9.3in}
-%\setlength{\columnsep}{1.4pc}
-%\setlength{\textwidth}{7.1in}
-
-\newcommand{\sys}{{\textrm{XPath}}\xspace}
-
-\newcommand{\paragraphb}[1]{\vspace{0.05in}\noindent{\bf #1}}
-
+\usepackage{graphicx}
+ 
 \newcommand{\paraspace}{\vspace{0.05in}}
 \newcommand{\para}[1]{\paraspace\noindent{\bf #1} }
-\newcommand{\parab}[1]{\paraspace\noindent{\bf #1} }
-\newcommand{\parae}[1]{\paraspace\noindent{\em #1} }
-\newcommand{\parabe}[1]{\paraspace\noindent{\bf \em #1} }
-%\newcommand{\kai}[1]{{\color{blue}[Kai: #1]}}
-\newcommand{\todo}{\textcolor{red}}
 \newcommand\fixme[1]{{\color{red} #1}}
-
+ 
 \def\naive{na\"\i ve}
 
 \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
-
+ 
 \newcommand{\subcaption}[1]{\centerline{#1}\vspace{0.1in}}
 \long\def\comment#1{}
 \newtheorem{theorem}{Theorem}
@@ -130,7 +50,7 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 %\newtheorem{problem}[theorem]{Problem}
-
+ 
 \def\BState{\State\hskip-\ALG@thistlm}
 
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
@@ -139,57 +59,35 @@
 \item[\hskip \labelsep {\bfseries}]}{\end{trivlist}}
 \newenvironment{remark}[1][Remark]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
-
-\newenvironment{icompact}{
-  \begin{list}{$\bullet$}{
-    \parsep 1pt plus 1pt
-    \partopsep 1pt plus 1pt
-    \topsep 1pt plus 2pt minus 1pt
-    \itemsep 1.5pt plus 1pt
-    \parskip 0pt plus 2pt
-    \leftmargin 0.15in}
-       }
-  {\normalsize\end{list}}
-
-\newenvironment{ecompact}{
-  \begin{list}{$\bullet$}{
-    \parsep 1pt plus 1pt
-    \partopsep 1pt plus 1pt
-    \topsep 1pt plus 2pt minus 1pt
-    \itemsep 1.5pt plus 1pt
-    \parskip 0pt plus 2pt
-    \leftmargin 0.15in}
-       }
-  {\normalsize\end{list}}
-
-%\hyphenpenalty=5000 %\tolerance=1000
-
-%\hyphenation{Mega-Switch para-digm}
-
-
-%%%%%%%% to calculate the time %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcount\hour \newcount\minute
-\hour=\time  \divide \hour by 60
-\minute=\time
-\loop \ifnum \minute > 59 \advance \minute by -60 \repeat
-\def\drafttime{\ifnum \hour<13 \number\hour:%
-                      \ifnum \minute<10 0\fi
-                      \number\minute
-                      \ifnum \hour<12 \ AM\else \ PM\fi
-         \else \advance \hour by -12 \number\hour:%
-                      \ifnum \minute<10 0\fi
-                      \number\minute \ PM\fi}
-\def\timestamp{\today \ \drafttime}
-
+%% 
+%% \newenvironment{icompact}{
+%%   \begin{list}{$\bullet$}{
+%%     \parsep 1pt plus 1pt
+%%     \partopsep 1pt plus 1pt
+%%     \topsep 1pt plus 2pt minus 1pt
+%%     \itemsep 1.5pt plus 1pt
+%%     \parskip 0pt plus 2pt
+%%     \leftmargin 0.15in}
+%%        }
+%%   {\normalsize\end{list}}
+%% 
+%% \newenvironment{ecompact}{
+%%   \begin{list}{$\bullet$}{
+%%     \parsep 1pt plus 1pt
+%%     \partopsep 1pt plus 1pt
+%%     \topsep 1pt plus 2pt minus 1pt
+%%     \itemsep 1.5pt plus 1pt
+%%     \parskip 0pt plus 2pt
+%%     \leftmargin 0.15in}
+%%        }
+%%   {\normalsize\end{list}}
+%% 
+%% 
 \begin{document}
-%\conferenceinfo{SIGCOMM,} {XXXXXX, XXXXX, XXXXX, XXXXX.} %
-%\CopyrightYear{2009} \crdata{1-59593-308-5/06/0009}
-
 \title{Practical PFC Deadlock Prevention in Datacenter Networks}
 \author{Paper 306}
 \maketitle
 
-%\vspace{-0.2in}
 \input{abstract.tex}
 \input{intro.tex}
 \input{background.tex}
@@ -201,18 +99,9 @@
 \input{evaluation.tex}
 \input{related.tex}
 \input{conclusion.tex}
-
-%\vspace{0.1in}
-%\section*{Acknowledgements}
-
 \input{appendix}
 
-%\begin{normalsize}
-%\begin{small}
-	\bibliographystyle{plain}
-	\bibliography{reference}
-%\end{small}
-%\end{normalsize}
-%\input{sections/appendix.tex}
+\bibliographystyle{plain}
+\bibliography{reference}
 
 \end{document}

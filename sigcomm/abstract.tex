@@ -3,8 +3,9 @@
 		While several solutions for preventing deadlocks have been proposed,
 		none have been widely deployed because they either require significant
 		changes to routing protocols, or require excessive buffers in the
-		switches. In this paper, we propose a simple and practical scheme for
-		deadlock prevention in datacenter RDMA networks, called \sysname{}.
+		switches. In this paper, we propose a scheme for dealdock prevention,
+		called \sysname{}. \sysname{} does not require any changes to the
+		routing protocol, and needs only modest buffers. 
 		\sysname{} is based on the insight that once all expected lossless
 		routes are known, a simple tagging and buffer management scheme can be
 		developed to prevent deadlock under all failure conditions. We show how
