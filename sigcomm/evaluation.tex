@@ -89,13 +89,14 @@ limited number of lossless queues.  We have already shown that on a Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
 upto $k$ bounces. In this section, we consider other topologies. 
 
-\begin{table*}[t]
+\begin{table}[t]
 	\centering
+	\scalebox{0.85}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-			Switch $\#$ &  Switch port $\#$ &  Network diameter &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
-			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
-				\text{a switch}}}\\
+			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules} \\
+				\text{at a switch}}}\\
 			\hline
 			\hline
 			10 & 12 & 5 & 2 & 10 \\
@@ -110,9 +111,10 @@ upto $k$ bounces. In this section, we consider other topologies.
 			\hline
 			
 		\end{tabular}
-	\caption{Resource consumption of Algorithm~\ref{alg:greedy} on Jellyfish at different scales.}
-	\label{table:resource_consumption}
-\end{table*}
+	}
+	\caption{Jellyfish with shortest paths.}
+	\label{table:jellyfish_shortestpath}
+\end{table}
 
 Jellyfish topology is an r-regular random graph, characterized by the the number
 of switches (N), the number of ports a switch has (k) and the number of ports
@@ -120,7 +122,7 @@ used to connect with other switches (r) (the remaining $k-r$ ports are for
 servers). In our experiment, we let r = k/2.  We construct the routing paths by
 building destination-rooted shortest-path spanning trees at all the servers.
 
-Table~\ref{table:resource_consumption}, shows the number of lossless priority
+Table~\ref{table:jellyfish_shortestpath}, shows the number of lossless priority
 classes needed for a variety of network sizes. We see that \sysname{} requires
 only three classes even for a network with 2000 switches. 
 
@@ -129,11 +131,98 @@ configurations~\footnote{Different switches require different number of rules
 due to the random nature of the topology.}. Even with 2000 switches, we need
 just 98 ACLs at a switch. Modern commodity switches can support 1-4K ACLs.
 
+\begin{table}[t]
+	\centering
+	\scalebox{0.85}{
+		\begin{tabular}{|r|r|r|r|r|}
+			\hline
+			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules} \\
+					\text{at a switch}}}\\
+			\hline
+			\hline
+			10 & 12 & 5 & 3 & 23 \\
+			\hline
+			100 & 32 & 6 & 4 &  69 \\
+			\hline
+			500 & 64 & 6 & 4 &  107\\
+			\hline
+			1,000 & 64 & 7 & 5 & to be added \\
+			\hline
+			2,000 & 64 & 7 & 5 &  to be added\\
+			\hline
+			
+		\end{tabular}
+	}
+	\caption{Jellyfish with shortest paths and random paths.}
+	\label{table:jellyfish_randompath}
+\end{table}
+
+
+In Table~\ref{table:jellyfish_randompath}, we further create $N*10$ random paths in addition to the shortest paths.
+
+\begin{table}[t]
+	\centering
+	\scalebox{0.87}{
+		\begin{tabular}{|r|r|r|r|r|}
+			\hline
+			n  &  k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
+					\text{a switch}}}\\
+			\hline
+			\hline
+			4 & 1 & 4 & 2 & 12 \\
+			\hline
+			8 & 2 & 6 & 3 &  30\\
+			\hline
+			8 & 3 & 8 & 4 &  41\\
+			\hline
+			8 & 4 & 10 & 5 &  50\\
+			\hline
+			16 & 5 & 10 & 5 &  108\\
+			\hline
+			
+		\end{tabular}
+	}
+	\caption{BCube with k shortest paths between every server pair}
+	\label{table:bcube_kpaths}
+\end{table}
+
+In Table~\ref{table:bcube_kpaths}, we consider $k$ shortest paths for BCube($n$,$k$), where $n$ is the number of switch ports and $k$ is the switch layers in the topology.
+
+\begin{table}[t]
+	\centering
+	\scalebox{0.83}{
+		\begin{tabular}{|r|r|r|r|r|}
+			\hline
+			\multicolumn{1}{|c|}{\tabincell{c}{\text{k (switch} \\ \text{port $\#$)}}} &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}    &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
+					\text{a switch}}}\\
+			\hline
+			\hline
+			4 & 6 & 2 & 14 \\
+			\hline
+			8 & 6 & 2 &  24 \\
+			\hline
+			16 & 6 & 2 &  44 \\
+			\hline
+			32 & 6 & 2 &  84 \\
+			\hline
+			64 & 6 & 2 &  164 \\
+			\hline
+		\end{tabular}
+	}
+	\caption{F10 with shortest paths and 1-bounce paths.}
+	\label{table:F10_onebounce}
+\end{table}
+
+In Table~\ref{table:F10_onebounce}, we consider all shortest paths and 1-bounce paths for F10($k$), where $k$ is the number of switch ports.
+
 \subsection{Performance penalty}\label{subsec:exp_performanceoverhead}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.45\textwidth] {figs/overhead_avgthrpt}
+	\includegraphics[width=0.4\textwidth] {figs/overhead_avgthrpt}
 	\caption{RDMA Throughput with different number of rules.}\label{fig:thrpt_overhead}
 \end{figure}
 
