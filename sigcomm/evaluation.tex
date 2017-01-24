@@ -147,9 +147,9 @@ just 98 ACLs at a switch. Modern commodity switches can support 1-4K ACLs.
 			\hline
 			500 & 64 & 6 & 4 &  107\\
 			\hline
-			1,000 & 64 & 7 & 5 & to be added \\
+			1,000 & 64 & to be added & to be added & to be added \\
 			\hline
-			2,000 & 64 & 7 & 5 &  to be added\\
+			2,000 & 64 & to be added & to be added &  to be added\\
 			\hline
 			
 		\end{tabular}
@@ -177,9 +177,9 @@ In Table~\ref{table:jellyfish_randompath}, we further create $N*10$ random paths
 			\hline
 			8 & 3 & 8 & 4 &  41\\
 			\hline
-			8 & 4 & 10 & 5 &  50\\
+			16 & 4 & 10 & 5 &  90\\
 			\hline
-			16 & 5 & 10 & 5 &  108\\
+			16 & 5 & 12 & 6 &  108\\
 			\hline
 			
 		\end{tabular}
@@ -192,10 +192,10 @@ In Table~\ref{table:bcube_kpaths}, we consider $k$ shortest paths for BCube($n$,
 
 \begin{table}[t]
 	\centering
-	\scalebox{0.83}{
+	\scalebox{0.88}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-			\multicolumn{1}{|c|}{\tabincell{c}{\text{k (switch} \\ \text{port $\#$)}}} &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}    &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+		k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}    &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
 			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
 					\text{a switch}}}\\
 			\hline
