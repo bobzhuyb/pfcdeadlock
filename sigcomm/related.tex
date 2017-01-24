@@ -2,11 +2,11 @@
 \section{Related Work}\label{sec:related}
 
 \para{The need for RoCE.}
-Many deep learning frameworks including Tensorflow \cite{tensorflow} and Microsoft Cognitive Toolkit \cite{cntk} support RDMA and RoCE for better performance as RDMA provides the needed communications latency and low CPU overhead. These deep learning frameworks are on their way into data centers. 
+Many deep learning frameworks including Tensorflow \cite{tensorflow} and Microsoft Cognitive Toolkit \cite{cntk} support RDMA and RoCE for better performance as RDMA provides the needed communications latency and low CPU overhead. These deep learning frameworks are on their way into data centers.
 
 RoCE, however, does not work well without PFC to provide a lossless network fabric, as the RDMA transport protocol cannot well handle packet drops \cite{dcqcn,rdmaatscale}.
 
-Our work in this paper showed that we can make PFC work with guaranteed deadlock-free with existing data center networks. Tagger works seamlessly with any existing routing protocols and network topologies. 
+Our work in this paper showed that we can make PFC work with guaranteed deadlock-free with existing data center networks. Tagger works seamlessly with any existing routing protocols and network topologies.
 
 \para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
 work by preemption. This does not work in Ethernet and in practice.
@@ -16,4 +16,4 @@ has discussed how they can be implemented in reality.
 
 \para{Summary: our differences.}
 We believe that deciding the priority of packets along the path is better than changing
-routing configuratoins.
+routing configurations.

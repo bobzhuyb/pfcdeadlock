@@ -19,7 +19,7 @@ pipelines shown in Figure~\ref{fig:tagger}.  In the first step, \sysname{}
 classifies packets into ingress queues based on the value of tags. In the second
 step, \sysname{} rewrites the value of tag based on (tag, inport, outport)
 information. These two steps form the core of \sysname{}.
- 
+
 \begin{figure}[t]
  	\centering
  	\subfloat[short for lof][Ingress priority = egress priority  $\rightarrow$ packet drop.] {
@@ -42,19 +42,19 @@ Note that the tagged graph $G$ only defines the mapping between tags and ingress
 queues. By default, a switch will enqueue a departing packet in the egress queue
 of the same priority class as its ingress queue. This default behavior can lead
 to packet loss when priority transition is performed. An example is shown in
-Figure~\ref{fig:prioritydecoupling}. 
- 
+Figure~\ref{fig:prioritydecoupling}.
+
 In this example, switch B is configured to do priority transition for packets
 received from switch A and destined for switch C. It is important to note that
 in this diagram, only {\em one port} on each switch is active. The two queues
 are for two priorities.
- 
+
 In Figure~\ref{fig:prioritydecoupling}(a), we consider the default behavior.
 Packets exit egress queue 1 at switch B, but with priority 2.  This can lead to
-to packet loss when ingress queue 2 of switch C becomes congested, because 
-the PFC PAUSE from switch C to switch B carries priority 2, and cannot pause 
-the offending egress queue 1 of switch B. 
- 
+to packet loss when ingress queue 2 of switch C becomes congested, because
+the PFC PAUSE from switch C to switch B carries priority 2, and cannot pause
+the offending egress queue 1 of switch B.
+
 In Figure~\ref{fig:prioritydecoupling}(b), we map the packet to the egress queue
 based on its new priority.  This avoids packet loss, since the PFC from switch C
 correctly pauses the queue on which the packet with the new tag would be
@@ -79,7 +79,7 @@ matches two fields simultaneously and fires only if both matches succeed.
 Rules that have the same action can be compressed into one TCAM entry, if the
 patterns to be matched can be aggregated using bit masking. Consider the three
 rules in Figure~\ref{fig:compression}. These rules share the same tag value,
-egress port and tag rewriting action. 
+egress port and tag rewriting action.
 
 Note that port numbers in TCAM are bitmaps, and not binary values. Thus, we can
 aggregate ingress ports for rules that share the same tag, egress port and
@@ -97,13 +97,15 @@ egress port.
 switches based on Broadcom chipsets.  We use DSCP field in IP header as the tag.
 DSCP rewriting is supported by all commodity chipsets. DSCP-based priority
 queuing (step 1) is supported natively by all switch ASIC vendors. Step 2 uses
-ingress ACL rules to map (DSCP, inport, outport) to new DSCP. 
+ingress ACL rules to map (DSCP, inport, outport) to new DSCP.
 
 Step 3 also uses ACLs, although it relies on certain details that are specific
 to Broadcom's match-action pipeline. We omit these gritty details for brevity.
 While the implementation of this step is Broadcom-specific, we believe that
 ASICs from other vendors can also support this functionality.
 
+%%comment: this claim is not true, as brcm sdk is never public.
+%%         
 We stress that none of the three steps require any changes to the switch ASIC,
 and everything is implemented using publicly available and documented
 functionality.
@@ -130,10 +132,10 @@ different servers connected to ports A and B. Both servers set the DSCP value in
 outgoing packets to 1. The match-action rules are set to rewrite the tag value
 of packets arriving on port A to 2, and forward them to port C. Tag of packets
 arriving on port B is not changed.
- 
+
 At time = 17s, C sends a stream of forged PFC PAUSE frames on priority 2 to
 switch S. The rate of both flows is plotted in Figure~\ref{fig:tagger_demon}(b)
 (link capacity = 40Gbps). As expected, after priority 2 is paused, rate of
-flow 1 is reduced to 0 while flow 2 gets all the available bandwidth. 
+flow 1 is reduced to 0 while flow 2 gets all the available bandwidth.
 Counters on switch S further confirm that no packets were dropped, and server
 connected to port A was paused as expected.

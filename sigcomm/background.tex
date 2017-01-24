@@ -7,19 +7,19 @@ pre-registered memory buffers at the two end hosts.  In modern data centers,
 RDMA is deployed using RDMA over Converged Ethernet V2 (RoCE)
 standard~\cite{roce,rroce}
 
-\para {PFC:} RoCE needs a lossless L2 layer for optimal performance. This is
+\para {PFC:} RoCE needs a lossless fabric for optimal performance. This is
 accomplished in Ethernet networks using the Priority Flow Control (PFC)
 mechanism~\cite{pfc}.  Using PFC, a switch can pause an incoming link when its
 ingress buffer occupancy reaches a preset threshold. As long as sufficient
 ``headroom'' is reserved to buffer packets that are in flight during the time
 takes for the PAUSE to take effect, no packet will be dropped due to buffer
-overflow~\cite{cisco-whitepaper,dcqcn}. 
+overflow~\cite{cisco-whitepaper,dcqcn}.
 
 The PFC standard defines 8 classes, called priorities\footnote{The word priority
 is a misnomer. There is no implicit ordering among priorities -- they are really
 just separate classes.}. Packets in each priority are buffered separately, and
 PAUSE messages carry this priority.  When a packet arrives at port $i$ of switch
-$S$ with priority $j$, it is enqueued in queue $j$ of port $i$. If the queue
+$S$ with priority $j$, it is enqueued in the ingress queue $j$ of port $i$. If the ingress queue
 length now exceeds the PFC threshold, a pause message is sent to the upstream
 switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$
@@ -31,7 +31,7 @@ the sense that it will continue to exist even if no new traffic is injected into
 the loop. Circular Buffer Dependency (CBD) is a necessary condition for deadlock
 formation, but sufficient conditions for deadlock formation in PFC networks are
 yet to be fully characterized~\cite{hu2016deadlocks}. Thus, deadlock avoidance
-schemes focus on avoiding CBD. 
+schemes focus on avoiding CBD.
 
 We now describe the three key challenges that any practical deadlock avoidance
 scheme must meet.

@@ -8,7 +8,7 @@
 Many current proposals~\cite{tcpbolt, karol2003prevention,
 sancho2004,lash,wu2003fault} for deadlock avoidance are based on custom routing
 protocols that go to great lengths to avoid CBD.  Unfortunately, this makes it
-very difficult to deploy them in existing data center networks. 
+very difficult to deploy them in existing data center networks.
 
 Routing in modern data centers is accomplished in a variety of ways, including
 BGP~\cite{vl2, facebookrouting} or using SDN-like
@@ -18,9 +18,9 @@ manageability and fault tolerance.  In addition, operators invest heavily in
 tools and technologies to monitor and maintain their networks.
 
 Thus, data center operators are reluctant to deploy a brand-new routing protocol
-{\em just for} deadlocks avoidance. This task appears especially onerous because
+{\em just for} deadlock avoidance. This task appears especially onerous because
 RoCEv2 itself can be deployed without any changes to routing protocols -- RoCEv2
-packets are encapsulated in normal UDP packets are routed like any normal IP
+packets are encapsulated in normal UDP packets and routed like any normal IP
 packets.
 
 \subsection{Data Center Networks are Dynamic}\label{sec:reroute}
@@ -46,22 +46,26 @@ packets ``bouncing'' between layers can cause
 deadlocks~\cite{shpiner2016unlocking}. See
 Figure~\ref{fig:clos_1_bounce}.
 
-In our data centers, we see see hundreds of violations of up-down routing per
+In our data centers, we see hundreds of violations of up-down routing per
 day. Such routes can persist for minutes or even longer. Overall, we estimate
 that $0.001\%$ of the traffic is routed over such paths. This may sound tiny,
 but given that our network carries exabytes of traffic per day, the absolute
-amount of traffic affected by such routing is in tens of petabytes. This makes
+amount of traffic affected by such routing is in tens of terabytes. This makes
 the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 \subsection{Limited Number of Lossless Queues}
 \label{subsec:pfcheadroom}
 
-One easy way to avoid deadlock without changing routing is to buffer packets
-from each flow separately from other flows at each hop -- essentially putting
-each flow in its own class, and applying per-hop backpressure only within the
-class.  A more sophisticated scheme in~\cite{karol2003prevention} requires as
-many priorities as the diameter of the network. 
+%comment: putting a flow into its own buffer does not solve deadlock. It only
+%         solves hol.
+%One easy way to avoid deadlock without changing routing is to buffer packets
+%from each flow separately from other flows at each hop -- essentially putting
+%each flow in its own class, and applying per-hop backpressure only within the
+%class.  
+One idea to solve deadlock is to assign dynamic priority to packets. The priority 
+of a packet increases as the packet approaches its destination ~\cite{karol2003prevention}.
+Such a design requires as many priorities as the diameter of the network.
 
 The problem with this idea is that the PFC standard supports only 8 priority
 classes. Worse yet, modern commodity switches can realistically support fewer
@@ -90,6 +94,6 @@ New switching ASICs may be able to support more lossless queues by adding more
 memory, using smaller cell size (64-byte) and by reducing the pause frame
 response time. But even these are not expected to support more than four or five
 lossless queues. Hence the solutions that require a large number of lossless
-queues are not practical. 
+queues are not practical.
 
-We now describe how \sysname{} addresses these three challenges. 
+We now describe how \sysname{} addresses these three challenges.

@@ -5,9 +5,6 @@ experiments. Our evaluation focuses on three key questions: $(i)$ Can \sysname{}
 prevent deadlock? $(ii)$ Is \sysname{} scalable for large data center networks?,
 and $(iii)$ Does \sysname{} have a performance penalty?
 
-In this section, we answer these questions using a mix of tetsbed experiments
-and numerical analysis.
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/testbed_topo}
@@ -16,9 +13,9 @@ and numerical analysis.
 
 \textbf{Testbed setup}: We use a small Clos network as our testbed with 16
 servers and 10 switches, as shown in Figure~\ref{fig:testbed_topo}. Each server
-is a Dell PowerEdge R730 server with a 40Gbps Mellanox ConnectX-3 Pro NIC, two
+is a Dell PowerEdge R730 server with a 40GbE Mellanox ConnectX-3 Pro NIC, two
 16-core Intel E5-2698 2.3GHz CPUs, 256GB memory and 2TB hard disk. Each switch
-is a Arista 7060CX-32S switch with 32 100Gbps ports and 16MB packet buffer. Our
+is a Arista 7060CX-32S switch with 32 100GbE ports and 16MB packet buffer. Our
 switches support PFC with at most 8 priority classes. Our ConnectX-3 Pro NICs
 support RoCEv2 and DCQCN protocol.
 
@@ -35,7 +32,7 @@ support RoCEv2 and DCQCN protocol.
 		\includegraphics[width=0.25\textwidth] {figs/validation_nonloopcase_flowrate_tagger}
 	}
 	
-	\caption{Clos deadlock due to 1 bounce paths}\label{fig:exp_validation_nonloop}
+	\caption{Clos deadlock due to 1-bounce paths.}\label{fig:exp_validation_nonloop}
 	
 \end{figure}
 
@@ -55,7 +52,7 @@ support RoCEv2 and DCQCN protocol.
 \end{figure}
 
 We have already {\em proved} that \sysname{} prevents deadlock, so the
-experiments in this section are primarily illustrative. 
+experiments in this section are primarily illustrative.
 
 \textbf{Deadlock due to one bounce:} We recreate the scenario shown in
 Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
@@ -69,7 +66,7 @@ are reduced to 0. With \sysname{}, and ELR set to include shortest paths and
 Figure~\ref{fig:exp_validation_loop}(a), we generate 2 flows across different
 ToRs, i.e.,  $F_1$ from H1 to H15 and $F_2$ from H2 to H16. At time = 20s, we
 install a bad route at L1 to let $F_1$ enter a routing loop between T1 and L1.
-The path taken by $F_2$ also traverses link T1-L1.  ELR is set to include
+The path taken by $F_2$ also traverses link T1-L1.  ELR is set to include the
 shortest paths and 1-bounce paths.
 
 In Figure~\ref{fig:exp_validation_loop}(b), we plot the rate of $F_2$ with and
@@ -87,14 +84,14 @@ routing loop.
 As discussed in \S\ref{sec:challenges}, commodity switches can support only a
 limited number of lossless queues.  We have already shown that on a Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
-upto $k$ bounces. In this section, we consider other topologies. 
+up to $k$ bounces. In this section, we consider other topologies.
 
 \begin{table}[t]
 	\centering
 	\scalebox{0.85}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	 \multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &
 			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules} \\
 				\text{at a switch}}}\\
 			\hline
@@ -124,7 +121,7 @@ building destination-rooted shortest-path spanning trees at all the servers.
 
 Table~\ref{table:jellyfish_shortestpath}, shows the number of lossless priority
 classes needed for a variety of network sizes. We see that \sysname{} requires
-only three classes even for a network with 2000 switches. 
+only three classes even for a network with 2000 switches.
 
 The table also shows the maximum number of rules needed at a switch for various
 configurations~\footnote{Different switches require different number of rules
@@ -136,7 +133,7 @@ just 98 ACLs at a switch. Modern commodity switches can support 1-4K ACLs.
 	\scalebox{0.85}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			Switch $\#$ &  \multicolumn{1}{c|}{\tabincell{c}{\text{Switch} \\ \text{port $\#$}}}   &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	 \multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &
 			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules} \\
 					\text{at a switch}}}\\
 			\hline
@@ -166,7 +163,7 @@ In Table~\ref{table:jellyfish_randompath}, we further create $N*10$ random paths
 	\scalebox{0.87}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-			n  &  k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+			n  &  k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}  &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &
 			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
 					\text{a switch}}}\\
 			\hline
@@ -184,7 +181,7 @@ In Table~\ref{table:jellyfish_randompath}, we further create $N*10$ random paths
 			
 		\end{tabular}
 	}
-	\caption{BCube with k shortest paths between every server pair}
+	\caption{BCube with k shortest paths between every server pair.}
 	\label{table:bcube_kpaths}
 \end{table}
 
@@ -195,7 +192,7 @@ In Table~\ref{table:bcube_kpaths}, we consider $k$ shortest paths for BCube($n$,
 	\scalebox{0.88}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-		k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}    &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &    
+		k &  \multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}    &	\multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &
 			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules at} \\
 					\text{a switch}}}\\
 			\hline
