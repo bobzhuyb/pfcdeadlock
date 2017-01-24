@@ -160,6 +160,46 @@ In Table~\ref{table:jellyfish_randompath}, we further create $N*10$ random paths
 
 \begin{table}[t]
 	\centering
+	\scalebox{0.85}{
+		\begin{tabular}{|r|r|r|r|}
+			\hline
+			m    &	\multicolumn{1}{c|}{\tabincell{c}{\text{Network} \\ \text{diameter}}}&  \multicolumn{1}{c|}{\tabincell{c}{\text{$\#$ of lossless} \\ \text{priority classes}}}   &
+			\multicolumn{1}{c|}{\tabincell{c}{Max \text{$\#$ of rules} \\
+					\text{at a switch}}}\\
+			\hline
+			\hline
+			1 & 5 & 2 & 30 \\
+			\hline
+			2  & 5 & 2&  36 \\
+			\hline
+			4  & 5 & 2 &  41\\
+			\hline
+			8  & 5 & 2 & 44 \\
+			\hline
+			16  & 5& 3 &  47\\
+			\hline
+			
+		\end{tabular}
+	}
+	\caption{Jellyfish with m shortest paths between each server pair (the result in the table is under the  settting of	switch number=50, switch port number = 32).}
+	\label{table:jellyfish_mshortestpath}
+\end{table}
+
+
+In Table~\ref{table:jellyfish_mshortestpath}, we  consider the case where there are m (m > 1) shortest paths between each server pair.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.45\textwidth] {figs/algo_runtime}
+	\caption{Runtime of Algorithm~\ref{alg:greedy} on Jellyfish under different network scales ( one shortest path between each server pair).}
+	\label{fig:algo_runtime}
+\end{figure}
+
+In Figure.~\ref{fig:algo_runtime}, we  plot the runtime of Algorithm~\ref{alg:greedy} on Jellyfish under different network scales.
+
+\begin{table}[t]
+	\centering
 	\scalebox{0.87}{
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
