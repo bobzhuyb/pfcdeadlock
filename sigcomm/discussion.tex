@@ -9,7 +9,7 @@ traffic.
 
 A n{\"a}ive way to use \sysname{} in such cases is to treat each application (or
 traffic class) separately.  For example, in \S\ref{subsec:combine}, we showed
-that for the Clos network, if ELR contained paths with no more than $M$
+that for the Clos network, if ELP contained paths with no more than $M$
 bounces lossless, we need $M+1$ priorities. If there are $N$ applications, the
 n{\"a}ive approach would use $N*(M+1)$ priorities.  However, the switches may
 not have sufficient buffer to support this large number of lossless queues
@@ -40,30 +40,18 @@ values are always decremented by the forwarding pipeline in the switch. It's
 possible to work around this problem, but using DSCP simplifies the
 implementation.
 
-\para{Specifying ELR:} The need to specify expected lossless paths is not a
+\para{Specifying ELP:} The need to specify expected lossless paths is not a
 problem in practice. For Clos networks, it is easy to enumerate paths with any
-given limit on bouncing. For a general topology, as long as the routing is
-traffic agnostic, it is usually easy to determine what routes the routing
-algorithm will compute -- e.g. BGP will find shortest AS path etc.  If an
-SDN controller is used, the controller algorithm can be used to generate the
-paths under a variety of simulated conditions. ECMP is handled by including all possible
-paths.
+given limit on bouncing. In general, as long as routing is traffic agnostic, it
+is usually easy to determine what routes the routing algorithm will compute --
+e.g. BGP will find shortest AS path etc.  If an SDN controller is used, the
+controller algorithm can be used to generate the paths under a variety of
+simulated conditions. ECMP is handled by including all possible paths.
 
-We stress again that there are no restrictions on routes included in ELR, apart
-from the common-sense requirement that each route be loop-free. Once ELR is
+We stress again that there are no restrictions on routes included in ELP, apart
+from the common-sense requirement that each route be loop-free. Once ELP is
 specified, we can handle any subsequent abnormalities, including routing loops
 that may form in error.
-
-%%comment. i do not understand this paragraph. If we only put 2 bounces paths into lossless then for $T1-L1-S1-L2-T2$, the packet starts from lossy tag. 
-%%         
-Note that ELR is the set of {\em expected} lossless paths. \sysname{} will
-ensure that any packet that travels on ELR paths will always be queue in
-lossless queues. However, \sysname{} may render other paths lossless as well.
-For example, for the Clos network shown in Figure~\ref{fig:basic_clos}, if we
-include in ELR all 2-bounce paths, the resulting system of tags will also ensure
-that any packet traveling on the path $T1-L1-S1-L2-T2$ is also always queued in
-lossless priority queues even though the path has no ``bounce''. Needless to
-say, typically most packets would travel $T1-L1-T2$ path.
 
 \para{Use of lossy queue:} Some may dislike the fact that we may eventually push
 a wayward packet into a lossy queue. We stress that we do this only as a last
@@ -71,20 +59,20 @@ resort, and we reiterate that it does not mean that the packets are
 automatically or immediately dropped.
 
 \para{Topology changes:} \sysname{} has to generate a new set of
-tags when network topology is updated. Under certain circumstances, e.g.  for
-Jellyfish-like random topologies, \sysname{} may require a updating tagging
+tags and rewriting rules if network topology and/or ELP is updated. For
+Jellyfish-like random topologies, \sysname{} may need to update tagging rules
 rules in all switches upon topology changes.  If, on the other hand, a
 FatTree-like topology is expanded by adding new ``pods'' under existing spines
 (i.e by using up empty ports on spine switches), none of the older switches need
 any rule changes.
 
-\para{Dynamic topologies:} Given the above limitation, it follows that \sysname{}
-is not currently suitable for networking architectures that use flexible
-topologies -- e.g. Helios~\cite{helios}, Flyways~\cite{flyways} or
-Projector~\cite{projector}.
+\para{Dynamic topologies:} Given the above limitation, \sysname{} is not
+suitable for networking architectures with flexible topologies -- e.g.
+Helios~\cite{helios}, Flyways~\cite{flyways} or Projector~\cite{projector}.
 
-\para{PFC alternatives:} One may ask whether getting rid of PFC altogether is a
-better way of preventing deadlocks.  We are sympathetic to this view, and are
+\para{PFC alternatives:} One might argue that PFC is not worth the trouble it
+causes; and we should focus on getting rid of PFC altogether.
+We are sympathetic to this view, and are
 actively investigating numerous schemes, including minimizing PFC generation
 (e.g.  using DCQCN~\cite{dcqcn} or Timely~\cite{timely}, better retransmission
 schemes for IB transport layer~\cite{roce}, as well as other more novel schemes.

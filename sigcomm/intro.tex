@@ -64,7 +64,7 @@ best of our knowledge, no deadlock free routing solution has been deployed in a
 production data center.  
 
 In this paper, we present \sysname{}, which meets all three challenges described
-above. \system is based on a simple observation: in a data center, we can ask
+above. \sysname{} is based on a simple observation: in a data center, we can ask
 the operator to supply a list of paths that the operator wants to be lossless.
 We call these expected lossless paths (ELPs). Enumerating ELPs is
 straightforward for ``structured'' topologies like Clos~\cite{clos},
@@ -76,14 +76,14 @@ switches use these tags to enqueue packets in different lossless queues. The tag
 values are such that CBD never forms due to packets travelling on paths in ELP.
 If packets ever deviate from paths in ELP (e.g. due to link failures or routing
 errors) they are automatically placed in a lossy queue to ensure that they do
-not trigger PFC. \system guarantees that there will be no deadlock - even under
+not trigger PFC. \sysname{} guarantees that there will be no deadlock - even under
 unforeseen link failures or routing errors. Even routing loops won't lead to
 deadlock!
 
-\system works for any routing protocol. There are no restrictions on what paths
-can be included in the ELP. Tagging rules are completely static and are
-specified only in terms of local information (tag, ingress port and egress port)
-available at each switch. 
+\sysname works for any routing protocol because there are no restrictions on what
+paths can be included in the ELP, and tagging rules are specified only in terms
+of local information (tag, ingress port and egress port) available at each
+switch. 
 
 The number of lossless queues and the number of tag match-action rules are
 small.  Even for a Jellyfish topology with 2000 switches, \sysname{} requires

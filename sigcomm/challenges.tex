@@ -2,7 +2,7 @@
 \section{Challenges}
 \label{sec:challenges}
 
-\subsection{Working with existing routing protocols}
+\subsection{Working with existing routing protocols and hardware}
 \label{sec:incremental}
 
 Many current proposals~\cite{tcpbolt, karol2003prevention,
@@ -22,6 +22,9 @@ Thus, data center operators are reluctant to deploy a brand-new routing protocol
 RoCEv2 itself can be deployed without any changes to routing protocols -- RoCEv2
 packets are encapsulated in normal UDP packets and routed like any normal IP
 packets.
+
+It's almost superfluous to note that operators would be even more reluctant to
+adopt a deadlock avoidance a protocol that requires deployment of new hardware. 
 
 \subsection{Data Center Networks are Dynamic}\label{sec:reroute}
 
@@ -57,31 +60,25 @@ in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 \subsection{Limited Number of Lossless Queues}
 \label{subsec:pfcheadroom}
 
-%comment: putting a flow into its own buffer does not solve deadlock. It only
-%         solves hol.
-%One easy way to avoid deadlock without changing routing is to buffer packets
-%from each flow separately from other flows at each hop -- essentially putting
-%each flow in its own class, and applying per-hop backpressure only within the
-%class.  
-One idea to solve deadlock is to assign dynamic priority to packets. The priority 
-of a packet increases as the packet approaches its destination ~\cite{karol2003prevention}.
-Such a design requires as many priorities as the diameter of the network.
-
-The problem with this idea is that the PFC standard supports only 8 priority
-classes. Worse yet, modern commodity switches can realistically support fewer
-than 8 lossless classes.  The problem is that  to guarantee the lossless
-property, a switch needs to reserve certain amount of {\it headroom} per port,
-per lossless queue.
+One idea to solve deadlock is to assign dynamic priority to packets. The
+priority of a packet increases as the packet approaches its destination
+~\cite{karol2003prevention}.  Such a design requires as many priorities as the
+diameter of the network.  The problem with this idea is that the PFC standard
+supports only 8 priority classes. Worse yet, commodity switches can
+realistically support fewer than 8 lossless classes.  The problem is that  to
+guarantee the lossless property, a switch needs to reserve certain amount of
+{\it headroom} per port, per lossless queue.
 
 The headroom is needed to absorb the packets that are in flight between the time
 a receiver sends a PFC pause frame to its upstream sender to the time the sender
 stops transmitting.  The headroom size depends on many factors, including length
-of cables between the switches. See \ref{APPHEADROOM} for details.  A typical
-32-port 40GbE Ethernet switch with 12MB total buffer needs to reserve 2.76MB of
-headroom to support one lossless queue on all ports. That's 23\% of the total
-buffer the switch has\footnote{The memory used to build switch buffers needs to
-be extremely fast, and hence is extremely expensive. Adding more memory raises
-switch costs, and can lead to bufferbloat-like problems~\cite{dctcp}.}.
+of cables between the switches. See Appendix \ref{APPHEADROOM} for details.  A 32-port
+40GbE Ethernet switch needs to reserve 2.76MB of headroom to support one
+lossless queue on all ports. A commodity switch like this typically has with
+12MB total buffer\footnote{The memory used to build switch buffers needs to be
+extremely fast, and hence is extremely expensive. Adding more memory raises
+switch costs, and can lead to bufferbloat-like problems~\cite{dctcp}.}, so 23\%
+of the total switch buffer is needed to support just one lossless priority.
 
 While this headroom is sufficient to avoid packet drops, in practice, we use a
 slightly larger value to avoid buffer under-flow when the receiver un-pauses the
