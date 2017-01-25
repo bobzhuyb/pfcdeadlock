@@ -35,11 +35,6 @@ packets experience one-bounce and may mix with traffic in the next lossless
 class.  This technique can be generalized for the output of
 Algorithm~\ref{alg:greedy}.
 
-\para{What to use for tag:} We use DSCP instead of TTL to tag packets. TTL
-values are always decremented by the forwarding pipeline in the switch. It's
-possible to work around this problem, but using DSCP simplifies the
-implementation.
-
 \para{Specifying ELP:} The need to specify expected lossless paths is not a
 problem in practice. For Clos networks, it is easy to enumerate paths with any
 given limit on bouncing. In general, as long as routing is traffic agnostic, it

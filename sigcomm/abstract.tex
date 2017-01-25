@@ -1,15 +1,12 @@
 \begin{abstract} Remote Direct Memory Access over Ethernet (RoCE) deployments
 		are vulnerable to deadlocks induced by Priority Flow Control (PFC).
-		While several solutions for preventing deadlocks have been proposed,
-		none have been widely deployed because they either require significant
+		Prior solutions for deadlock prevention either require significant
 		changes to routing protocols, or require excessive buffers in the
 		switches. In this paper, we propose a scheme for dealdock prevention,
-		called \sysname{}. \sysname{} does not require any changes to the
-		routing protocol, and needs only modest buffers.
-		\sysname{} is based on the insight that once all expected lossless
-		routes are known, a simple tagging and buffer management scheme can be
-		developed to prevent deadlock for those routes under all failure conditions. We show how
-		to design such a scheme, prove that it prevents deadlock under all
-		conditions, and show how to implement it efficiently on commodity
-		hardware.
+		called \sysname{} that does not require any changes to the routing
+		protocol, and needs only modest buffers.  \sysname{} is based on the
+		insight that given a set of expected lossless routes, a simple tagging
+		scheme can be developed to ensure that no deadlock will occur under any
+		failure conditions. We design such a scheme, prove that it prevents
+		deadlock and implement it efficiently on commodity hardware.
 \end{abstract}

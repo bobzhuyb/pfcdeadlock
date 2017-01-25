@@ -4,7 +4,7 @@
 
 \begin{figure}[t]
 		\centering
-		\includegraphics[width=0.4\textwidth] {figs/updown_paths}
+		\includegraphics[width=0.3\textwidth] {figs/updown_paths}
 		\caption{Clos topology with two flows following up-down .}
 		\label{fig:basic_clos}
 \end{figure}
@@ -40,13 +40,6 @@ We now describe the core idea behind \sysname{}.
 
 \subsection{Tagging on bounce}
 \label{subsec:tag}
-
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.5\textwidth] {figs/cbd_a}
-	\caption{1-bounce path creates CBD.}
-	\label{fig:clos_1_bounce}
-\end{figure}
 
 Consider Figure~\ref{fig:basic_clos}. Lets assume that the operator defines ELP
 simply - just shortest up-down paths as they exist in this network.  Both the
@@ -116,6 +109,60 @@ end, we show how to combine tags.
 
 \begin{figure}[t]
 	\centering
+	\includegraphics[width=0.5\textwidth] {figs/cbd_a}
+	\caption{1-bounce path creates CBD.}
+	\label{fig:clos_1_bounce}
+\end{figure}
+
+\subsection{Reducing the number of lossless queues}
+\label{subsec:combine}
+
+Consider again the network Figure~\ref{fig:basic_clos}.  Let's say the operator
+wants to make sure that in face of link failures, packets are not immediately
+put into a lossy queue. The operator is willing to tolerate up to $k$ bounces.
+So, the ELP consists of all shortest paths, and all paths with up to $k$ bounces.
+Do we need to assign a distinct tag and a corresponding priority queue for each
+bouncing point?
+
+To answer this question, we leverage our knowledge of Clos topology.  Consider a
+packet that bounces twice. The path between the first bounce and the second
+bounce is a normal up-down path. Therefore, these path segments do not have CBD
+even if we combine them into a single priority queue. We can use a single tag to
+represent these segments altogether, and map the tag to a globally unique
+priority queue.
+
+This completes the design of \sysname{} for Clos topology. Packets start with
+tag of 1. We configure all ToR and Leaf switches such that every time they see
+a packet coming down and then going up (therefore, bouncing) for any reasons,
+they increase the tag by one. Spine switches do not need to change tags since 
+packets never go up there.
+
+All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELP
+includes paths with up to $k$ bounces, the switches need to have $k+1$ lossless
+queues. If a packet bounces more than $k$ times (e.g. due to numerous link
+failures, or loop), it will carry a tag larger than $k+1$. All switches will put
+such packets into a lossy queue.  Pseudocode of the algorithm, using notation
+developed in \S\ref{sec:generic}, is shown in Appendix~\ref{sec:clos_optimal}.
+
+Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in action, for
+ELP consisting of all shortest up-down paths, plus all 1-bounce paths.
+Packets, when traveling on path segments before bounce carry a tag value of 1,
+and the tag is set to 2 after the bounce. This ensures that the packets are
+queued in separate lossless queues, and thus there is no CBD. In other words, we
+show a system for $k=2$. The lossy queue for packets that bounce more than once
+is omitted for clarity. The corresponding tag rewriting rules at  $T2, L2 and
+S2$ are shown in Table~\ref{tab:clos_tag_rules}.  Rules for other switches are
+similar. Note that only $L2$ is doing any ``rewriting''.
+\S\ref{sec:implementation} we will show how to implement these rules compactly
+using TCAM match-action tables.
+
+This design satisfies all three challenges described in \S\ref{sec:challenges}.
+We do not change the routing protocol. We work with existing hardware. We deal
+with dynamic changes to , and we do not exceed the number of available
+lossless queues.
+
+\begin{figure}[t]
+	\centering
 	\includegraphics[width=0.5\textwidth] {figs/cbd_b}
 	\caption{Illustration of \sysname{} for ELP of all shortest up-down paths,
 		and all 1-bounce paths. For clarity, only lossless queues are shown.}
@@ -169,83 +216,36 @@ end, we show how to combine tags.
 		\vspace{-1em}
 \end{table}
 
-\subsection{Reducing the number of lossless queues}
-\label{subsec:combine}
-
-Consider again the network Figure~\ref{fig:basic_clos}.  Let's say the operator
-wants to make sure that in face of link failures, packets are not immediately
-put into a lossy queue. The operator is willing to tolerate up to $k$ bounces.
-So, the ELP consists of all shortest paths, and all paths with up to $k$ bounces.
-Do we need to assign a distinct tag and a corresponding priority queue for each
-bouncing point?
-
-To answer this question, we leverage our knowledge of Clos topology.  Consider a
-packet that bounces twice. The path between the first bounce and the second
-bounce is a normal up-down path. Therefore, these path segments do not have CBD
-even if we combine them into a single priority queue. We can use a single tag to
-represent these segments altogether, and map the tag to a globally unique
-priority queue.
-
-This completes the design of \sysname{} for Clos topology. Packets start with
-tag of 1. We configure all ToR and Leaf switches such that every time they see
-a packet coming down and then going up (therefore, bouncing) for any reasons,
-they increase the tag by one. Spine switches do not need to change tags since 
-packets never go up there.
-
-All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELP
-includes paths with up to $k$ bounces, the switches need to have $k+1$ lossless
-queues. If a packet bounces more than $k$ times (e.g. due to numerous link
-failures, or loop), it will carry a tag larger than $k+1$. All switches will put
-such packets into a lossy queue.  Pseudocode of the algorithm, using notation
-developed in \S\ref{sec:generic}, is shown in Appendix~\ref{sec:clos_optimal}.
-
-Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in action, for
-ELP consisting of all shortest up-down paths, plus all 1-bounce paths.
-Packets, when traveling on path segments before bounce carry a tag value of 1,
-and the tag is set to 2 after the bounce. This ensures that the packets are
-queued in separate lossless queues, and thus there is no CBD. In other words, we
-show a system for $k=2$. The lossy queue for packets that bounce more than once
-is omitted for clarity. The corresponding tag rewriting rules at  $T2, L2 and
-S2$ are shown in Table~\ref{tab:clos_tag_rules}.  Rules for other switches are
-similar. Note that only $L2$ is doing any ``rewriting''.
-\S\ref{sec:implementation} we will show how to implement these rules compactly
-using TCAM match-action tables.
-
-This design satisfies all three challenges described in \S\ref{sec:challenges}.
-We do not change the routing protocol. We work with existing hardware. We deal
-with dynamic changes to , and we do not exceed the number of available
-lossless queues.
-
 \subsection {Deadlock freedom and optimality}
 \label{subsec:specific_deadlock_free}
 
 We now provide brief proof sketches to prove that the above algorithm is
 deadlock free, and optimal in terms of number of lossless priorities used.
 
-\begin{figure}[t]
-	%\vspace{-0.1in}
-	\centering
-	
-	\subfloat[short for lof][CBD across subspaces.] {
-		\includegraphics[width=0.26\textwidth] {figs/subspace_a}
-	}
-	\subfloat[short for lof][DAG across subspaces.]{
-		\includegraphics[width=0.24\textwidth] {figs/subspace_b}
-	}
-	
-	\caption{DAG across subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
-\end{figure}
+%% \begin{figure}[t]
+%% 	%\vspace{-0.1in}
+%% 	\centering
+%% 	
+%% 	\subfloat[short for lof][CBD across subspaces.] {
+%% 		\includegraphics[width=0.26\textwidth] {figs/subspace_a}
+%% 	}
+%% 	\subfloat[short for lof][DAG across subspaces.]{
+%% 		\includegraphics[width=0.24\textwidth] {figs/subspace_b}
+%% 	}
+%% 	
+%% 	\caption{DAG across subspaces ensure deadlock-free priority transition.}\label{fig:subspace}
+%% \end{figure}
 
 \para{\sysname{} is deadlock-free for Clos networks:} \sysname{} has two
 important properties. First, for any given tag and its corresponding priority
 queue, there is no CBD because each tag only has a set of ``up-down'' routing
 paths.  Second, every time the tag changes, it changes monotonically. This means
 that the packet is going unidirectionally in a DAG of priority queues. This is
-important because otherwise CBD may still happen across different priorities
-(Figure~\ref{fig:subspace}).  We conclude that no CBD can form either within a
-tag or across different tags.  The network is deadlock-free since CBD is a
-necessary condition for deadlock.  A formal proof, which applies to any
-topology, is given in \S\ref{sec:generic}.
+important because otherwise CBD may still happen across different priorities.
+We conclude that no CBD can form either within a tag or across different tags.
+The network is deadlock-free since CBD is a necessary condition for deadlock.  A
+formal proof, which applies to any topology, is given in \S\ref{sec:generic}.
+%(Figure~\ref{fig:subspace}). 
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$

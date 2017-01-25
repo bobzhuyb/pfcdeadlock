@@ -2,13 +2,13 @@
 \section{Challenges}
 \label{sec:challenges}
 
-\subsection{Working with existing routing protocols and hardware}
+\subsection{Work with existing routing protocols and hardware}
 \label{sec:incremental}
 
 Many current proposals~\cite{tcpbolt, karol2003prevention,
 sancho2004,lash,wu2003fault} for deadlock avoidance are based on custom routing
-protocols that go to great lengths to avoid CBD.  Unfortunately, this makes it
-very difficult to deploy them in existing data center networks.
+protocols. Unfortunately, this makes it very difficult to deploy them in
+existing data center networks.
 
 Routing in modern data centers is accomplished in a variety of ways, including
 BGP~\cite{vl2, facebookrouting} or using SDN-like
@@ -20,11 +20,10 @@ tools and technologies to monitor and maintain their networks.
 Thus, data center operators are reluctant to deploy a brand-new routing protocol
 {\em just for} deadlock avoidance. This task appears especially onerous because
 RoCEv2 itself can be deployed without any changes to routing protocols -- RoCEv2
-packets are encapsulated in normal UDP packets and routed like any normal IP
-packets.
+packets are encapsulated in standard UDP packets.
 
-It's almost superfluous to note that operators would be even more reluctant to
-adopt a deadlock avoidance a protocol that requires deployment of new hardware. 
+It goes without saying that operators would be even more reluctant to
+adopt a deadlock avoidance scheme that requires deployment of new hardware. 
 
 \subsection{Data Center Networks are Dynamic}\label{sec:reroute}
 

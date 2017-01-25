@@ -110,6 +110,9 @@ We stress that none of the three steps require any changes to the switch ASIC,
 and everything is implemented using publicly available and documented
 functionality.
 
+We considered using TTL instead of DSCP to tag packets, but TTL is decremented
+by the forwarding pipeline, which complicates the rule structure.
+
 \begin{figure}[t]
 	%\vspace{-0.1in}
 	\centering

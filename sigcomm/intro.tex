@@ -15,8 +15,7 @@ deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}.
 
 Deadlocks in PFC-enabled network are caused by circular buffer dependency
 (CBD)~\cite{hu2016deadlocks}. Figure~\ref{fig:deadlock_example} illustrates a
-3-node CBD: switch A is blocked by switch B, which is blocked by C, which is
-blocked by A.
+3-node CBD.
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in
@@ -47,28 +46,26 @@ routing protocols or switch hardware, $(ii)$ it must deal with link failures and
 associated  route changes, and $(iii)$ it must work with limited buffer
 available in commodity switches.
 
-While a number of schemes for preventing deadlocks have been proposed, they fail
-to meet one or more of these challenges.  Some schemes require centralized,
-SDN-style routing.  These are difficult to deploy in existing data centers,
-without wholesale infrastructure changes.  Others are distributed, but brand-new
-routing protocols~\cite{tcpbolt} that are not supported by commodity switches.
-Many of these schemes also require carefully controlling the paths -- something
-that is simply not possible with decentralized routing in presence of link
-failures~\cite{netpilot}.  Finally, some schemes require creation of numerous
-priorities and buffer management according to those priorities. For example, if
-each of the flows in Figure~\ref{fig:deadlock_example} had its own priority and
-was buffered separately at each switch, there would be no deadlock.  However,
-modern data center networks, built using commodity switches, can realistically
-support only two or three lossless priorities~\cite{rdmaatscale}.  Thus, to the
-best of our knowledge, no deadlock free routing solution has been deployed in a
-production data center.  
+Prior proposals for deadlock prevention fail to meet one or more of these
+challenges.  Some schemes require centralized, SDN-style routing.  These are
+difficult to deploy in existing data centers, without wholesale infrastructure
+changes.  Others are distributed, but brand-new routing protocols~\cite{tcpbolt}
+that are not supported by commodity switches.  Many of these schemes also
+require carefully controlling the paths -- something that is simply not possible
+with decentralized routing in presence of link failures~\cite{netpilot}.
+Finally, some schemes require creation of numerous priorities and buffer
+management according to those priorities. For example, if each of the flows in
+Figure~\ref{fig:deadlock_example} had its own priority and was buffered
+separately at each switch, there would be no deadlock.  However, modern data
+center networks, built using commodity switches, can realistically support only
+two or three lossless priorities~\cite{rdmaatscale}. 
 
 In this paper, we present \sysname{}, which meets all three challenges described
 above. \sysname{} is based on a simple observation: in a data center, we can ask
-the operator to supply a list of paths that the operator wants to be lossless.
+the operator to supply a list of paths that must be lossless.
 We call these expected lossless paths (ELPs). Enumerating ELPs is
 straightforward for ``structured'' topologies like Clos~\cite{clos},
-FatTree~\cite{fattree} and Bcube~\cite{bcube}, and not onerous even for
+FatTree~\cite{fattree} or Bcube~\cite{bcube}, and not onerous even for
 randomized topologies like Jellyfish~\cite{jellyfish}. 
 
 Using ELPs, we create a system of match-action rules to ``tag'' packets. The
@@ -80,28 +77,28 @@ not trigger PFC. \sysname{} guarantees that there will be no deadlock - even und
 unforeseen link failures or routing errors. Even routing loops won't lead to
 deadlock!
 
-\sysname works for any routing protocol because there are no restrictions on what
+\sysname{} works for any routing protocol because there are no restrictions on what
 paths can be included in the ELP, and tagging rules are specified only in terms
 of local information (tag, ingress port and egress port) available at each
 switch. 
 
-The number of lossless queues and the number of tag match-action rules are
-small.  Even for a Jellyfish topology with 2000 switches, \sysname{} requires
-just three lossless queues per switch.  In fact, we prove that for Clos
-topology,  \sysname{} is optimal in terms of number of lossless queues required.
-We also show how to minimize the number of match-action rules required to
-implement \sysname{}.
+The number of lossless queues and the number of tag match-action rules required
+by \sysname{} are small.  Even for a Jellyfish topology with 2000 switches,
+\sysname{} requires just three lossless queues per switch.  In fact, we prove
+that for Clos topology,  \sysname{} is optimal in terms of number of lossless
+queues required.  We also show how to minimize the number of match-action rules
+required to implement \sysname{}.
 
 We have implemented and tested \sysname{} on commodity Arista 7050 Switches with
 Broadcom chipsets. The implementation requires carefully addressing the problem
 of priority transition (\S\ref{sec:implementation}). Our tests show that
-\sysname{} has no performance penalty on datapath.
+\sysname{} has no impact on throughput and latency of RDMA traffic.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth] {figs/deadlock}
 	\vspace{-0.15in}
-	\caption{PFC-induced deadlock: simple illustration of CBD.}
+	\caption{Illustration of CBD: The routing is contrived, but note that there is no routing loop.}
 	\vspace{-0.15in}
 	\label{fig:deadlock_example}
 \end{figure}
