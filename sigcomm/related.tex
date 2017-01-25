@@ -10,7 +10,7 @@
 %Our work in this paper showed that we can make PFC work with guaranteed deadlock-free with existing data center networks. Tagger works seamlessly with any existing routing protocols and network topologies.
 
 \para{Deadlock-free routing.}
-Deadlock-free routing \cite{dally,duato93,dally93} [todo: more references] can be achieved by splitting the physical links into virtual channels and virtual channels are arranged in a way so as to avoid circular buffer dependency. In all those designs, the routing is decided by the virtual channels. Hence they cannot work with existing routing protocols for the data center networks which was designed for the lossy networks.
+Deadlock-free routing \cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011} can be achieved by splitting the physical links into virtual channels and virtual channels are arranged in a way so as to avoid circular buffer dependency. In all those designs, the routing is decided by the virtual channels. Hence they cannot work with existing routing protocols for the data center networks which was designed for the lossy networks.
 
 TCP-Bolt~\cite{tcpbolt} uses multiple edge-disjoint spanning trees (EDSTs) and puts every EDST into a separate VLAN and lossless queue to achieve deadlock-free. To achieve good performance, TCP-Bolt may need a large number of lossless queues (which cannot be provided in current commodity switches). Furthermore, TCP-Bolt needs to run layer-2 VLAN, whereas all large-scale data center networks run layer-3. 
 DF-EDST~\cite{dfedst16} introduces a set of edge-disjoint spanning trees and a tree transition graph to provide deadlock free routing for arbitrary data center network topologies. DF-EDST, however, cannot work with existing routing protocols as it needs to follow the EDSTs. Furthermore, The EDST selection and transition cannot be readily implemented in current Ethernet switches.
@@ -22,7 +22,7 @@ The latest Intel Omni-Path architecture \cite{omnipath} introduced the concept o
 has discussed how they can be implemented in reality. In \cite{dag}, the author tried to reduce the number of lossless queues to only two. The design, however, does not guarantee lossless. Further, some arbitrary switches need much larger buffer space than the others.
 
 \para{Deadlock recovery.}
-All the deadlock recovery schemes \cite{isca95,shpiner2016unlocking} need to detect if deadlock occurs, and if occurs, break the deadlock by rerouting packets. These approaches have two issues: (1) They cannot guarantee that deadlock will not happen again (if they can, there will be no need for deadlock recovery). (2) They need add new deadlock detection algorithms and deadlock breaking protocols into the switches.
+All the deadlock recovery schemes \cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998} need to detect if deadlock occurs, and if occurs, break the deadlock by rerouting packets. These approaches have two issues: (1) They cannot guarantee that deadlock will not happen again (if they can, there will be no need for deadlock recovery). (2) They need add new deadlock detection algorithms and deadlock breaking protocols into the switches.
 
 \para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
 work by preemption. This does not work in Ethernet and in practice.
