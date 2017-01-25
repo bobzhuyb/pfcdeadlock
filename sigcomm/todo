@@ -17,3 +17,6 @@ runtime numbers (e.g., how many seconds) for fat-tree and jelly fish
 rules for jellyfish with 8-shortest paths
 
 intro needs to say that deadlock spreads
+
+
+update 7 to remove subspace, just say tag.

@@ -25,15 +25,10 @@ switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$
 until a resume message with priority $j$ is received.
 
-\para{Deadlock:} PFC can lead to deadlocks when paused links form a cycle
-(Figure~\ref{fig:deadlock_example}). Once formed, deadlock is ``permanent'' in
-the sense that it will continue to exist even if no new traffic is injected into
-the loop. Circular Buffer Dependency (CBD) is a necessary condition for deadlock
-formation, but sufficient conditions for deadlock formation in PFC networks are
-yet to be fully characterized~\cite{hu2016deadlocks}. Thus, deadlock avoidance
-schemes focus on avoiding CBD.
-
-We now describe the three key challenges that any practical deadlock avoidance
-scheme must meet.
+\para{Deadlock:} PFC can lead to deadlocks when paused queues form a cycle
+(Figure~\ref{fig:deadlock_example}). Circular Buffer Dependency (CBD) is a
+necessary condition for deadlock formation, and thus, deadlock avoidance schemes
+focus on avoiding CBD.  We now describe the three key challenges that any
+practical deadlock avoidance scheme must meet.
 
 
