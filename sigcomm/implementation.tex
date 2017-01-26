@@ -61,12 +61,12 @@ correctly pauses the queue on which the packet with the new tag would be
 exiting. This example thus demonstrates the necessity of the third step.
 
 \para{Rule compression:}  The match-action rules of \sysname{}
-are implemented with TCAM. TCAM entries consist of three parts ({\em Value},
-{\em Mask}, {\em Result}). {\em Value} refers to the pattern to be matched, {\em
+are implemented with TCAM. TCAM entries consist of three parts ({\em Pattern},
+{\em Mask}, {\em Result}). {\em Pattern} refers to the pattern to be matched, {\em
 Mask} refers to the mask bits associated with the pattern and {\em Result}
 refers to the action that occurs when a lookup hits the pattern.  One TCAM entry
-can have several Value-Mask pairs to match multiple packet header fields
-simultaneously, e.g., an entry like (Value-1, Mask-1, Value-2, Mask-2, Result)
+can have several Pattern-Mask pairs to match multiple packet header fields
+simultaneously, e.g., an entry like (Pattern-1, Mask-1, Pattern-2, Mask-2, Result)
 matches two fields simultaneously and fires only if both matches succeed.
 
 \begin{figure}
@@ -81,16 +81,15 @@ patterns to be matched can be aggregated using bit masking. Consider the three
 rules in Figure~\ref{fig:compression}. These rules share the same tag value,
 egress port and tag rewriting action.
 
-Note that port numbers in TCAM are bitmaps, and not binary values. Thus, we can
-aggregate ingress ports for rules that share the same tag, egress port and
-action, by simply setting corresponding bits in the inport value to 1, and
-setting the mask to all 1s. Thus, the three \sysname{} rules are compressed into
+Note that port numbers in TCAM are bitmaps, and not binary values. To match a single port, we can simply set the corresponding bit in the pattern to 1, and set the mask to all 1s. 
+
+However, in order to match multiple ports with one rule, we should set the pattern to all 0s, and set the corresponding bits in the mask to 0. As shown in Figure~\ref{fig:compression},  to match ingress ports 0, 1 and 3, we set Pattern-2 to ``0000''  and Mask-2 to ``0100''. In this case, only the packet received from ingress port 0, 1 or 3 will match Pattern-2 after doing bit masking with Mask-2. Thus, the three \sysname{} rules are compressed into
 a single TCAM entry.
 
 Recall from \S\ref{sec:generic} that without any compression, we need
 $n(n-1)m(m-1)/2$ rules per switch. The number of rules can be
 compressed to $nm(m-1)/2$ by aggregating ingress ports.  The
-result can further improved by doing joint aggregation on tag, ingress port and
+result can be further improved by doing joint aggregation on tag, ingress port and
 egress port.
 
 \para{Broadcom implementation:} We have implemented \sysname{} on commodity
@@ -113,32 +112,3 @@ functionality.
 We considered using TTL instead of DSCP to tag packets, but TTL is decremented
 by the forwarding pipeline, which complicates the rule structure.
 
-\begin{figure}[t]
-	%\vspace{-0.1in}
-	\centering
-	
-	\subfloat[short for lof][Experiment scenario.]{
-		\includegraphics[width=0.25\textwidth] {figs/demon_scenario}
-	}
-	\subfloat[short for lof][Rate of flow 1 and flow 2.]{
-	\includegraphics[width=0.25\textwidth] {figs/demon_flowrate}
-}
-	
-	\caption{The match-action rules in action}\label{fig:tagger_demon}
-\end{figure}
-
-
-\para{Simple demonstration:}  A simple experiment shown in
-Figure~\ref{fig:tagger_demon} demonstrates the behavior of the match-action
-rules.  We generate two flows, flow 1 and flow 2, to send packets to C from
-different servers connected to ports A and B. Both servers set the DSCP value in
-outgoing packets to 1. The match-action rules are set to rewrite the tag value
-of packets arriving on port A to 2, and forward them to port C. Tag of packets
-arriving on port B is not changed.
-
-At time = 17s, C sends a stream of forged PFC PAUSE frames on priority 2 to
-switch S. The rate of both flows is plotted in Figure~\ref{fig:tagger_demon}(b)
-(link capacity = 40Gbps). As expected, after priority 2 is paused, rate of
-flow 1 is reduced to 0 while flow 2 gets all the available bandwidth.
-Counters on switch S further confirm that no packets were dropped, and server
-connected to port A was paused as expected.
