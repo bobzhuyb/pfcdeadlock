@@ -72,8 +72,9 @@ FatTree~\cite{fattree} or Bcube~\cite{bcube}, and not onerous even for
 randomized topologies like Jellyfish~\cite{jellyfish}.
 
 Using ELPs, we create a system of match-action rules to ``tag'' packets. The
-switches use these tags to enqueue packets in different lossless queues. The tag
-values are such that CBD never forms due to packets travelling on paths in ELP.
+switches use these tags to enqueue packets in different lossless queues. The tags 
+carried in packets are manipulated in a way 
+such that CBD never forms due to packets traveling on paths in ELP.
 If packets ever deviate from paths in ELP (e.g. due to link failures or routing
 errors) they are automatically placed in a lossy queue to ensure that they do
 not trigger PFC. \sysname{} guarantees that there will be no deadlock - even under
