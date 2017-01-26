@@ -28,13 +28,16 @@ is embedded in a packet. A packet belonging to one lossless class may change its
 tag value, which means that a lossless class may have multiple tag values.
 
 \para{Switch model:} For ease of discussion, we use a simplified
-switch model in this section.  A switch has multiple ports. Each port has up to 7
-lossless queues associated with it, and one lossy queue\footnote{All queues
-share a single packet buffer.}. The queue number corresponds to the PFC priority.
-Switch classifies arriving packets into queues based on {\em tags}.  Typically,
-each tag maps to a single priority value. If a tag does not match any priority
-value, the packet is added to a lossy queue. Before forwarding a packet, the
-switch can rewrite the tag according to user-specified rules.
+switch model in this section.  A switch has multiple ports. Each port
+has up to $n$ lossless queues (typically $n\leq8$), and at least one
+lossy queue\footnote{All queues share a single memory pool.}. The queue
+number corresponds to the PFC priority. Switch classifies arriving
+packets into ingress queues based on {\em tags}. Each tag maps to a
+single priority value. If a tag does not match any priority value, the
+packet is added to a lossy queue. Before forwarding a packet, the
+switch can rewrite the tag according to user-specified, match-action
+rules based on the inport and outport numbers and the original tag
+value.
 
 We now describe the core idea behind \sysname{}.
 
@@ -134,7 +137,7 @@ priority queue.
 This completes the design of \sysname{} for Clos topology. Packets start with
 tag of 1. We configure all ToR and Leaf switches such that every time they see
 a packet coming down and then going up (therefore, bouncing) for any reasons,
-they increase the tag by one. Spine switches do not need to change tags since 
+they increase the tag by one. Spine switches do not need to change tags since
 packets never go up there.
 
 All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELP
@@ -245,7 +248,7 @@ important because otherwise CBD may still happen across different priorities.
 We conclude that no CBD can form either within a tag or across different tags.
 The network is deadlock-free since CBD is a necessary condition for deadlock.  A
 formal proof, which applies to any topology, is given in \S\ref{sec:generic}.
-%(Figure~\ref{fig:subspace}). 
+%(Figure~\ref{fig:subspace}).
 
 \para{\sysname{} is optimal in terms of lossless priorities used:} We show that
 to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$

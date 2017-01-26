@@ -149,7 +149,7 @@ up to $k$ bounces. We now consider other topologies.
 			2,000 (*)  & 64 & 7 & 4 &  135\\
 			\hline
 			
-		\end{tabular} 
+		\end{tabular}
 		\caption{Rules and priorities required for Jellyfish. Half the ports on
 		each switch are connected to servers. ELP is shortest paths for first four entries. ELP for last entry includes additional 20,000 random paths.}
 \label{table:jellyfish_shortestpath} \end{table}
@@ -159,17 +159,17 @@ switches, the number of ports a switch has (n) and the number of ports used to
 connect with other switches (r).  In our experiment, we let r = n/2. Remaining
 ports are connected to servers. We construct ELP by building destination-rooted
 shortest-path spanning trees at all the servers.
-Table~\ref{table:jellyfish_shortestpath} shows the results.  
+Table~\ref{table:jellyfish_shortestpath} shows the results.
 
 \sysname{} requires only four classes for a network with 2000 switches, even
 when 20,000 random routes are used in addition to the shortest paths, and at
 most\footnote{Different switches require different number of rules due to the
 random nature of the topology.} 135 match-action rules per switch.  Modern
-commodity switches can support 1-4K rules, so this is not an issue. 
+commodity switches can support 1-4K rules, so this is not an issue.
 
-We also considered smaller (100 switches, 32 ports) Jellyfish topologies with
-upto 16-shortest path routing. We need just 2 lossless priorities, and no more
-than 47 rules per switch.
+We also considered smaller (100 switches, 32 ports) Jellyfish
+topologies with upto 16-shortest paths. We need only 2 lossless
+priorities, and no more than 47 rules per switch.
 
 BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$
 ports, $n^k$ switches with $n$ ports. BCube$(8,3)$ with ELP of $3$ shortest
@@ -185,7 +185,7 @@ different sizes. Even with 2000 switches, we complete rule generation in about
 1.5 hours on a commodity desktop machine.
 
 Thus, we conclude that in terms of number of lossless classes and ACLs,
-\sysname{} scales well for modern data center architectures. 
+\sysname{} scales well for modern data center architectures.
 
 \begin{figure}
 	\centering
@@ -227,7 +227,7 @@ shows that latency is not affected.
 
 
 
-%\subsection{Simple demonstration of \sysname{}}\label{subsec:exp_demon}  
+%\subsection{Simple demonstration of \sysname{}}\label{subsec:exp_demon}
 %	
 %	\begin{figure}[t]
 %		%\vspace{-0.1in}

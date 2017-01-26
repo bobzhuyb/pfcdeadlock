@@ -33,11 +33,11 @@ be implemented in current commodity switching ASICs.
 TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recently
 proposed deadlock-free routing designs. They both build edge-disjoint
 spanning trees (EDSTs), with DF-EDST~\cite{dfedst16} further builds a
-deadlock-free tree transition graph such that the transition among some
-EDSTs can be allowed. Existing routing protocols, however, cannot
-support EDST. Furthermore, these designs need many EDSTs and every EDST
-needs to occupy a lossless queue. Current switching ASIC, however, can
-only support 2-3 lossless queues.
+deadlock-free tree transition acyclic graph such that the transition
+among some EDSTs can be allowed. Existing routing protocols, however,
+cannot support EDST. Furthermore, these designs need many EDSTs and
+every EDST needs to occupy a lossless queue. Current switching ASIC,
+however, can only support 2-3 lossless queues.
 
 %For exampe, a recent work TCP-Bolt~\cite{tcpbolt} uses multiple
 %edge-disjoint spanning trees (EDSTs) and puts every EDST into a
@@ -52,22 +52,23 @@ only support 2-3 lossless queues.
 
 The second category is {\em adaptive routing based approach.} The key
 idea is to pre-install  ``escape'' paths at every switch to cover all
-possible destinations. The switches can reroute packets to ``escape''
-paths in the presence of congestion so that deadlock can be avoided.
+possible destinations. The switches can reroute packets to the
+``escape'' paths in the presence of congestion so that deadlock can be
+avoided.
 %This approach mainly has two drawbacks. First, the number of ''escape``
 %paths to be installed can be huge for large-scale data center networks.
 %Second, the function to dynamically reroute packets based on instant
 %buffer occupancy is too complitated to be implemtented in current
 %switching chipset.
 As far as we know, no commodity switching ASIC supports dynamic reroute
-packets based on traffic occupation.
+based on traffic / queue status.
 
 \para{Intel Omni-Path.}
 The latest Intel Omni-Path architecture \cite{omnipath} introduced the
 concept of Service Channels (SC) for routing deadlock avoidance. Though
-the details are not currently available, Tagger differs from Omni-Path
-in two significant ways. First, Omni-path needs a fabric manager to
-dynamically setup SC whereas the tag match-action rules are
+the details of Omni-Path are not currently available, Tagger differs
+from Omni-Path in two significant ways. First, Omni-path needs a fabric
+manager to dynamically setup SC whereas the tag match-action rules are
 pre-computed and statically configured. Second, Tagger enforces that
 the tag of a packet increases monotonically whereas Omni-Path does not
 enforce order for SC.
@@ -77,20 +78,21 @@ It has been shown that by increasing the packet priority hop-by-hop
 along the path, and putting packets of different priority into
 different buffers, deadlock can be avoided
 \cite{firstpaper,survey,datanetworks,karol2003prevention}. These
-designs, however, needs a large number lossless queues (the number is
-the diameter of the network). In \cite{dag}, the author tried to reduce
-the number of lossless queues to only two. The design, however, does
-not guarantee lossless. Furthermore, some arbitrary switches need much
+designs, however, needs a large number lossless queues (which is the
+diameter of the network). In \cite{dag}, the author tried to reduce the
+number of lossless queues to only two. The design, however, does not
+guarantee lossless. Furthermore, some arbitrary switches need much
 larger buffer space than the others.
 
 \para{Deadlock recovery.}
 All the deadlock recovery schemes
 \cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998}
-need to detect if deadlock occurs, and if occurs, break the deadlock by
-rerouting packets. These approaches have two issues: (1) They cannot
-guarantee that deadlock will not happen again (if they can, there will
-be no need for deadlock recovery). (2) They need add new deadlock
-detection algorithms and deadlock breaking protocols into the switches.
+need to detect if deadlocks occur, and break the deadlocks if they do
+occur by rerouting packets. These approaches have two issues: (1) They
+cannot guarantee that deadlock will not happen again (if they can,
+there will be no need for deadlock recovery). (2) They need add new
+deadlock detection algorithms and deadlock breaking protocols into the
+switches.
 
 %\para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
 %work by preemption. This does not work in Ethernet and in practice.
@@ -111,7 +113,7 @@ be directly used to help any routing protocol to be deadlock-free, as
 \para{Summary.}
 The power of \sysname{} comes from the fact that \sysname{} works with
 any (lossy) routing protocol and turn it into lossless. We further have
-shown that  \sysname{} achieves lossless using a small number of tags. 
+shown that \sysname{} achieves lossless using a small number of tags.
 
 %We believe that deciding the priority of packets along the path is
 %better than changing routing configurations.
