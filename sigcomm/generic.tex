@@ -121,21 +121,21 @@ the ELP set.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 2 & 3 & \textcolor{red}{1} \\
+			1 & 2 & 3 & \textcolor{red}{2} \\
 			\hline
-			0 & 2 & 4 & \textcolor{red}{1} \\
+			1 & 2 & 4 & \textcolor{red}{2} \\
 			\hline
-			1 & 3 & 2 & \textcolor{red}{2} \\
+			2 & 3 & 2 & \textcolor{red}{3} \\
 			\hline
-			1 & 3 & 4 & \textcolor{red}{2} \\
-			\hline
-			1 & 4 & 2 & \textcolor{red}{2} \\
-			\hline
-			1 & 4 & 3 & \textcolor{red}{2} \\
-			\hline
-			2 & 3 & 2& \textcolor{red}{3} \\
+			2 & 3 & 4 & \textcolor{red}{3} \\
 			\hline
 			2 & 4 & 2 & \textcolor{red}{3} \\
+			\hline
+			2 & 4 & 3 & \textcolor{red}{3} \\
+			\hline
+			3 & 3 & 2& \textcolor{red}{4} \\
+			\hline
+			3 & 4 & 2 & \textcolor{red}{4} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
@@ -147,21 +147,21 @@ the ELP set.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 2 & 1 & \textcolor{red}{1} \\
+			1 & 2 & 1 & \textcolor{red}{2} \\
 			\hline
-			0 & 2 & 4 & \textcolor{red}{1} \\
+			1 & 2 & 4 & \textcolor{red}{2} \\
 			\hline
-			1 & 1 & 2 & \textcolor{red}{2} \\
+			2 & 1 & 2 & \textcolor{red}{3} \\
 			\hline
-			1 & 1 & 4 & \textcolor{red}{2} \\
+			2 & 1 & 4 & \textcolor{red}{3} \\
 			\hline
-			1 & 4 & 1 & \textcolor{red}{2} \\
-			\hline
-			1 & 4 & 2 & \textcolor{red}{2} \\
-			\hline
-			2 & 1 & 2& \textcolor{red}{3} \\
+			2 & 4 & 1 & \textcolor{red}{3} \\
 			\hline
 			2 & 4 & 2 & \textcolor{red}{3} \\
+			\hline
+			3 & 1 & 2& \textcolor{red}{4} \\
+			\hline
+			3 & 4 & 2 & \textcolor{red}{4} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
@@ -173,28 +173,28 @@ the ELP set.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 4 & 1 & \textcolor{red}{1} \\
+			1 & 4 & 1 & \textcolor{red}{2} \\
 			\hline
-			0 & 4 & 3 & \textcolor{red}{1} \\
+			1 & 4 & 3 & \textcolor{red}{2} \\
 			\hline
-			1 & 1 & 3 & \textcolor{red}{2} \\
-			\hline
-			1 & 1 & 4 & \textcolor{red}{2} \\
-			\hline
-			1 & 3 & 1 & \textcolor{red}{2} \\
-			\hline
-			1 & 3 & 4 & \textcolor{red}{2} \\
+			2 & 1 & 3 & \textcolor{red}{3} \\
 			\hline
 			2 & 1 & 4 & \textcolor{red}{3} \\
 			\hline
+			2 & 3 & 1 & \textcolor{red}{3} \\
+			\hline
 			2 & 3 & 4 & \textcolor{red}{3} \\
+			\hline
+			3 & 1 & 4 & \textcolor{red}{4} \\
+			\hline
+			3 & 3 & 4 & \textcolor{red}{4} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
 			\multicolumn{4}{c}{(c) rules installed in C} \\
 		\end{tabular}
 	\end{tabular}
-	\caption{Tag rewriting rules under Algorithm~\ref{alg:ttl} (tag ``3'' will only appear on destination servers).}
+	\caption{Tag rewriting rules under Algorithm~\ref{alg:ttl} (tag ``4'' will only appear on destination servers).}
 	\label{table:tagging_table}
 \end{table*}
 
@@ -211,7 +211,7 @@ as described in Algorithm~\ref{alg:ttl}.
 	$V \gets Set()$\;
 	$E \gets Set()$\;
 	\For{each path $r$ in $ELP$} {
-		$tag \gets 0$\;
+		$tag \gets 1$\;
 		\For{each hop $h$ in $r$} {
 			$V \gets V \cup \{(h, tag)\}$\;
 			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
@@ -246,7 +246,7 @@ Algorithm~\ref{alg:greedy} uses a greedy heuristic to combine the tags generated
 by Algorithm~\ref{alg:ttl} to reduce the number of lossless queues required.  It
 greedily combines as many nodes in $G(V,E)$ as possible into each path segment
 under CBD-free constraint. To ensure the monotonic property, we start
-from combining the nodes with smallest tag, 0 and proceed linearly to consider
+from combining the nodes with smallest tag, 1 and proceed linearly to consider
 all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 
 \begin{algorithm}[t]
@@ -254,8 +254,8 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
     \KwIn{The brute-force tagged graph $G(V, E)$}
 	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
 	Initialize $V'$, $E'$, $V_{tmp}$, $E_{tmp}$ as empty $Set()$\;
-	$t' \gets 0$\;
-	\For{$t \gets 0$ \textbf{to} $mT$} {
+	$t' \gets 1$\;
+	\For{$t \gets 1$ \textbf{to} $mT$} {
 		\For{each $(A_i, t)$ in $V$ whose tag is $t$} {
 			$V_{tmp} \gets V_{tmp} \cup \{(A_i, t')\}$\;
 			$E_{tmp} \gets E_{tmp} \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
@@ -298,17 +298,17 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 2 & 3 & \textcolor{red}{0} \\
+			1 & 2 & 3 & \textcolor{red}{1} \\
 			\hline
-			0 & 2 & 4 & \textcolor{red}{0} \\
+			1 & 2 & 4 & \textcolor{red}{1} \\
 			\hline
-			0 & 3 & 2 & \textcolor{red}{0} \\
+			1 & 3 & 2 & \textcolor{red}{1} \\
 			\hline
-			0 & 3 & 4 & \textcolor{red}{1} \\
+			1 & 3 & 4 & \textcolor{red}{2} \\
 			\hline
-			0 & 4 & 2 & \textcolor{red}{0} \\
+			1 & 4 & 2 & \textcolor{red}{1} \\
 			\hline
-			0 & 4 & 3 & \textcolor{red}{0} \\
+			1 & 4 & 3 & \textcolor{red}{1} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
@@ -320,17 +320,17 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 2 & 1 & \textcolor{red}{0} \\
+			1 & 2 & 1 & \textcolor{red}{1} \\
 			\hline
-			0 & 2 & 4 & \textcolor{red}{0} \\
+			1 & 2 & 4 & \textcolor{red}{1} \\
 			\hline
-			0 & 1 & 2 & \textcolor{red}{0} \\
+			1 & 1 & 2 & \textcolor{red}{1} \\
 			\hline
-			0 & 1 & 4 & \textcolor{red}{1} \\
+			1 & 1 & 4 & \textcolor{red}{2} \\
 			\hline
-			0 & 4 & 1 & \textcolor{red}{0} \\
+			1 & 4 & 1 & \textcolor{red}{1} \\
 			\hline
-			0 & 4 & 2 & \textcolor{red}{0} \\
+			1 & 4 & 2 & \textcolor{red}{1} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
@@ -343,21 +343,21 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
-			0 & 4 & 1 & \textcolor{red}{0} \\
+			1 & 4 & 1 & \textcolor{red}{1} \\
 			\hline
-			0 & 4 & 3 & \textcolor{red}{0} \\
+			1 & 4 & 3 & \textcolor{red}{1} \\
 			\hline
-			0 & 1 & 3 & \textcolor{red}{0} \\
-			\hline
-			0 & 1 & 4 & \textcolor{red}{0} \\
-			\hline
-			0 & 3 & 1 & \textcolor{red}{0} \\
-			\hline
-			0 & 3 & 4 & \textcolor{red}{0} \\
+			1 & 1 & 3 & \textcolor{red}{1} \\
 			\hline
 			1 & 1 & 4 & \textcolor{red}{1} \\
 			\hline
+			1 & 3 & 1 & \textcolor{red}{1} \\
+			\hline
 			1 & 3 & 4 & \textcolor{red}{1} \\
+			\hline
+			2 & 1 & 4 & \textcolor{red}{2} \\
+			\hline
+			2 & 3 & 4 & \textcolor{red}{2} \\
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
@@ -369,7 +369,7 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 	\label{table:tagging_table2}
 \end{table*}
 
-The new tag $t'$ also starts from 0. In every iteration, we check all nodes with
+The new tag $t'$ also starts from 1. In every iteration, we check all nodes with
 the same tag value $t$. $V_{tmp}$ and $E_{tmp}$ is the ``sandbox''. For every
 node, we add it to $V_{tmp}$ and $E_{tmp}$ and check whether adding it to
 $G'_{t'}$ will lead to a cycle within $G'_{t'}$. If not, we re-tag the node to

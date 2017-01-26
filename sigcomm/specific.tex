@@ -146,8 +146,8 @@ developed in \S\ref{sec:generic}, is shown in Appendix~\ref{sec:clos_optimal}.
 
 Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in action, for
 ELP consisting of all shortest up-down paths, plus all 1-bounce paths.
-Packets, when traveling on path segments before bounce carry a tag value of 0,
-and the tag is set to 1 after the bounce. This ensures that the packets are
+Packets, when traveling on path segments before bounce carry a tag value of 1,
+and the tag is set to 2 after the bounce. This ensures that the packets are
 queued in separate lossless queues, and thus there is no CBD. In other words, we
 show a system for $k=2$. The lossy queue for packets that bounce more than once
 is omitted for clarity. The corresponding tag rewriting rules at  $T2, L2$ and
@@ -178,7 +178,7 @@ lossless queues.
 			Tag&  Ingress& Egress & Newtag \\
 			\hline
 			\hline
-			0 & 1 & 2 & 0 \\
+			1 & 1 & 2 & 1 \\
 			\hline
 			\multicolumn{4}{c}{(a) At switch T2} \\
 		\end{tabular}
@@ -188,9 +188,9 @@ lossless queues.
 			Tag&  Ingress& Egress & Newtag \\
 			\hline
 			\hline
-			0 & 1 & 2 & 0 \\
+			1 & 1 & 2 & 1 \\
 			\hline
-			\textcolor{red}{0} & 3 & 2 & \textcolor{red}{1} \\
+			\textcolor{red}{1} & 3 & 2 & \textcolor{red}{2} \\
 			\hline
 			\multicolumn{4}{c}{(b) At switch L2} \\
 		\end{tabular}
@@ -201,9 +201,9 @@ lossless queues.
 			Tag&  Ingress& Egress & Newtag \\
 			\hline
 			\hline
-			0 & 2 & 3 & 0 \\
+			1 & 2 & 3 & 1 \\
 				\hline
-			1 & 2 & 1 & 1 \\
+			2 & 2 & 1 & 2 \\
 			\hline
 			\multicolumn{4}{c}{(c) At switch S1} \\
 		\end{tabular}
