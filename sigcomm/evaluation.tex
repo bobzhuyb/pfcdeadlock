@@ -9,13 +9,17 @@ and $(iii)$ Does \sysname{} have a performance penalty?
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/testbed_topo}
 	\caption{Testbed Topology.}\label{fig:testbed_topo}
+	\vspace{-0.25in}
 \end{figure}
 
 \para{Testbed:} Our testbed consists of a Clos network with 10 switches 16
 servers (Figure~\ref{fig:testbed_topo}). Each server is a Dell PowerEdge R730
 server with a 40GbE Mellanox ConnectX-3 Pro NIC. Each switch is a Arista
-7060CX-32S switch with 32 100GbE ports and 16MB packet buffer. The switches
+7050 switch with 32 40GbE ports and 16MB packet buffer. The switches
 support PFC with at most 8 priority classes.
+
+
+
 
 \subsection{Deadlock prevention}\label{subsec:exp_validation}
 
@@ -31,7 +35,7 @@ support PFC with at most 8 priority classes.
 	}
 	
 	\caption{Clos deadlock due to 1-bounce paths}\label{fig:exp_validation_nonloop}
-	
+	\vspace{-0.25in}
 \end{figure}
 
 \begin{figure}[t]
@@ -41,6 +45,8 @@ support PFC with at most 8 priority classes.
 	\subfloat[short for lof][Scenario] {
 		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_scenario}
 	}
+
+\vspace{-0.25in}
 
 	\subfloat[short for lof][Rate of flow 2]{
 		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_flowrate}
@@ -68,7 +74,8 @@ support PFC with at most 8 priority classes.
 	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_notagger}
 }
 	
-	\caption{PFC PAUSE propagation due to deadlock (\textcolor{red}{This is expected results. Will be updated later.}) }\label{fig:exp_validation_propagation}
+	\caption{PFC PAUSE propagation due to deadlock
+	 }\label{fig:exp_validation_propagation}
 	
 \end{figure}
 
@@ -79,11 +86,11 @@ extensive simulations. We omit these for lack of space.
 
 \textbf{Deadlock due to one bounce:} We recreate the scenario shown in
 Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
-experiment, we start the green flow at time 0, and the blue flow at time 20.
+experiment, we start the orange flow at time 0, and the green flow at time 20.
 Figure~\ref{fig:exp_validation_nonloop} shows the rate of the two flows with and
 without \sysname{}.  Without \sysname{}, deadlock occurs and rate of both flows
 are reduced to 0. With \sysname{}, and ELR set to include shortest paths and
-1-bounce paths, there is no deadlock and flow rates are not affected.
+1-bounce paths, there is no deadlock and flows are not paused.
 
 \textbf{Deadlock due to routing loop:} As shown in
 Figure~\ref{fig:exp_validation_loop}(a), we generate 2 flows across different
@@ -95,7 +102,7 @@ shortest paths and 1-bounce paths.
 In Figure~\ref{fig:exp_validation_loop}(b), we plot the rate of $F_2$ with and
 without \sysname{}. As we can see, if \sysname{} is not used, deadlock occurs
 and $F_2$ is paused due to propagation of PFC PAUSE. With \sysname{}, there is
-no deadlock and rate of $F_2$ is not affected by the routing loop. Note that
+no deadlock and $F_2$ is not paused (but rate is affected by the routing loop). Note that
 throughput of $F_1$ is zero, as packets are dropped due to TTL expiration.
 
 The key takeaway here is that \sysname{} was able to successfully deal with a
@@ -106,7 +113,7 @@ propagate and may finally pause all the flow running in the datacenter network.
 In this experiment, we run a many-to-one data shuffle from H9, H10, H13 and H14
 to H1, and a one-to-many data shuffle from H5 to  H11, H12, H15 and H16
 simultaneously.  We then change the routing tables manually so that flow from H9
-to H1 and the flow from H5 to H15 take -bounce paths. This creates CBD as
+to H1 and the flow from H5 to H15 take 1-bounce paths. This creates CBD as
 discussed earlier.
 
 In Figure~\ref{fig:exp_validation_propagation}, we plot the throughput of all 8
@@ -139,7 +146,7 @@ up to $k$ bounces. We now consider other topologies.
 			\hline
 			2,000 & 64 & 7 & 3 & 98 \\
 			\hline
-			2,000 (*)  & 64 & ? & ? &  ?\\
+			2,000 (*)  & 64 & 7 & 4 &  135\\
 			\hline
 			
 		\end{tabular} 
@@ -154,20 +161,20 @@ ports are connected to servers. We construct ELP by building destination-rooted
 shortest-path spanning trees at all the servers.
 Table~\ref{table:jellyfish_shortestpath} shows the results.  
 
-\sysname{} requires only three classes for a network with 2000 switches, even
+\sysname{} requires only four classes for a network with 2000 switches, even
 when 20,000 random routes are used in addition to the shortest paths, and at
 most\footnote{Different switches require different number of rules due to the
-random nature of the topology.} 98 match-action rules per switch.  Modern
+random nature of the topology.} 135 match-action rules per switch.  Modern
 commodity switches can support 1-4K rules, so this is not an issue. 
 
-We also considered smaller (50 switches, 32 ports) Jellyfish topologies with
-upto 16-shortest path routing. We need just 3 lossless priorities, and no more
+We also considered smaller (100 switches, 32 ports) Jellyfish topologies with
+upto 16-shortest path routing. We need just 2 lossless priorities, and no more
 than 47 rules per switch.
 
 BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$
 ports, $n^k$ switches with $n$ ports. BCube$(8,3)$ with ELP of $3$ shortest
 paths requires 4 lossless priorities, and 41 rules per switch.
-F10~\cite{F10} is a fault-tolerant FatTree-like topology.  With three-level
+F10~\cite{f10} is a fault-tolerant FatTree-like topology.  With three-level
 network of 64 port switches, and ELP of all shortest and 1-bounce paths, we need
 just 2 lossless priorities and 164 rules per switch.
 
@@ -185,6 +192,7 @@ Thus, we conclude that in terms of number of lossless classes and ACLs,
 	\includegraphics[width=0.45\textwidth] {figs/algo_runtime}
 	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
 	\label{fig:algo_runtime}
+	\vspace{-0.25in}
 \end{figure}
 
 \subsection{Impact on throughout and latency}\label{subsec:exp_performanceoverhead}
@@ -201,7 +209,7 @@ Thus, we conclude that in terms of number of lossless classes and ACLs,
 	
 		\caption{\sysname{} has no impact on throughput and latency}
 		\label{fig:perf_penalty}
-	
+	\vspace{-0.25in}
 \end{figure}
 
 At run time, the only impact of \sysname{} is that the packet has to traverse
@@ -217,3 +225,36 @@ affected.
 collect 5000 RTT samples between H1 and H2.  Table~\ref{fig:perf_penalty}(b)
 shows that latency is not affected.
 
+
+
+%\subsection{Simple demonstration of \sysname{}}\label{subsec:exp_demon}  
+%	
+%	\begin{figure}[t]
+%		%\vspace{-0.1in}
+%		\centering
+%		
+%		\subfloat[short for lof][Experiment scenario.]{
+%			\includegraphics[width=0.25\textwidth] {figs/demon_scenario}
+%		}
+%		\subfloat[short for lof][Rate of flow 1 and flow 2.]{
+%			\includegraphics[width=0.25\textwidth] {figs/demon_flowrate}
+%		}
+%		
+%		\caption{The match-action rules in action}\label{fig:tagger_demon}
+%	\end{figure}
+%	
+%	
+%A simple experiment shown in
+%Figure~\ref{fig:tagger_demon} demonstrates the behavior of the match-action
+%rules.  We generate two flows, flow 1 and flow 2, to send packets to C from
+%different servers connected to ports A and B. Both servers set the DSCP value in
+%outgoing packets to 1. The match-action rules are set to rewrite the tag value
+%of packets arriving on port A to 2, and forward them to port C. Tag of packets
+%arriving on port B is not changed.
+%
+%At time = 17s, C sends a stream of forged PFC PAUSE frames on priority 2 to
+%switch S. The rate of both flows is plotted in Figure~\ref{fig:tagger_demon}(b)
+%(link capacity = 40Gbps). As expected, after priority 2 is paused, rate of
+%flow 1 is reduced to 0 while flow 2 gets all the available bandwidth.
+%Counters on switch S further confirm that no packets were dropped, and server
+%connected to port A was paused as expected.
