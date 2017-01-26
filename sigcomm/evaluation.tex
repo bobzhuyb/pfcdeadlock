@@ -5,15 +5,15 @@ experiments. Our evaluation focuses on three key questions: $(i)$ Can \sysname{}
 prevent deadlock? $(ii)$ Is \sysname{} scalable for large data center networks?,
 and $(iii)$ Does \sysname{} have a performance penalty?
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.45\textwidth] {figs/testbed_topo}
-	\caption{Testbed Topology.}\label{fig:testbed_topo}
-	\vspace{-0.25in}
-\end{figure}
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.45\textwidth] {figs/testbed_topo}
+%	\caption{Testbed Topology.}\label{fig:testbed_topo}
+%	\vspace{-0.25in}
+%\end{figure}
 
 \para{Testbed:} Our testbed consists of a Clos network with 10 switches 16
-servers (Figure~\ref{fig:testbed_topo}). Each server is a Dell PowerEdge R730
+servers (Figure~\ref{fig:basic_clos}). Each server is a Dell PowerEdge R730
 server with a 40GbE Mellanox ConnectX-3 Pro NIC. Each switch is a Arista
 7050 switch with 32 40GbE ports and 16MB packet buffer. The switches
 support PFC with at most 8 priority classes.
