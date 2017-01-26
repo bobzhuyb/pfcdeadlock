@@ -8,14 +8,16 @@ transfers with minimal CPU overhead~\cite{dcqcn}. Systems like
 Pilaf~\cite{pilaf}, Farm~\cite{farm}, TesnorFlow~\cite{tensorflow}, and
 CNTK~\cite{cntk} rely on RoCE for enhanced performance.
 
-RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
-overflow at the switches. PFC allows a switch to temporarily pause its upstream
-neighbor. While PFC is effective, it can lead to
-deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}.
+RoCE uses Priority Flow Control (PFC) to prevent packet drops due to
+buffer overflow at the switches. PFC allows a switch to temporarily
+pause its upstream neighbor. While PFC is effective, it can lead to
+deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}. Deadlocks, as we
+know, are caused by circular buffer dependency
+(CBD)~\cite{hu2016deadlocks}.
 
-Deadlocks in PFC-enabled network are caused by circular buffer dependency
-(CBD)~\cite{hu2016deadlocks}. Figure~\ref{fig:deadlock_example} illustrates a
-3-node CBD.
+%Deadlocks in PFC-enabled network are caused by circular buffer dependency
+%(CBD)~\cite{hu2016deadlocks}.
+%Figure~\ref{fig:deadlock_example} illustrates a 3-node CBD.
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in
@@ -55,10 +57,11 @@ require carefully controlling the paths -- something that is simply not possible
 with decentralized routing in presence of link failures~\cite{netpilot}.
 Finally, some schemes require creation of numerous priorities and buffer
 management according to those priorities. For example, if each of the flows in
-Figure~\ref{fig:deadlock_example} had its own priority and was buffered
+%Figure~\ref{fig:deadlock_example}
+had its own priority and was buffered
 separately at each switch, there would be no deadlock.  However, modern data
 center networks, built using commodity switches, can realistically support only
-two or three lossless priorities~\cite{rdmaatscale}. 
+two or three lossless priorities~\cite{rdmaatscale}.
 
 In this paper, we present \sysname{}, which meets all three challenges described
 above. \sysname{} is based on a simple observation: in a data center, we can ask
@@ -66,7 +69,7 @@ the operator to supply a list of paths that must be lossless.
 We call these expected lossless paths (ELPs). Enumerating ELPs is
 straightforward for ``structured'' topologies like Clos~\cite{clos},
 FatTree~\cite{fattree} or Bcube~\cite{bcube}, and not onerous even for
-randomized topologies like Jellyfish~\cite{jellyfish}. 
+randomized topologies like Jellyfish~\cite{jellyfish}.
 
 Using ELPs, we create a system of match-action rules to ``tag'' packets. The
 switches use these tags to enqueue packets in different lossless queues. The tag
@@ -80,7 +83,7 @@ deadlock!
 \sysname{} works for any routing protocol because there are no restrictions on what
 paths can be included in the ELP, and tagging rules are specified only in terms
 of local information (tag, ingress port and egress port) available at each
-switch. 
+switch.
 
 The number of lossless queues and the number of tag match-action rules required
 by \sysname{} are small.  Even for a Jellyfish topology with 2000 switches,
@@ -94,11 +97,11 @@ Broadcom chipsets. The implementation requires carefully addressing the problem
 of priority transition (\S\ref{sec:implementation}). Our tests show that
 \sysname{} has no impact on throughput and latency of RDMA traffic.
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\textwidth] {figs/deadlock}
-	\vspace{-0.15in}
-	\caption{Illustration of CBD: The routing is contrived, but note that there is no routing loop.}
-	\vspace{-0.15in}
-	\label{fig:deadlock_example}
-\end{figure}
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.5\textwidth] {figs/deadlock}
+%	\vspace{-0.15in}
+%	\caption{Illustration of CBD: The routing is contrived, but note that there is no routing loop.}
+%	\vspace{-0.15in}
+%	\label{fig:deadlock_example}
+%\end{figure}
