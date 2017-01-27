@@ -50,7 +50,7 @@ in this diagram, only {\em one port} on each switch is active. The two queues
 are for two priorities.
 
 In Figure~\ref{fig:prioritydecoupling}(a), we consider the default behavior.
-Packets exit egress queue 1 at switch B, but with priority 2.  This can lead to
+Packets exit egress queue 1 at switch B, but with priority 2.  This can lead
 to packet loss when ingress queue 2 of switch C becomes congested, because
 the PFC PAUSE from switch C to switch B carries priority 2, and cannot pause
 the offending egress queue 1 of switch B.

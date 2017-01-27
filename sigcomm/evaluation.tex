@@ -13,7 +13,7 @@ have a performance penalty?
 %\end{figure}
 
 \para{Testbed:} Our testbed (Figure~\ref{fig:basic_clos}) consists of a Clos
-network with 10 Arista 7050 (32x40Gb) switches and 16 servers with Mellanox 40Gb
+network with 10 Arista 7060 (32x40Gb) switches and 16 servers with Mellanox 40Gb
 ConnectX-3 Pro NICs.  
 
 \subsection{Deadlock prevention}\label{subsec:exp_validation}
@@ -164,7 +164,7 @@ random nature of the topology.} 135 match-action rules per switch.  Modern
 commodity switches can support 1-4K rules, so this is not an issue.
 
 We also considered smaller (100 switches, 32 ports) Jellyfish
-topologies with upto 16-shortest paths between every switch pair. 
+topologies with up to 16-shortest paths between every switch pair. 
 We need only 2 lossless priorities, and no more than 47 rules per switch.
 
 BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$

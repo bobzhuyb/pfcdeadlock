@@ -13,7 +13,7 @@ lossless, we need $M+1$ priorities. If there are $N$ applications, the n{\"a}ive
 approach would use $N*(M+1)$ priorities. 
 
 However, we can use fewer priorities by trading off some isolation.  The first
-application class starts with tag 1, and uses tags upto $M+1$.  The second
+application class starts with tag 1, and uses tags up to $M+1$.  The second
 application class starts with tag 2, and also increases tags by 1 at each
 bounce.  Thus, the second application class uses tags $2 \ldots M+2$. Thus, for
 $N$ application classes need just $M + N -1$ tags. This can be further reduced
@@ -53,7 +53,7 @@ older switches need any rule changes.  Jellyfish-like random topologies may need
 more extensive changes.
 
 Note that switch and link failures are common in data center
-networks~\cite{netpilot}, and we have have shown
+networks~\cite{netpilot}, and we have shown
 (Figure~\ref{fig:clos_1_bounce}) that \sysname{} handles them fine. 
 
 \para{Flexible topology architectures:} \sysname{} can support architectures

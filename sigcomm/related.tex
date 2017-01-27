@@ -18,10 +18,16 @@ TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recently
 proposed deadlock-free routing designs. They both build edge-disjoint
 spanning trees (EDSTs), with DF-EDST~\cite{dfedst16} further builds a
 deadlock-free tree transition acyclic graph such that the transition
-among some EDSTs can be allowed. Existing routing protocols, however,
-cannot support EDST. Furthermore, these designs need many EDSTs and
-every EDST needs to occupy a lossless queue. Current switching ASIC,
-however, can only support 2-3 lossless queues.
+among some EDSTs can be allowed. However, existing L3 routing protocols
+do not guarantee that packets will follow the pre-assign EDSTs, especially
+upon link failures. Current switching ASIC cannot detect and handle all 
+the potential EDST transition properly.
+
+%support EDST.
+%Furthermore, these designs need many EDSTs and
+%every EDST needs to occupy a lossless queue. 
+%Current switching ASIC,
+%however, can only support 2-3 lossless queues.
 
 The second category is {\em adaptive routing based approach.} The key idea is to
 pre-install  ``escape'' paths at every switch to cover all possible
