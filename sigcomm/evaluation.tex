@@ -28,7 +28,7 @@ ConnectX-3 Pro NICs.
 	\subfloat[short for lof][With \sysname]{
 		\includegraphics[width=0.25\textwidth] {figs/validation_nonloopcase_flowrate_tagger}
 	}
-	
+	\vspace{-1em}
 	\caption{Clos deadlock due to 1-bounce paths}\label{fig:exp_validation_nonloop}
 	\vspace{-0.15in}
 \end{figure}
@@ -46,7 +46,7 @@ ConnectX-3 Pro NICs.
 	\subfloat[short for lof][Rate of flow 2]{
 		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_flowrate}
 	}
-	
+	\vspace{-1em}
 	\caption{Deadlock due to routing loop}\label{fig:exp_validation_loop}
 	\vspace{-1em}
 	
@@ -69,10 +69,10 @@ ConnectX-3 Pro NICs.
 \subfloat[short for lof][1-to-4 shuffle without \sysname]{
 	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_notagger}
 }
-	
+	\vspace{-0.5em}
 	\caption{PFC PAUSE propagation due to deadlock
 	 }\label{fig:exp_validation_propagation}
-	
+	\vspace{-0.5em}
 \end{figure}
 
 
@@ -146,8 +146,10 @@ up to $k$ bounces. We now consider other topologies.
 			\hline
 			
 		\end{tabular}
+		\vspace{-1em}
 		\caption{Rules and priorities required for Jellyfish. Half the ports on
 		each switch are connected to servers. ELP is shortest paths for first four entries. ELP for last entry includes additional 20,000 random paths.}
+		\vspace{-1em}
 \label{table:jellyfish_shortestpath} \end{table}
 
 Jellyfish topology is an r-regular random graph, characterized by the number of
@@ -187,6 +189,7 @@ just 1.5 hours on a commodity desktop machine.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.3\textwidth] {figs/algo_runtime}
+	\vspace{-1em}
 	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
 	\label{fig:algo_runtime}
 	\vspace{-0.25in}
@@ -203,8 +206,9 @@ just 1.5 hours on a commodity desktop machine.
 	\subfloat[short for lof][Latency]{
 		\includegraphics[width=0.25\textwidth] {figs/RDMAlatency_overhead}
 	}
-	
+	\vspace{-1em}
 		\caption{\sysname{} has no impact on throughput and latency}
+		\vspace{-1em}
 		\label{fig:perf_penalty}
 \end{figure}
 

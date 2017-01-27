@@ -14,7 +14,7 @@
 % April 22nd. 2009 - Inserted various bug-fixes and improvements - Gerry
 %
 % To produce Type 1 fonts in the document plus allow for 'normal LaTeX accenting' in the critical areas;
-% title, author block, section-heads, confname, etc. etc.
+% title, author block, section-heads, confname, etc. etc. 
 % i.e. the whole purpose of this version update is to NOT resort to 'inelegant accent patches'.
 % After much research, three extra .sty packages were added to the the tail (ae, aecompl, aeguill) to solve,
 % in particular, the accenting problem(s). We _could_ ask authors (via instructions/sample file) to 'include' these in
@@ -319,17 +319,16 @@
 % *********************************************
 % Gerry Murray 11/30/2006
 % *********************************************
-\newfont{\secfnt}{ptmb8t at 11pt}
+\newfont{\secfnt}{ptmb8t at 12pt}
 \newfont{\secit}{ptmbi8t at 12pt}    %13 Jan 00 gkmt
-\newfont{\subsecfnt}{ptmb8t at 10pt}
-\newfont{\subsubsecfnt}{ptmri8t at 10pt}
-\newfont{\subsecit}{ptmbi8t at 11pt}  %
+\newfont{\subsecfnt}{ptmri8t at 11pt}
+\newfont{\subsecit}{ptmbi8t at 11pt}  % 
 \newfont{\ttlfnt}{phvb8t at 18pt}
 \newfont{\ttlit}{phvbo8t at 18pt}    % GM 2/4/2000
 \newfont{\subttlfnt}{phvr8t at 14pt}
 \newfont{\subttlit}{phvro8t at 14pt} % GM 2/4/2000
 \newfont{\subttlbf}{phvb8t at 14pt}  % 13 Jan 00 gkmt
-\newfont{\aufnt}{phvr8t at 11pt}
+\newfont{\aufnt}{phvr8t at 12pt}
 \newfont{\auit}{phvro8t at 12pt}     % GM 2/4/2000
 \newfont{\affaddr}{phvr8t at 10pt}
 \newfont{\affaddrit}{phvro8t at 10pt} % GM 2/4/2000
@@ -525,7 +524,7 @@
   \hrule width .5\columnwidth   % (was .4) updated Gerry March 20 2007
   \kern 2.6\p@}                 % The \hrule has default height of .4pt % (was .4) updated Gerry March 20 2007
 % ------
-\long\def\@makefntext#1{\noindent
+\long\def\@makefntext#1{\noindent 
 %\hbox to .5em{\hss$^{\@thefnmark}$}#1}   % original
 \hbox to .5em{\hss\textsuperscript{\@thefnmark}}#1}  % C. Clifton / GM Oct. 2nd. 2002
 % -------
@@ -719,20 +718,20 @@
  \null
  \setbox\@acmtitlebox\vbox{%
 \baselineskip 20pt
-\vskip 2.5em                   % Vertical space above title.
+\vskip 2em                   % Vertical space above title.
    \begin{center}
     {\ttlfnt \@title\par}       % Title set in 18pt Helvetica (Arial) bold size.
-    \vskip 1em                % Vertical space after title.
+    \vskip 1.5em                % Vertical space after title.
 %This should be the subtitle.
 {\subttlfnt \the\subtitletext\par}\vskip 1.25em%\fi
-    {\baselineskip 12pt\aufnt   % each author set in \12 pt Arial, in a
-     \lineskip .3em             % tabular environment
+    {\baselineskip 16pt\aufnt   % each author set in \12 pt Arial, in a
+     \lineskip .5em             % tabular environment
      \begin{tabular}[t]{c}\@author
      \end{tabular}\par}
-    \vskip 0.5em               % Vertical space after author.
+    \vskip 1.5em               % Vertical space after author.
    \end{center}}
  \dimen0=\ht\@acmtitlebox
- \advance\dimen0 by -8.75pc\relax % Increased space for title box -- KBT
+ \advance\dimen0 by -12.75pc\relax % Increased space for title box -- KBT
  \unvbox\@acmtitlebox
  \ifdim\dimen0<0.0pt\relax\vskip-\dimen0\fi}
 
@@ -1020,16 +1019,16 @@
 }
 \def\section{%
     \@startsection{section}{1}{\z@}{-10\p@ \@plus -4\p@ \@minus -2\p@}% GM
-    {2\p@}{\baselineskip 2pt\secfnt}%
+    {4\p@}{\baselineskip 14pt\secfnt\@ucheadtrue}%
 }
 
 \def\subsection{%
     \@startsection{subsection}{2}{\z@}{-8\p@ \@plus -2\p@ \@minus -\p@}
-    {2\p@}{\subsecfnt}%
+    {4\p@}{\secfnt}%
 }
 \def\subsubsection{%
     \@startsection{subsubsection}{3}{\z@}{-8\p@ \@plus -2\p@ \@minus -\p@}%
-    {1\p@}{\subsubsecfnt}%
+    {4\p@}{\subsecfnt}%
 }
 %\def\paragraph{%
 %    \vskip 12pt\@startsection{paragraph}{3}{\z@}{6\p@ \@plus \p@}% original
@@ -1314,11 +1313,11 @@
 \newdimen\bibindent
 \setcounter{enumi}{1}
 \bibindent=0em
-\def\thebibliography#1{%
+\def\thebibliography#1{% 
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
      \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
         {References} % was uppercased but this affects pdf bookmarks (SP/GM October 2004)
-          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing)
+          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing) 
          \@mkboth{{\refname}}{{\refname}}%
      }%
      \list{[\arabic{enumi}]}{%
@@ -1456,11 +1455,11 @@
 % font. Conversely the letter-character font would be correct but, e.g. a 'bar' would appear superimposed on the
 % character instead of, say, an unlaut/diaresis. Sometimes the letter-character would NOT appear at all.
 % Using [T1]{fontenc} outright was not an option as this caused 99% of the authors to 'produce' a Type-3 (bitmapped)
-% PDF file - useless for production.
+% PDF file - useless for production. 
 %
-% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil'
+% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil' 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%% This is file `ae.sty'
+%% This is file `ae.sty' 
 \def\fileversion{1.3}
 \def\filedate{2001/02/12}
 \NeedsTeXFormat{LaTeX2e}
@@ -1481,7 +1480,7 @@
     \renewcommand{\ttdefault}{aett}
 \fi
 \endinput
-%%
+%% 
 %% End of file `ae.sty'.
 %
 %
@@ -1490,7 +1489,7 @@
 \NeedsTeXFormat{LaTeX2e}
 %\ProvidesPackage{aecompl}[\filedate\space\fileversion\space   % GM
 %T1 Complements for AE fonts (D. Roegel)]                      % GM -- keeping the log file clean(er)
-
+ 
 \def\@ae@compl#1{{\fontencoding{T1}\fontfamily{cmr}\selectfont\symbol{#1}}}
 \def\guillemotleft{\@ae@compl{19}}
 \def\guillemotright{\@ae@compl{20}}
@@ -1510,18 +1509,18 @@
 \endinput
 %
 %
-%% This is file `aeguill.sty'
+%% This is file `aeguill.sty' 
 % This file gives french guillemets (and not guillemots!)
-% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts
-% or with the EC fonts.
+% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts 
+% or with the EC fonts. 
 % This is useful in conjunction with the ae package
 % (this package loads the ae package in case it has not been loaded)
 %  and with or without the french(le) package.
 %
 % In order to get the guillemets, it is necessary to either type
 % \guillemotleft and \guillemotright, or to use an 8 bit encoding
-% (such as ISO-Latin1) which selects these two commands,
-% or, if you use the french package (but not the frenchle package),
+% (such as ISO-Latin1) which selects these two commands, 
+% or, if you use the french package (but not the frenchle package), 
 % to type << or >>.
 %
 % By default, you get the Polish CMR guillemets; if this package is loaded
@@ -1535,7 +1534,7 @@
 % and these guillemets are very close in shape to the EC guillemets.
 % There are no free Type 1 versions of the EC fonts.
 %
-% Support for Polish CMR guillemets was kindly provided by
+% Support for Polish CMR guillemets was kindly provided by 
 % Rolf Niepraschk <niepraschk@ptb.de> in version 0.99 (2000/05/22).
 % Bernd Raichle provided extensive simplifications to the code
 % for version 1.00.
@@ -1592,12 +1591,12 @@
   \def\selectguillfont{\fontencoding{T1}\fontfamily{#1}\selectfont}%
   \def\@oguills{{\selectguillfont\symbol{19}}}%
   \def\@fguills{{\selectguillfont\symbol{20}}}%
-  }
+  } 
 
 \newcommand{\aeguills}{%
   \ae@guills
   % We redefine \guillemotleft and \guillemotright
-  % in order to catch them when they are used
+  % in order to catch them when they are used 
   % with \DeclareInputText (in latin1.def for instance)
   % We use \auxWARNINGi as a safe indicator that french.sty is used.
   \gdef\guillemotleft{\ifx\auxWARNINGi\undefined
@@ -1659,3 +1658,4 @@
 
 \endinput
 %
+
