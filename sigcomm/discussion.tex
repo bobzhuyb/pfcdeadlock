@@ -8,29 +8,25 @@ would not be held up by data traffic.
 
 A n{\"a}ive way to use \sysname{} in such cases is to treat each application (or
 traffic class) separately.  For example, in \S\ref{subsec:combine}, we showed
-that for the Clos network, if ELP contained paths with no more than $M$
-bounces lossless, we need $M+1$ priorities. If there are $N$ applications, the
-n{\"a}ive approach would use $N*(M+1)$ priorities. 
+that for the Clos network, if ELP contained paths with no more than $M$ bounces
+lossless, we need $M+1$ priorities. If there are $N$ applications, the n{\"a}ive
+approach would use $N*(M+1)$ priorities. 
 
-However, if we are willing to trade off some isolation, we can make do with
-fewer priorities.
-The first lossless class starts with tag 1, and uses tag upto $M+1$.
-The second lossless class starts with tag 2, and change tags in the same way as
-the first class.  That is, whenever it has a bounce, the tag will increase by
-one. The second lossless class uses tag from 2 to $M+2$. This goes on until the
-$N'th$ lossless class. The total number of tags and lossless classes required is
-$M + N -1$. The operator can further reduce the number of tags required by allowing
-some application classes to tolerate fewer bounces than others.
+However, we can use fewer priorities by trading off some isolation.  The first
+application class starts with tag 1, and uses tags upto $M+1$.  The second
+application class starts with tag 2, and also increases tags by 1 at each
+bounce.  Thus, the second application class uses tags $2 \ldots M+2$. Thus, for
+$N$ application classes need just $M + N -1$ tags. This can be further reduced
+by making some application classes to tolerate fewer bounces than others.
 
-It's easy to see that there is still no deadlock after such mix. First, there is
-still no deadlock within each tag, because each tag is still a set of
-``up-down'' routing. Second, the update of tags is still monotonic. We omit
-formal proof for brevity.
+Note that there is still no deadlock after such mix. First, there is still no
+deadlock within each tag, because each tag is still a set of ``up-down''
+routing. Second, the update of tags is still monotonic. We omit formal proof for
+brevity.
 
-The reduced isolation may be acceptable, since only a small fraction of
-packets experience one-bounce and may mix with traffic in the next lossless
-class.  This technique can be generalized for the output of
-Algorithm~\ref{alg:greedy}.
+The reduced isolation may be acceptable, since only a small fraction of packets
+experience one-bounce and may mix with traffic in the next lossless class.  This
+technique can be generalized for the output of Algorithm~\ref{alg:greedy}.
 
 \para{Specifying ELP:} The need to specify expected lossless paths is not a
 problem in practice. For Clos networks, it is easy to enumerate paths with any
@@ -42,8 +38,7 @@ simulated conditions. ECMP is handled by including all possible paths.
 
 We stress again that there are no restrictions on routes included in ELP, apart
 from the common-sense requirement that each route be loop-free. Once ELP is
-specified, we can handle any subsequent abnormalities, including routing loops
-that may form in error.
+specified, we can handle any subsequent abnormalities.
 
 \para{Use of lossy queue:} Some may dislike the fact that we may eventually push
 a wayward packet into a lossy queue. We stress that we do this only as a last
@@ -53,16 +48,16 @@ automatically or immediately dropped.
 \para{Topology changes:} \sysname{} has to generate a new set of tags if ELP is
 updated.  ELP is typically updated when switches or links are added to the
 network. If a FatTree-like topology is expanded by adding new ``pods'' under
-existing spines (i.e by using up empty ports on spine switches), none of the
+existing spines (i.e. by using up empty ports on spine switches), none of the
 older switches need any rule changes.  Jellyfish-like random topologies may need
 more extensive changes.
 
 Note that switch and link failures are common in data center
 networks~\cite{netpilot}, and we have have shown
-(Figure~\ref{fig:_clos_1_bounce}) that \sysname{} handles them fine. 
+(Figure~\ref{fig:clos_1_bounce}) that \sysname{} handles them fine. 
 
 \para{Flexible topology architectures:} \sysname{} can support architectures
-like Helios~\cite{helios}, Flyways~\cite{flyway} or Projector~\cite{projector},
+like Helios~\cite{helios}, Flyways~\cite{flyways} or Projector~\cite{projector},
 as long as ELP set is specified.
 
 \para{PFC alternatives:} One might argue that PFC is not worth the trouble it

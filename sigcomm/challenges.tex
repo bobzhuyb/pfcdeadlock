@@ -3,31 +3,22 @@
 \label{sec:challenges}
 
 \subsection{Work with existing routing protocols and hardware}
-\label{sec:incremental}
-
-Many current
-proposals~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
-for deadlock avoidance are based on custom routing
-protocols. Unfortunately, this make is difficult to deploy them in existing data
-centers.
-
-Data center routing protocols have to satisfy a variety of complex requirements
-regarding fault tolerance, and security~\cite{beckett2016don}.  Operators also
-invest heavily in  tools and technologies to monitor and maintain their
-networks; and these tools are tailored for the routing protocols that are
-already deployed.  Thus, no operator is going to deploy a brand-new routing
-protocol just for deadlock avoidance --  especially when RoCEv2 itself can be
+\label{sec:incremental} Data center routing protocols have to satisfy a variety
+of complex requirements regarding fault tolerance, and
+security~\cite{beckett2016don}.  Operators also invest heavily in  tools and
+technologies to monitor and maintain their networks; and these tools are
+tailored for the routing protocols that are already deployed.  Thus, operators
+are unwilling to deploy a brand-new routing
+protocols like~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
+or hardware just for deadlock avoidance --  especially when RoCEv2 itself can be
 deployed without any changes to routing\footnote{RoCEv2 packets are encapsulated
-in standard UDP packets, and are routed by standard IP routing.}!
-
-Needless to say, operators would be even more reluctant to
-adopt a deadlock avoidance scheme that requires deployment of new hardware. 
+in standard UDP packets.}! 
 
 \subsection{Data center networks are dynamic}\label{sec:reroute}
 
-Building a deadlock avoidance scheme that does not make any changes to routing
-protocols is easier said than done. The key problem is that the routing is
-dynamic -- paths can change in response to link failures or other events.
+A deadlock avoidance scheme that works with existing routing infrastructure must
+address the issue that most routing schemes are dynamic -- paths change in
+response to link failures or other events.
 
 Figure~\ref{fig:basic_clos} shows a simplified (and small) version
 of network deployed in our data center, with commonly used up-down routing (also
@@ -40,7 +31,7 @@ it should not go UP. Thus, with up-down routing, there can be no CBD and hence
 no deadlock.
 
 However, packets can deviate from the UP-DOWN paths due to many reasons,
-including link failures (leading to route flaps), which are quite common in data
+including link failures, port flaps etc., which are quite common in data
 center networks~\cite{netpilot,f10}. When the up-down property is violated,
 packets ``bouncing'' between layers can cause
 deadlocks~\cite{shpiner2016unlocking}. See
@@ -66,12 +57,12 @@ realistically support fewer than 8 lossless classes.  The problem is that  to
 guarantee the lossless property, a switch needs to reserve certain amount of
 {\it headroom} per port, per lossless queue.
 
-The headroom is needed to absorb the packets that are in flight between the time
-a receiver sends a PFC pause frame to its upstream sender to the time the sender
-stops transmitting.  The headroom size depends on many factors, including length
-of cables between the switches. See Appendix \ref{APPHEADROOM} for details.  A
+The headroom is needed to absorb the packets that are in flight during the time
+it takes for the PAUSE message to take effect.
+The headroom size depends on many factors, including length
+of cables. See Appendix \ref{APPHEADROOM} for details.  A
 32-port 40GbE Ethernet switch needs to reserve 2.76MB of headroom to support one
-lossless queue on all ports. A commodity switch like this typically has with
+lossless queue on all ports. A commodity switch like this typically has
 12MB total buffer\footnote{The memory used to build switch buffers needs to be
 extremely fast (e.g. 32x40GB switch needs memory that can support read/write
 speeds of 1.28 Tbps), and hence is very expensive.}, so 23\%
