@@ -13,7 +13,7 @@ RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
 overflow at the switches. PFC allows a switch to temporarily pause its upstream
 neighbor. While PFC is effective, it can lead to
 deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}. Deadlocks are caused by
-circular buffer dependency (CBD)~\cite{hu2016deadlocks} -- i.e. the occupied 
+circular buffer dependency (CBD)~\cite{hu2016deadlocks}, {\em i.e.,} the occupied 
 buffers are waiting for each other in a loop.
 
 While CBD can be caused by a routing loop, routing loop is not required -- flows
