@@ -8,16 +8,15 @@ The PFC headroom needed per port per lossless queue can be calculated by
 
 	
 \noindent\textbf{The time to send a PAUSE frame $t_1$}.  Once a pause frame is
-		generated, it may be blocked by a packet ahead of it which just starts
-		transmitting. Since Ethernet is non-preemptive, the pause fame has to
-		wait for the completion of the previous packet. Hence in the worst-cast,
+		generated, it may be blocked by a packet that has just started
+		transmision. Since Ethernet is non-preemptive, in the worst-cast,
 		$t_1 = \frac{ L_{mtu} + L_{pfc}}{B}$, where $L_{mtu}$ is the MTU size,
 		and $L_{pfc}$ is the size of a PFC pause frame, and $B$ is the link
 		rate.
 
 
-\noindent\textbf{The PAUSE frame propagation time $t_2$}. This value is decided
-		by the cable length between the sender and receiver.
+\noindent\textbf{The PAUSE frame propagation time $t_2$}. This depends on 
+		the cable length between the sender and receiver.
 
 \noindent\textbf{The PAUSE frame receiving time at the sender $t3$}.
 		$t_3=\frac{L_{pfc}}{B}$.
@@ -26,10 +25,9 @@ The PFC headroom needed per port per lossless queue can be calculated by
 		for the sender to respond after the pause frame is received.
 
 \noindent\textbf{The time for the sender to stop transmitting $t_5$}. Again,
-		because Ethernet is non-preemptive, when the sender decides to stop
-		transmitting, it needs to finish the packet already gets started. In the
-		worst-case, the packet size can be $L^{p}_{mtu}$, which is the maximum
-		packet size for that lossless class $p$. Hence $t_5 =
+		because Ethernet is non-preemptive, sender must to finish 
+		transmitting the packet that may have already started. Hence, in the
+		worst case, $t_5 =
 		\frac{L^{p}_{mtu}}{B}$.
 
 \noindent\textbf{The time for the pipe to be drained $t_6$}. We know $t_6 =

@@ -17,10 +17,10 @@ overflow~\cite{cisco-whitepaper,dcqcn}.
 
 The PFC standard defines 8 classes, called priorities\footnote{The word priority
 is a misnomer. There is no implicit ordering among priorities -- they are really
-just separate classes.}. Packets in each priority are buffered separately, and
+just separate classes.}. Packets in each priority are buffered separately.
 PAUSE messages carry this priority.  When a packet arrives at port $i$ of switch
 $S$ with priority $j$, it is enqueued in the ingress queue $j$ of port $i$. If the ingress queue
-length now exceeds the PFC threshold, a pause message is sent to the upstream
+length exceeds the PFC threshold, a pause message is sent to the upstream
 switch connected to port $i$. The message carries priority $j$. The upstream
 switch then stops sending packets with priority $j$ to switch $S$ on port $i$
 until a resume message with priority $j$ is received.

@@ -5,27 +5,25 @@
 \subsection{Work with existing routing protocols and hardware}
 \label{sec:incremental}
 
-Many current proposals~\cite{tcpbolt, karol2003prevention,
-sancho2004,lash,wu2003fault} for deadlock avoidance are based on custom routing
-protocols. Unfortunately, this makes it very difficult to deploy them in
-existing data center networks.
+Many current
+proposals~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
+for deadlock avoidance are based on custom routing
+protocols. Unfortunately, this make is difficult to deploy them in existing data
+centers.
 
-Routing in modern data centers is accomplished in a variety of ways, including
-BGP~\cite{vl2, facebookrouting} or using SDN-like
-protocols~\cite{singh2015jupiter}.  No matter what routing protocols are used,
-data center operators tune them carefully satisfy numerous requirements such as
-manageability and fault tolerance.  In addition, operators invest heavily in
-tools and technologies to monitor and maintain their networks.
+Data center routing protocols have to satisfy a variety of complex requirements
+regarding fault tolerance, and security~\cite{beckett2016don}.  Operators also
+invest heavily in  tools and technologies to monitor and maintain their
+networks; and these tools are tailored for the routing protocols that are
+already deployed.  Thus, no operator is going to deploy a brand-new routing
+protocol just for deadlock avoidance --  especially when RoCEv2 itself can be
+deployed without any changes to routing\footnote{RoCEv2 packets are encapsulated
+in standard UDP packets, and are routed by standard IP routing.}!
 
-Thus, data center operators are reluctant to deploy a brand-new routing protocol
-{\em just for} deadlock avoidance. This task appears especially onerous because
-RoCEv2 itself can be deployed without any changes to routing protocols -- RoCEv2
-packets are encapsulated in standard UDP packets.
-
-It goes without saying that operators would be even more reluctant to
+Needless to say, operators would be even more reluctant to
 adopt a deadlock avoidance scheme that requires deployment of new hardware. 
 
-\subsection{Data Center Networks are Dynamic}\label{sec:reroute}
+\subsection{Data center networks are dynamic}\label{sec:reroute}
 
 Building a deadlock avoidance scheme that does not make any changes to routing
 protocols is easier said than done. The key problem is that the routing is
@@ -52,11 +50,11 @@ In our data centers, we see hundreds of violations of up-down routing per
 day. Such routes can persist for minutes or even longer. Overall, we estimate
 that $0.001\%$ of the traffic is routed over such paths. This may sound tiny,
 but given that our network carries exabytes of traffic per day, the absolute
-amount of traffic affected by such routing is in tens of terabytes. This makes
+volume of traffic affected by such routing is in tens of terabytes. This makes
 the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
-\subsection{Limited Number of Lossless Queues}
+\subsection{Limited number of lossless queues}
 \label{subsec:pfcheadroom}
 
 One idea to solve deadlock is to assign dynamic priority to packets. The
@@ -71,12 +69,12 @@ guarantee the lossless property, a switch needs to reserve certain amount of
 The headroom is needed to absorb the packets that are in flight between the time
 a receiver sends a PFC pause frame to its upstream sender to the time the sender
 stops transmitting.  The headroom size depends on many factors, including length
-of cables between the switches. See Appendix \ref{APPHEADROOM} for details.  A 32-port
-40GbE Ethernet switch needs to reserve 2.76MB of headroom to support one
+of cables between the switches. See Appendix \ref{APPHEADROOM} for details.  A
+32-port 40GbE Ethernet switch needs to reserve 2.76MB of headroom to support one
 lossless queue on all ports. A commodity switch like this typically has with
 12MB total buffer\footnote{The memory used to build switch buffers needs to be
-extremely fast, and hence is extremely expensive. Adding more memory raises
-switch costs, and can lead to bufferbloat-like problems~\cite{dctcp}.}, so 23\%
+extremely fast (e.g. 32x40GB switch needs memory that can support read/write
+speeds of 1.28 Tbps), and hence is very expensive.}, so 23\%
 of the total switch buffer is needed to support just one lossless priority.
 
 While this headroom is sufficient to avoid packet drops, in practice, we use a

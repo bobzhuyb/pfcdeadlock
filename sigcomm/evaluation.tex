@@ -1,9 +1,9 @@
 \section{Evaluation}\label{sec:eval}
 
-We evaluate \sysname{} using a combination of testbed experiments and numerical
-experiments. Our evaluation focuses on three key questions: $(i)$ Can \sysname{}
-prevent deadlock? $(ii)$ Is \sysname{} scalable for large data center networks?,
-and $(iii)$ Does \sysname{} have a performance penalty?
+We evaluate \sysname{} using a testbed experiments and numerical analysis.  We
+consider three questions: $(i)$ Can \sysname{} prevent deadlock?  $(ii)$ Is
+\sysname{} scalable for large data center networks?, and $(iii)$ Does \sysname{}
+have a performance penalty?
 
 %\begin{figure}
 %	\centering
@@ -12,14 +12,9 @@ and $(iii)$ Does \sysname{} have a performance penalty?
 %	\vspace{-0.25in}
 %\end{figure}
 
-\para{Testbed:} Our testbed consists of a Clos network with 10 switches 16
-servers (Figure~\ref{fig:basic_clos}). Each server is a Dell PowerEdge R730
-server with a 40GbE Mellanox ConnectX-3 Pro NIC. Each switch is a Arista
-7050 switch with 32 40GbE ports and 16MB packet buffer. The switches
-support PFC with at most 8 priority classes.
-
-
-
+\para{Testbed:} Our testbed (Figure~\ref{fig:basic_clos}) consists of a Clos
+network with 10 Arista 7050 (32x40Gb) switches and 16 servers with Mellanox 40Gb
+ConnectX-3 Pro NICs.  
 
 \subsection{Deadlock prevention}\label{subsec:exp_validation}
 
@@ -80,27 +75,27 @@ support PFC with at most 8 priority classes.
 \end{figure}
 
 
-We have already {\em proved} that \sysname{} prevents deadlock, so the
+We have already {\em proved} that \sysname{} prevents deadlock. Thus,
 experiments in this section are primarily illustrative. We have also done
-extensive simulations. We omit these for lack of space.
+extensive simulations, which we omit due to lack of space.
 
 \textbf{Deadlock due to one bounce:} We recreate the scenario shown in
 Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
 experiment, we start the orange flow at time 0, and the green flow at time 20.
 Figure~\ref{fig:exp_validation_nonloop} shows the rate of the two flows with and
 without \sysname{}.  Without \sysname{}, deadlock occurs and rate of both flows
-are reduced to 0. With \sysname{}, and ELR set to include shortest paths and
+are reduced to 0. With \sysname{}, and ELP set to include shortest paths and
 1-bounce paths, there is no deadlock and flows are not paused.
 
 \textbf{Deadlock due to routing loop:} As shown in
 Figure~\ref{fig:exp_validation_loop}(a), we generate 2 flows across different
 ToRs, i.e.,  $F_1$ from H1 to H15 and $F_2$ from H2 to H16. At time = 20s, we
-install a bad route at L1 to let $F_1$ enter a routing loop between T1 and L1.
-The path taken by $F_2$ also traverses link T1-L1.  ELR is set to include the
+install a bad route at L1 to force $F_1$ enter a routing loop between T1 and L1.
+The path taken by $F_2$ also traverses link T1-L1.  ELP is set to include the
 shortest paths and 1-bounce paths.
 
-In Figure~\ref{fig:exp_validation_loop}(b), we plot the rate of $F_2$ with and
-without \sysname{}. As we can see, if \sysname{} is not used, deadlock occurs
+Figure~\ref{fig:exp_validation_loop}(b) shows the rate of $F_2$ with and
+without \sysname{}. Without \sysname{}, deadlock occurs
 and $F_2$ is paused due to propagation of PFC PAUSE. With \sysname{}, there is
 no deadlock and $F_2$ is not paused (but rate is affected by the routing loop). Note that
 throughput of $F_1$ is zero, as packets are dropped due to TTL expiration.
@@ -112,7 +107,7 @@ routing loop.
 propagate and may finally pause all the flow running in the datacenter network.
 In this experiment, we run a many-to-one data shuffle from H9, H10, H13 and H14
 to H1, and a one-to-many data shuffle from H5 to  H11, H12, H15 and H16
-simultaneously.  We then change the routing tables manually so that flow from H9
+simultaneously.  We then manually change the routing tables so that flow from H9
 to H1 and the flow from H5 to H15 take 1-bounce paths. This creates CBD as
 discussed earlier.
 
@@ -178,18 +173,19 @@ F10~\cite{f10} is a fault-tolerant FatTree-like topology.  With three-level
 network of 64 port switches, and ELP of all shortest and 1-bounce paths, we need
 just 2 lossless priorities and 164 rules per switch.
 
-Generating tagging rules is a one-time activity. Still, runtime of
-Algorithm~\ref{alg:greedy} is of possible interest.
-Figure.~\ref{fig:algo_runtime} shows the runtime for Jellyfish topologies of
-different sizes. Even with 2000 switches, we complete rule generation in about
-1.5 hours on a commodity desktop machine.
-
 Thus, we conclude that in terms of number of lossless classes and ACLs,
 \sysname{} scales well for modern data center architectures.
 
+Generating tagging rules is a one-time activity. Still, runtime of
+Algorithm~\ref{alg:greedy} is of possible interest.
+Figure~\ref{fig:algo_runtime} shows the runtime for Jellyfish topologies of
+different sizes. Even with 2000 switches, Algorithm~\ref{alg:greedy} takes
+just 1.5 hours on a commodity desktop machine.
+
+
 \begin{figure}
 	\centering
-	\includegraphics[width=0.45\textwidth] {figs/algo_runtime}
+	\includegraphics[width=0.3\textwidth] {figs/algo_runtime}
 	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
 	\label{fig:algo_runtime}
 	\vspace{-0.25in}
@@ -209,22 +205,14 @@ Thus, we conclude that in terms of number of lossless classes and ACLs,
 	
 		\caption{\sysname{} has no impact on throughput and latency}
 		\label{fig:perf_penalty}
-	\vspace{-0.25in}
 \end{figure}
 
-At run time, the only impact of \sysname{} is that the packet has to traverse
-the ACL rules. These are installed in TCAM, and hence have no discernible impact
-on throughput and latency, as illustrated in Figure~\ref{fig:perf_penalty}.
-
-\textbf{Throughput}: We generate one flow from H1 to H2, and observe its average
-throughput over 100 seconds under varying number of \sysname{} rules installed
-on T1. Figure~\ref{fig:perf_penalty}(a) shows that the average throughput is not
-affected.
-
-\textbf{Latency}: We install different number of \sysname{} rules in T1 and
-collect 5000 RTT samples between H1 and H2.  Table~\ref{fig:perf_penalty}(b)
-shows that latency is not affected.
-
+On datapath, packets have to traverse the rules installed by \sysname{}.  These
+rules installed in TCAM, and hence have no discernible impact on throughput and
+latency. We installed different number of \sysname{} rules on T1, and measured
+average throughput and latency between H1 and H2 over several runs.
+Figure~\ref{fig:perf_penalty} confirms that throughput and latency are not
+affected by the number of rules.
 
 
 %\subsection{Simple demonstration of \sysname{}}\label{subsec:exp_demon}
