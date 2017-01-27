@@ -1,6 +1,6 @@
 \section{Evaluation}\label{sec:eval}
 
-We evaluate \sysname{} using a testbed experiments and numerical analysis.  We
+We evaluate \sysname{} using testbed experiments and numerical analysis.  We
 consider three questions: $(i)$ Can \sysname{} prevent deadlock?  $(ii)$ Is
 \sysname{} scalable for large data center networks?, and $(iii)$ Does \sysname{}
 have a performance penalty?
@@ -48,6 +48,7 @@ ConnectX-3 Pro NICs.
 	}
 	
 	\caption{Deadlock due to routing loop}\label{fig:exp_validation_loop}
+	\vspace{-1em}
 	
 \end{figure}
 
@@ -81,7 +82,7 @@ extensive simulations, which we omit due to lack of space.
 
 \textbf{Deadlock due to one bounce:} We recreate the scenario shown in
 Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
-experiment, we start the orange flow at time 0, and the green flow at time 20.
+experiment, we start the blue flow at time 0, and the green flow at time 20.
 Figure~\ref{fig:exp_validation_nonloop} shows the rate of the two flows with and
 without \sysname{}.  Without \sysname{}, deadlock occurs and rate of both flows
 are reduced to 0. With \sysname{}, and ELP set to include shortest paths and
@@ -107,7 +108,7 @@ routing loop.
 propagate and may finally pause all the flow running in the datacenter network.
 In this experiment, we run a many-to-one data shuffle from H9, H10, H13 and H14
 to H1, and a one-to-many data shuffle from H5 to  H11, H12, H15 and H16
-simultaneously.  We then manually change the routing tables so that flow from H9
+simultaneously. We then manually change the routing tables so that the flow from H9
 to H1 and the flow from H5 to H15 take 1-bounce paths. This creates CBD as
 discussed earlier.
 
@@ -129,8 +130,8 @@ up to $k$ bounces. We now consider other topologies.
 	\centering
 		\begin{tabular}{|r|r|r|r|r|}
 			\hline
-				Switches & Ports & Network & Lossless & Max \\
-						 &		 & Diameter & Priorities & Rules \\
+				Switches & Ports & Longest & Lossless & Max \\
+						 &		 & ELP & Priorities & Rules \\
 			\hline
 			\hline
 			100 & 32 & 6 & 3 &  37 \\
@@ -163,11 +164,11 @@ random nature of the topology.} 135 match-action rules per switch.  Modern
 commodity switches can support 1-4K rules, so this is not an issue.
 
 We also considered smaller (100 switches, 32 ports) Jellyfish
-topologies with upto 16-shortest paths. We need only 2 lossless
-priorities, and no more than 47 rules per switch.
+topologies with upto 16-shortest paths between every switch pair. 
+We need only 2 lossless priorities, and no more than 47 rules per switch.
 
 BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$
-ports, $n^k$ switches with $n$ ports. BCube$(8,3)$ with ELP of $3$ shortest
+ports, $n^k$ switches with $k+1$ ports. BCube$(8,3)$ with ELP of $4$ shortest
 paths requires 4 lossless priorities, and 41 rules per switch.
 F10~\cite{f10} is a fault-tolerant FatTree-like topology.  With three-level
 network of 64 port switches, and ELP of all shortest and 1-bounce paths, we need
@@ -191,7 +192,7 @@ just 1.5 hours on a commodity desktop machine.
 	\vspace{-0.25in}
 \end{figure}
 
-\subsection{Impact on throughout and latency}\label{subsec:exp_performanceoverhead}
+\subsection{Impact on throughput and latency}\label{subsec:exp_performanceoverhead}
 
 \begin{figure}[t]
 	\centering

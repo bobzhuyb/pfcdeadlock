@@ -41,6 +41,7 @@ $(A_i, x)\rightarrow(B_j, y)$ & A tagged edge \\ \hline
 $V$ & All tagged nodes  \\ \hline
 $E$ & All tagged edges \\ \hline
 $G(V, E)$ & Tagged graph \\ \hline
+$T$ & Largest tag in $G(V,E)$ \\ \hline
 $G_k$ & Partition of $G(V,E)$ for priority $k$ \\ \hline
 \end{tabular}
 \caption{Notations in the formalized description.}
@@ -103,22 +104,23 @@ the ELP set.
 		\subfloat[short for lof][Topology and ELP set.] {
 		\includegraphics[width=0.26\textwidth] {figs/alo_walkthrough_a}
 	}
-	\subfloat[short for lof][Output tagged graph Algorithm~\ref{alg:ttl}.]{
-		\includegraphics[width=0.27\textwidth] {figs/alo_walkthrough_b}
+	\subfloat[short for lof][Output tagged graph by Algorithm~\ref{alg:ttl}.]{
+		\includegraphics[width=0.3\textwidth] {figs/alo_walkthrough_b}
 	}
 	\subfloat[short for lof][Output tagged graph by Algorithm~\ref{alg:greedy}.]{
 	\includegraphics[width=0.34\textwidth] {figs/alo_walkthrough_c}
 }
-	\caption{Walk-through example of the algorithms (Each rectange in (b) and (c) is a (port,tag) pair).}\label{fig:three_node}
+	\caption{Walk-through example of the algorithms. Each rectange in (b) and (c) is a (port,tag) pair.}\label{fig:three_node}
 \end{figure*}
 
 \begin{table*}[t]
+\small
     \footnotesize
 	\centering
 	\begin{tabular}{lll}
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 2 & 3 & \textcolor{red}{2} \\
@@ -144,7 +146,7 @@ the ELP set.
 		&
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 2 & 1 & \textcolor{red}{2} \\
@@ -170,7 +172,7 @@ the ELP set.
 		&
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 4 & 1 & \textcolor{red}{2} \\
@@ -194,7 +196,9 @@ the ELP set.
 			\multicolumn{4}{c}{(c) rules installed in C} \\
 		\end{tabular}
 	\end{tabular}
-	\caption{Tag rewriting rules under Algorithm~\ref{alg:ttl} (tag ``4'' will only appear on destination servers).}
+	\vspace{-1em}
+	\caption{Tag rewriting rules under Algorithm~\ref{alg:ttl}. Tag ``4'' will only appear on destination servers.}
+	\vspace{-1em}
 	\label{table:tagging_table}
 \end{table*}
 
@@ -245,15 +249,15 @@ by Algorithm~\ref{alg:ttl} to reduce the number of lossless queues required.  It
 greedily combines as many nodes in $G(V,E)$ as possible into each path segment
 under CBD-free constraint. To ensure the monotonic property, we start
 from combining the nodes with smallest tag, 1 and proceed linearly to consider
-all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
+all tags up to $T$, which is the largest tag number used in $G(V,E)$.
 
 \begin{algorithm}[t]
 	\small
-    \KwIn{The brute-force tagged graph $G(V, E)$}
+    \KwIn{The brute-force tagged graph $G(V, E)$ with largest tag $T$}
 	\KwOut{A new tagged graph $G'(V', E')$ that has small $|\{G'_k\}|$}
 	Initialize $V'$, $E'$, $V_{tmp}$, $E_{tmp}$ as empty $Set()$\;
 	$t' \gets 1$\;
-	\For{$t \gets 1$ \textbf{to} $mT$} {
+	\For{$t \gets 1$ \textbf{to} $T$} {
 		\For{each $(A_i, t)$ in $V$ whose tag is $t$} {
 			$V_{tmp} \gets V_{tmp} \cup \{(A_i, t')\}$\;
 			$E_{tmp} \gets E_{tmp} \cup \{$edges of $(A_i, t)$, change $t$ to $t'\}$\;
@@ -288,12 +292,13 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 %\end{figure}
 
 \begin{table*}[t]
+\small
 	\footnotesize
 	\centering
 	\begin{tabular}{lll}
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 2 & 3 & \textcolor{red}{1} \\
@@ -310,12 +315,12 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
-			\multicolumn{4}{c}{(a) rules installed in A} \\
+			\multicolumn{4}{c}{(a) Rules installed in A} \\
 		\end{tabular}
 		&
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 2 & 1 & \textcolor{red}{1} \\
@@ -332,13 +337,13 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
-			\multicolumn{4}{c}{(b) rules installed in B} \\
+			\multicolumn{4}{c}{(b) Rules installed in B} \\
 		\end{tabular}
 		&
 		
 		\begin{tabular}{|r|r|r|r|}
 			\hline
-			Tag&  Ingress& Egress & \textcolor{red}{Newtag} \\
+			Tag&  InPort& OutPort & \textcolor{red}{Newtag} \\
 			\hline
 			\hline
 			1 & 4 & 1 & \textcolor{red}{1} \\
@@ -359,11 +364,13 @@ all tags up to $mT$, which is the largest tag number used in $G(V,E)$.
 			\hline
 			others & others & others & \textcolor{red}{lossy tag} \\
 			\hline
-			\multicolumn{4}{c}{(c) rules installed in C} \\
+			\multicolumn{4}{c}{(c) Rules installed in C} \\
 		\end{tabular}
 		
 	\end{tabular}
-	\caption{Tag rewriting rules generated by Algorithm~\ref{alg:greedy}.  (Without compression.)}
+	\vspace{-1em}
+	\caption{Tag rewriting rules generated by Algorithm~\ref{alg:greedy} (without compression).}
+	\vspace{-1em}
 	\label{table:tagging_table2}
 \end{table*}
 
@@ -386,15 +393,30 @@ of tags is reduced to {\em two}.
 \label{subsec:caveats}
 
 \para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Recall that
-$mT$ is the largest value of tag in $G(V,E)$. Let the number of links in the
-original topology be $L$. Then, $G(V,E)$ can have at most have $L \times mT$
+$T$ is the largest value of tag in $G(V,E)$. Let $S$, $L$ and $P$ be the number 
+of switches, the number of links and the number of ports a switch has in the
+original topology, respectively. Then, $G(V,E)$ can have at most $L \times T$
 nodes.  Each node will be examined exactly once for checking whether $G_{tmp}$
 is acyclic.  Checking whether $G_{tmp}$ is acyclic with a newly added node
 requires a Breadth-First Search, with runtime complexity of $O(|V_{tmp}| +
-|E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number of switches $S$, and
-$|E_{tmp}|$ is bounded by the number of links, $L$, in the network.  Therefore,
-the total runtime complexity is $O(L \times mT \times (S+L))$. Note that $mT$
+|E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number of linkes $L$, and $|E_{tmp}|$ 
+is bounded by the number of pairs of incident links $L \times P$, in the network.  Therefore,
+the total runtime complexity is $O(L \times T \times (L+L \times P))$. Note that $T$
 itself is bounded by the length of the longest path in $ELP$.
+
+
+%\para{Algorithm runtime:}. Algorithm~\ref{alg:greedy} is efficient. Recall that
+%$mT$ is the largest value of tag in $G(V,E)$. Let the number of links in the
+%original topology be $L$. Then, $G(V,E)$ can have at most have $L \times mT$
+%nodes.  Each node will be examined exactly once for checking whether $G_{tmp}$
+%is acyclic.  Checking whether $G_{tmp}$ is acyclic with a newly added node
+%requires a Breadth-First Search, with runtime complexity of $O(|V_{tmp}| +
+%|E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number of switches $S$, and
+%$|E_{tmp}|$ is bounded by the number of links, $L$, in the network.  Therefore,
+%the total runtime complexity is $O(L \times mT \times (S+L))$. Note that $mT$
+%itself is bounded by the length of the longest path in $ELP$.
+
+
 
 \para{Number of tags:} Algorithm~\ref{alg:greedy}, while not optimal, works well
 in practice. For example, it gives optimal results for BCube topology without
@@ -413,8 +435,8 @@ tags with shortest-path routing (\S\ref{sec:eval}).
 	\vspace{-0.2in}
 \end{figure}
 
-\para{Number of rules:} From the conceptual switch model, a switch needs ingress
-port number, egress port number, and the current Tag to decide the next Tag.
+\para{Number of rules:} From the conceptual switch model, a switch needs InPort 
+(ingress port number), OutPort (egress port number), and the current Tag to decide the next Tag.
 Hence it seems the number of rules needed per switch is $n(n-1)\times
 \frac{m(m-1)}{2}$, where $n$ is the number of switch ports and $m=|G'_{k}|$ is
 the number of Tags. We will show in \S~\ref{sec:implementation} that the number

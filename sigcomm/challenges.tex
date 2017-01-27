@@ -50,8 +50,8 @@ in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 One idea to solve deadlock is to assign dynamic priority to packets. The
 priority of a packet increases as the packet approaches its destination
-~\cite{karol2003prevention}.  Such a design requires as many priorities as the
-diameter of the network.  The problem with this idea is that the PFC standard
+~\cite{karol2003prevention}.  Such a design requires as many priorities as largest 
+path length in the network.  The problem with this idea is that the PFC standard
 supports only 8 priority classes. Worse yet, commodity switches can
 realistically support fewer than 8 lossless classes.  The problem is that  to
 guarantee the lossless property, a switch needs to reserve certain amount of

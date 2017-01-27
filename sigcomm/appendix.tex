@@ -18,14 +18,13 @@ The PFC headroom needed per port per lossless queue can be calculated by
 \noindent\textbf{The PAUSE frame propagation time $t_2$}. This depends on 
 		the cable length between the sender and receiver.
 
-\noindent\textbf{The PAUSE frame receiving time at the sender $t3$}.
-		$t_3=\frac{L_{pfc}}{B}$.
+\noindent\textbf{The PAUSE frame receiving time at the sender $t_3=\frac{L_{pfc}}{B}$}.
 
 \noindent\textbf{The PFC response time $t_4$}. This is the amount of time needed
 		for the sender to process the pause frame.
 
 \noindent\textbf{The time for the sender to stop transmitting $t_5$}. Again,
-		because Ethernet is non-preemptive, sender must to finish 
+		because Ethernet is non-preemptive, sender must finish 
 		transmitting the packet that may have already started. Hence, in the
 		worst case, $t_5 =
 		\frac{L^{p}_{mtu}}{B}$.

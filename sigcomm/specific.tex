@@ -5,7 +5,9 @@
 \begin{figure}[t]
 		\centering
 		\includegraphics[width=0.3\textwidth] {figs/updown_paths}
+		\vspace{-1em}
 		\caption{Clos topology with two flows following up-down .}
+		\vspace{-1em}
 		\label{fig:basic_clos}
 \end{figure}
 
@@ -36,8 +38,8 @@ packets into ingress queues based on {\em tags}. Each tag maps to a
 single priority value. If a tag does not match any priority value, the
 packet is added to a lossy queue. Before forwarding a packet, the
 switch can rewrite the tag according to user-specified, match-action
-rules based on the inport and outport numbers and the original tag
-value.
+rules based on the InPort (ingress port number), OutPort (egress port number)
+and the original tag value.
 
 We now describe the core idea behind \sysname{}.
 
@@ -80,7 +82,7 @@ lossy queue.
 One way for $S1$ (and any other switch afterwards) to recognize a bounced packet
 is by TTL. Since the ELP consists of shortest paths, a bounced packet will have
 ``lower than expected'' TTL. However, TTL values are set by end
-hosts\footnote{Using TTL has other problems as well, see \S\ref{sec:implemenation}}, so a
+hosts\footnote{Using TTL has other problems as well, see \S\ref{sec:implementation}}, so a
 more controllable way is for the switch $L2$ to provide this information via a
 special tag (e.g. DSCP value) in the packet. 
 
