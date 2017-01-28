@@ -75,8 +75,9 @@ matches two fields simultaneously and fires only if both matches succeed.
 	\centering
 	\includegraphics[width=0.45\textwidth] {figs/compression_with_bitmasking}
 	\vspace{-1em}
-	\caption{Rule compression with bit masking. Note that port numbers in TCAM are bitmaps, not binary values.}\label{fig:compression}
-    \vspace{-1em}	
+	\caption{Rule compression with bit masking. Port numbers in TCAM are bitmaps.
+	The first bit from right represents port 0. The second bit represents port 1, and so on. }\label{fig:compression}
+    \vspace{-1.5em}	
 \end{figure}
 
 Rules that have the same action can be compressed into one TCAM entry, if the
