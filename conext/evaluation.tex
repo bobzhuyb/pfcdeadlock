@@ -1,0 +1,349 @@
+\section{Evaluation}\label{sec:eval}
+
+We evaluate \sysname{} using testbed experiments and numerical analysis.  We
+consider three questions: $(i)$ Can \sysname{} prevent deadlock?  $(ii)$ Is
+\sysname{} scalable for large data center networks?, and $(iii)$ Does \sysname{}
+have a performance penalty?
+
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.45\textwidth] {figs/testbed_topo}
+%	\caption{Testbed Topology.}\label{fig:testbed_topo}
+%	\vspace{-0.25in}
+%\end{figure}
+
+\para{Testbed:} Our testbed (Figure~\ref{fig:basic_clos}) consists of a Clos
+network with 10 Arista 7060 (32x40Gb) switches and 16 servers with Mellanox 40Gb
+ConnectX-3 Pro NICs.  
+
+\subsection{Deadlock prevention}\label{subsec:exp_validation}
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][Without \sysname] {
+		\includegraphics[width=0.25\textwidth] {figs/validation_nonloopcase_flowrate_notagger}
+	}
+	\subfloat[short for lof][With \sysname]{
+		\includegraphics[width=0.25\textwidth] {figs/validation_nonloopcase_flowrate_tagger}
+	}
+	\vspace{-1em}
+	\caption{Clos deadlock due to 1-bounce paths}\label{fig:exp_validation_nonloop}
+	\vspace{-0.15in}
+\end{figure}
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][Scenario] {
+		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_scenario}
+	}
+
+\vspace{-0.25in}
+
+	\subfloat[short for lof][Rate of flow 2]{
+		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_flowrate}
+	}
+	\vspace{-1em}
+	\caption{Deadlock due to routing loop}\label{fig:exp_validation_loop}
+	\vspace{-1em}
+	
+\end{figure}
+
+\begin{figure}[t]
+	%\vspace{-0.1in}
+	\centering
+	
+	\subfloat[short for lof][4-to-1 shuffle with \sysname] {
+		\includegraphics[width=0.25\textwidth] {figs/validation_pp_manytoone_tagger}
+	}
+	\subfloat[short for lof][4-to-1 shuffle without \sysname]{
+		\includegraphics[width=0.25\textwidth] {figs/validation_pp_manytoone_notagger}
+	}
+
+	\subfloat[short for lof][1-to-4 shuffle with \sysname] {
+	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_tagger}
+}
+\subfloat[short for lof][1-to-4 shuffle without \sysname]{
+	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_notagger}
+}
+	\vspace{-0.5em}
+	\caption{PFC PAUSE propagation due to deadlock
+	 }\label{fig:exp_validation_propagation}
+	\vspace{-0.5em}
+\end{figure}
+
+
+We have already {\em proved} that \sysname{} prevents deadlock. Thus,
+experiments in this section are primarily illustrative. We have also done
+extensive simulations, which we omit due to lack of space.
+
+\textbf{Deadlock due to one bounce:} We recreate the scenario shown in
+Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
+experiment, we start the blue flow at time 0, and the green flow at time 20.
+Figure~\ref{fig:exp_validation_nonloop} shows the rate of the two flows with and
+without \sysname{}.  Without \sysname{}, deadlock occurs and rate of both flows
+are reduced to 0. With \sysname{}, and ELP set to include shortest paths and
+1-bounce paths, there is no deadlock and flows are not paused.
+
+\textbf{Deadlock due to routing loop:} As shown in
+Figure~\ref{fig:exp_validation_loop}(a), we generate 2 flows across different
+ToRs, i.e.,  $F_1$ from H1 to H15 and $F_2$ from H2 to H16. At time = 20s, we
+install a bad route at L1 to force $F_1$ enter a routing loop between T1 and L1.
+The path taken by $F_2$ also traverses link T1-L1.  ELP is set to include the
+shortest paths and 1-bounce paths.
+
+Figure~\ref{fig:exp_validation_loop}(b) shows the rate of $F_2$ with and
+without \sysname{}. Without \sysname{}, deadlock occurs
+and $F_2$ is paused due to propagation of PFC PAUSE. With \sysname{}, there is
+no deadlock and $F_2$ is not paused (but rate is affected by the routing loop). Note that
+throughput of $F_1$ is zero, as packets are dropped due to TTL expiration.
+
+The key takeaway here is that \sysname{} was able to successfully deal with a
+routing loop.
+
+\textbf{PAUSE propagation due to deadlock:} Once deadlock occurs, PFC PAUSE will
+propagate and may finally pause all the flow running in the datacenter network.
+In this experiment, we run a many-to-one data shuffle from H9, H10, H13 and H14
+to H1, and a one-to-many data shuffle from H5 to  H11, H12, H15 and H16
+simultaneously. We then manually change the routing tables so that the flow from H9
+to H1 and the flow from H5 to H15 take 1-bounce paths. This creates CBD as
+discussed earlier.
+
+In Figure~\ref{fig:exp_validation_propagation}, we plot the throughput of all 8
+flows with and without \sysname{}. Without \sysname{}, all flows get paused due
+to PFC PAUSE propagation and throughput is reduced to zero. With \sysname{},
+flows are not affected by link failures.
+
+\subsection{Scalability}
+\label{subsec:exp_overhead}
+
+As discussed in \S\ref{sec:challenges}, commodity switches can support only a
+limited number of lossless queues.  We have already shown that on a Clos
+topology, \sysname{} requires $k+1$ lossless priorities to support paths with
+up to $k$ bounces. We now consider other topologies.
+
+\begin{table}[t]
+		\footnotesize
+	\centering
+		\begin{tabular}{|r|r|r|r|r|}
+			\hline
+				Switches & Ports & Longest & Lossless & Max \\
+						 &		 & ELP & Priorities & Rules \\
+			\hline
+			\hline
+			100 & 32 & 5 & 2 &  40 \\
+			\hline
+			500 & 64 & 6 & 3 & 76 \\
+			\hline
+			1,000 & 64 & 6 & 3 & 88 \\
+			\hline
+			2,000 & 64 & 7 & 3 & 98 \\
+			\hline
+			2,000 (*)  & 64 & 7 & 4 &  135\\
+			\hline
+			
+		\end{tabular}
+		\vspace{-1em}
+		\caption{Rules and priorities required for Jellyfish. Half the ports on
+		each switch are connected to servers. ELP is shortest paths for first four entries. ELP for last entry includes additional 20,000 random paths.}
+		\vspace{-1em}
+\label{table:jellyfish_shortestpath} \end{table}
+
+Jellyfish topology is an r-regular random graph, characterized by the number of
+switches, the number of ports a switch has (n) and the number of ports used to
+connect with other switches (r).  In our experiment, we let r = n/2. Remaining
+ports are connected to servers. We construct ELP by building destination-rooted
+shortest-path spanning trees at all the servers.
+Table~\ref{table:jellyfish_shortestpath} shows the results.
+
+\sysname{} requires only four classes for a network with 2000 switches, even
+when 20,000 random routes are used in addition to the shortest paths, and at
+most\footnote{Different switches require different number of rules due to the
+random nature of the topology.} 135 match-action rules per switch.  Modern
+commodity switches can support 1-4K rules, so this is not an issue.
+
+We also considered smaller (100 switches, 32 ports) Jellyfish
+topologies with up to 16-shortest paths between every switch pair. 
+We need only 2 lossless priorities, and no more than 47 rules per switch.
+
+BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$
+ports, $n^k$ switches with $k+1$ ports. BCube$(8,3)$ with ELP of $4$ shortest
+paths requires 4 lossless priorities, and 41 rules per switch.
+F10~\cite{f10} is a fault-tolerant FatTree-like topology.  With three-level
+network of 64 port switches, and ELP of all shortest and 1-bounce paths, we need
+just 2 lossless priorities and 164 rules per switch.
+
+Thus, we conclude that in terms of number of lossless classes and ACLs,
+\sysname{} scales well for modern data center architectures.
+
+Generating tagging rules is a one-time activity. Still, runtime of
+Algorithm~\ref{alg:greedy} is of possible interest.
+Figure~\ref{fig:algo_runtime} shows the runtime for Jellyfish topologies of
+different sizes. Even with 2000 switches, Algorithm~\ref{alg:greedy} takes
+just 1.5 hours on a commodity desktop machine.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.3\textwidth] {figs/algo_runtime}
+	\vspace{-1em}
+	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
+	\label{fig:algo_runtime}
+	\vspace{-0.25in}
+\end{figure}
+
+\subsection{Impact on throughput and latency}\label{subsec:exp_performanceoverhead}
+
+\begin{figure}[t]
+	\centering
+	
+	\subfloat[short for lof][Flows bounced once.] {
+		\includegraphics[width=0.25\textwidth] {figs/bounce_probability}
+	}
+	\subfloat[short for lof][Flows bounced more than once.]{
+		\includegraphics[width=0.25\textwidth] {figs/bounce_probability2}
+	}
+	\vspace{-1em}
+	\caption{Percentage of bounced flows under varying number of concurrent link failures.}
+	\vspace{-1em}
+	\label{fig:bounce_probability}
+\end{figure}
+
+\begin{table}[t]
+	\footnotesize
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		& 8-to-1 & 16-to-1 & 24-to-1 \\
+		&scenario & scenario & scenario \\
+		\hline
+		\hline
+		1 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{6.87$\times 10^{-7}$}  & \multirow{2}{*}{1.61$\times 10^{-6}$} \\
+		
+		1 lossy Q &  &  & \\
+		\hline
+		2 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
+		
+		1 lossy Q &  &  & \\
+		\hline
+	\end{tabular}
+	\vspace{-0.5em}
+	\caption{Packet loss rate under web search workload.}
+	\vspace{-0.5em}
+	\label{table:loss_rate_ws} 
+\end{table}
+
+
+\begin{table}[t]
+	\footnotesize
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		
+		\hline
+		& 8-to-1 & 16-to-1 & 24-to-1 \\
+		&scenario & scenario & scenario \\
+		\hline
+		\hline
+		1 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{1.01$\times 10^{-7}$}  & \multirow{2}{*}{5.2$\times 10^{-7}$} \\
+		
+		1 lossy Q &  &  & \\
+		\hline
+		2 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
+		
+		1 lossy Q &  &  & \\
+		\hline
+	\end{tabular}
+	\vspace{-0.5em}
+	\caption{Packet loss rate under data mining workload.}
+	\vspace{-0.5em}
+	\label{table:loss_rate_dm} 
+\end{table}
+
+
+\begin{figure}[t]
+	\centering
+	
+	\subfloat[short for lof][FCT of web search flows] {
+		\includegraphics[width=0.25\textwidth] {figs/fct_ws}
+	}
+	\subfloat[short for lof][FCT of data mining flows]{
+		\includegraphics[width=0.25\textwidth] {figs/fct_dm}
+	}
+	\vspace{-1em}
+	\caption{Impact of \sysname{} on application performance}
+	\vspace{-1em}
+	\label{fig:app_fct_impact}
+\end{figure}
+
+\textcolor{blue}{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of bounced flows under varying number of concurrent link failures with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link failure(s) break the original paths. Figure~\ref{fig:bounce_probability}(a) counts the percentage of flows bounced once, while Figure~\ref{fig:bounce_probability}(b) counts the percentage of flows bounced more than once.}
+
+\textcolor{blue}{There are two takeaways from the results: 1) As the size of network scales up, the bounce probability decreases significantly. Hence the lossy queues of large-scale datacenter networks will only serve a very small percentage of flows;  2) It is very rare for a flow to be bounced more than once even under tens of concurrent link failures.}
+
+
+\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with 24 concurrent link failures, which has the largest bounce probability in the previous experiment\footnote{In practice, it is unlikely for a datacenter to have tens of unconverged link failures simultaneously, as the routing protocol used in today's datacenters can converge very fast (within a few seconds) after detecting failures. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search and data mining workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
+
+\textcolor{blue}{The results shown in Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm} is consistent with the bounce percentage shown in Figure~\ref{fig:bounce_probability}. Given the expectation that $\sim 15\%$ of flows are bounced once, it is possible to have packet loss when only using 1 lossless queue. On the other hand, with the configured WRR scheduling, the lossy queue can get half of the link capacity to serve 1-bounced flows, so the packet loss rate is very small ($10^{-7}$-$10^{-6}$). }
+
+\textcolor{blue}{As less than $4\%$ of flows are bounced more than once, there is no packet loss when using 2 lossless queues. The takeaway is that in practice, making 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
+
+\textcolor{blue}{In Figure~\ref{fig:app_fct_impact}, we ploted the flow completion time (FCT) of flows with and without Tagger. As one may expect, \sysname{} has little impact on the FCT results for both web search and data mining workload.}
+
+
+\begin{figure}[t]
+	\centering
+	
+	\subfloat[short for lof][Throughput] {
+		\includegraphics[width=0.25\textwidth] {figs/overhead_avgthrpt}
+	}
+	\subfloat[short for lof][Latency]{
+		\includegraphics[width=0.25\textwidth] {figs/RDMAlatency_overhead}
+	}
+	\vspace{-1em}
+	\caption{\sysname{} has no impact on throughput and latency}
+	\vspace{-1em}
+	\label{fig:perf_penalty}
+\end{figure}
+
+\textbf{Impact of \sysname{} rules:} On datapath, packets have to traverse the rules installed by \sysname{}.  These
+rules installed in TCAM, and hence have no discernible impact on throughput and
+latency. We installed different number of \sysname{} rules on T1, and measured
+average throughput and latency between H1 and H2 over several runs.
+Figure~\ref{fig:perf_penalty} confirms that throughput and latency are not
+affected by the number of rules.
+
+
+
+%\subsection{Simple demonstration of \sysname{}}\label{subsec:exp_demon}
+%	
+%	\begin{figure}[t]
+%		%\vspace{-0.1in}
+%		\centering
+%		
+%		\subfloat[short for lof][Experiment scenario.]{
+%			\includegraphics[width=0.25\textwidth] {figs/demon_scenario}
+%		}
+%		\subfloat[short for lof][Rate of flow 1 and flow 2.]{
+%			\includegraphics[width=0.25\textwidth] {figs/demon_flowrate}
+%		}
+%		
+%		\caption{The match-action rules in action}\label{fig:tagger_demon}
+%	\end{figure}
+%	
+%	
+%A simple experiment shown in
+%Figure~\ref{fig:tagger_demon} demonstrates the behavior of the match-action
+%rules.  We generate two flows, flow 1 and flow 2, to send packets to C from
+%different servers connected to ports A and B. Both servers set the DSCP value in
+%outgoing packets to 1. The match-action rules are set to rewrite the tag value
+%of packets arriving on port A to 2, and forward them to port C. Tag of packets
+%arriving on port B is not changed.
+%
+%At time = 17s, C sends a stream of forged PFC PAUSE frames on priority 2 to
+%switch S. The rate of both flows is plotted in Figure~\ref{fig:tagger_demon}(b)
+%(link capacity = 40Gbps). As expected, after priority 2 is paused, rate of
+%flow 1 is reduced to 0 while flow 2 gets all the available bandwidth.
+%Counters on switch S further confirm that no packets were dropped, and server
+%connected to port A was paused as expected.
