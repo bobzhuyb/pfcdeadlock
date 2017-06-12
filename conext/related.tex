@@ -1,0 +1,99 @@
+%\vspace{-0.1in}
+\section{Related Work}\label{sec:related}
+
+\para{Deadlock-free routing.} Many Deadlock-free routing designs have been
+proposed. See
+\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
+for representative schemes. Generally, these designs prevent deadlock by
+imposing restrictions on the routing paths, and can be classified into two
+categories.
+
+The first category is {\em deterministic routing based approach}, in which the
+routing path is not affected by the traffic status, and there is no CBD.  These
+routing algorithms are not compatible with existing routing protocols including
+OSFP and BGP. Worse, they cannot be implemented in current commodity switching
+ASICs.
+
+TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recently
+proposed deadlock-free routing designs. They both build edge-disjoint
+spanning trees (EDSTs), with DF-EDST~\cite{dfedst16} further builds a
+deadlock-free tree transition acyclic graph such that the transition
+among some EDSTs can be allowed. However, existing L3 routing protocols
+do not guarantee that packets will follow the pre-assign EDSTs, especially
+upon link failures. Current switching ASIC cannot detect and handle all 
+the potential EDST transition properly.
+
+%support EDST.
+%Furthermore, these designs need many EDSTs and
+%every EDST needs to occupy a lossless queue. 
+%Current switching ASIC,
+%however, can only support 2-3 lossless queues.
+
+The second category is {\em adaptive routing based approach.} The key idea is to
+pre-install  ``escape'' paths at every switch to cover all possible
+destinations. The switches can reroute packets to the ``escape'' paths in the
+presence of congestion so that deadlock can be avoided.  As far as we know, no
+commodity switching ASIC supports dynamic reroute based on traffic / queue
+status.
+
+\para{Intel Omni-Path.} Intel Omni-Path architecture \cite{omnipath} uses the
+concept of Service Channels (SC) for routing deadlock avoidance.  Unlike
+\sysname{}, Ommi-path uses a centralized fabric manager to manage the
+network~\cite{omnipath}, including setting up SCs. This is not feasible at
+data center scale.
+
+%% Technical details of Omni-Path are not currently available, Tagger differs
+%% from Omni-Path in two significant ways. First, Omni-path needs a fabric
+%% manager to dynamically setup SC whereas the tag match-action rules are
+%% pre-computed and statically configured. Second, Tagger enforces that
+%% the tag of a packet increases monotonically whereas Omni-Path does not
+%% enforce order for SC.
+
+\para{Buffer management for deadlock prevention.} It has been shown that by
+increasing the packet priority hop-by-hop, and putting packets of different
+priority into different buffers, deadlock can be avoided
+\cite{firstpaper,survey,datanetworks,karol2003prevention}. These designs,
+however, need a large number lossless queues (which is the diameter of the
+network). In \cite{dag}, the author tried to reduce the number of lossless
+queues to only two. The design does not guarantee losslessness. Furthermore,
+some switches need much larger buffer space than the others. 
+
+\para{Deadlock recovery.} Deadlock recovery schemes
+\cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998}
+detect deadlocks once they occur, and then try to break them by rerouting
+packets.  These approaches have two issues: (1) They cannot guarantee that
+deadlock will not happen again (if they can, there will be no need for deadlock
+recovery). (2) They cannot be deployed using existing switch hardware.
+
+%% need to add new deadlock detection algorithms and deadlock
+%% breaking protocols into the switches.
+
+%\para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
+%work by preemption. This does not work in Ethernet and in practice.
+
+\para{Deadlock-free routing reconfiguration}:
+Several deadlock-free routing reconfiguration schemes
+\cite{automatic,lysne2005,doublescheme,gara2005} have been proposed for
+ensuring deadlock-free during routing reconfiguration. \sysname{} can
+be used to help any routing protocol to be deadlock-free, as
+\sysname{} is decoupled from the routing protocols.
+
+%The basic idea is to divide the reconfiguration process into multiple
+%stages, and guarantee deadlock-free routing within each stage. We
+%believe
+%\sysname{} can be easily modified to guarantee deadlock-free of each
+%reconfiguration stage.
+
+\para{Summary.} \sysname{} is different from prior work because it works with
+any routing protocol, and with existing hardware. We further have shown that
+\sysname{} needs only small number of lossless queues.
+
+%We believe that deciding the priority of packets along the path is
+%better than changing routing configurations.
+
+%Deadlock-free routing \cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999} can be achieved by splitting the physical links into virtual channels and virtual channels are arranged in a way so as to avoid circular buffer dependency. In all those designs, the routing is decided by the virtual channels. Hence they cannot work with existing routing protocols for the data center networks which was designed for the lossy networks.
+%can be achieved by splitting the physical links into virtual channels and virtual channels are arranged in a way so as to avoid circular buffer dependency. In all those designs, the routing is decided by the virtual channels. Hence they cannot work with existing routing protocols for the data center networks which was designed for the lossy networks.
+
+%%TCP-Bolt~\cite{tcpbolt} uses multiple edge-disjoint spanning trees (EDSTs) and puts every EDST into a separate VLAN and lossless queue to achieve deadlock-free. In addition to the above drawbacks, to achieve good performance, TCP-Bolt may need a large number of lossless queues (which cannot be provided in current commodity switches). Furthermore, TCP-Bolt needs to run layer-2 VLAN, whereas all large-scale data center networks run layer-3.
+%
+%%DF-EDST~\cite{dfedst16} introduces a set of edge-disjoint spanning trees and a tree transition graph to provide deadlock free routing for arbitrary data center network topologies. DF-EDST, however, cannot work with existing routing protocols as it needs to follow the EDSTs. Furthermore, The EDST selection and transition cannot be readily implemented in current Ethernet switches.

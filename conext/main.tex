@@ -1,0 +1,110 @@
+\documentclass[letterpaper,twocolumn,fleqn]{sig-alternate-10pt}
+\paperheight 11in
+\paperwidth 8.5in
+\usepackage[pass,paperwidth=8.5in,paperheight=11in]{geometry}
+\usepackage{epsfig,endnotes}
+\usepackage[export]{adjustbox}
+\usepackage{tabularx}
+\usepackage{appendix}
+\newcommand{\sysname}{Tagger}
+
+\usepackage{url}
+\usepackage[space]{cite}
+\usepackage{lineno}
+\renewcommand\linenumberfont{\normalfont\bfseries\small}
+\usepackage{pifont}
+\usepackage{epsfig,epsf,url,amssymb}
+\usepackage{tabularx}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\newtheorem{mydef}{Definition}
+\usepackage{rotating}
+\usepackage{wrapfig}
+\usepackage{times}
+\long\def\comment#1{}
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{stmaryrd}
+\usepackage{wrapfig}
+\usepackage{hhline}
+\usepackage{textcomp,booktabs}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{epstopdf}
+\usepackage{url}
+\usepackage{subfig}
+\usepackage{graphicx}
+ 
+\newcommand{\paraspace}{\vspace{0.05in}}
+\newcommand{\para}[1]{\paraspace\noindent{\bf #1} }
+\newcommand\fixme[1]{{\color{red} #1}}
+ 
+\def\naive{na\"\i ve}
+
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+ 
+\newcommand{\subcaption}[1]{\centerline{#1}\vspace{0.1in}}
+\long\def\comment#1{}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{problem}[theorem]{Problem}
+ 
+\def\BState{\State\hskip-\ALG@thistlm}
+
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{problem}[1][]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+%% 
+%% \newenvironment{icompact}{
+%%   \begin{list}{$\bullet$}{
+%%     \parsep 1pt plus 1pt
+%%     \partopsep 1pt plus 1pt
+%%     \topsep 1pt plus 2pt minus 1pt
+%%     \itemsep 1.5pt plus 1pt
+%%     \parskip 0pt plus 2pt
+%%     \leftmargin 0.15in}
+%%        }
+%%   {\normalsize\end{list}}
+%% 
+%% \newenvironment{ecompact}{
+%%   \begin{list}{$\bullet$}{
+%%     \parsep 1pt plus 1pt
+%%     \partopsep 1pt plus 1pt
+%%     \topsep 1pt plus 2pt minus 1pt
+%%     \itemsep 1.5pt plus 1pt
+%%     \parskip 0pt plus 2pt
+%%     \leftmargin 0.15in}
+%%        }
+%%   {\normalsize\end{list}}
+%% 
+%% 
+\begin{document}
+\title{\sysname{}: Practical PFC Deadlock Prevention in\\Data Center Networks}
+\author{Paper 165, 12 pages + references}
+\maketitle
+
+\input{abstract.tex}
+\input{intro.tex}
+\input{background.tex}
+\input{challenges.tex}
+\input{specific.tex}
+\input{generic.tex}
+\input{discussion}
+\input{implementation.tex}
+\input{evaluation.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\input{appendix.tex}
+
+\bibliographystyle{acm}
+\bibliography{reference}
+
+\end{document}

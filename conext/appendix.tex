@@ -1,0 +1,78 @@
+\begin{appendices}
+\section{PFC headroom calculation}\label{APPHEADROOM}
+
+The PFC headroom needed per port per lossless queue can be calculated by
+		considering the time interval needed for a receiver to pause its
+		upstream sender. The time interval is composed of the following 6
+		periods for the lossless class $p$:
+
+	
+\noindent\textbf{The time to send a PAUSE frame $t_1$}.  Once a pause frame is
+		generated, it may be blocked by a packet that has just started
+		transmision. Since Ethernet is non-preemptive, in the worst-cast,
+		$t_1 = \frac{ L_{mtu} + L_{pfc}}{B}$, where $L_{mtu}$ is the MTU size,
+		and $L_{pfc}$ is the size of a PFC pause frame, and $B$ is the link
+		rate.
+
+\noindent\textbf{The PAUSE frame propagation time $t_2$}. This depends on 
+		the cable length between the sender and receiver.
+
+\noindent\textbf{The PAUSE frame receiving time at the sender $t_3=\frac{L_{pfc}}{B}$}.
+
+\noindent\textbf{The PFC response time $t_4$}. This is the amount of time needed
+		for the sender to process the pause frame.
+
+\noindent\textbf{The time for the sender to stop transmitting $t_5$}. Again,
+		because Ethernet is non-preemptive, sender must finish 
+		transmitting the packet that may have already started. Hence, in the
+		worst case, $t_5 =
+		\frac{L^{p}_{mtu}}{B}$.
+
+\noindent\textbf{The time for the pipe to be drained $t_6$}. We know $t_6 =
+		t_2$.
+
+
+At a first glance, the headroom size should be $B\times\sum t_i$. But there are
+some additional details. The switching ASICs typically divide a packet
+into small cells of equal size for internal packet storage and
+processing. The cell size ($C$) is typically larger than the smallest
+Ethernet packet size (64 bytes). For one 64-byte packet, one cell is
+allocated. So in the worst-case, the needed headroom size is:
+\begin{eqnarray} \label{eqn:pfcheadroom} S_{hdr} & = &
+C\lceil\frac{(t_1+t_2+t_3+t_4 + t_6)B}{64}\rceil + C\lceil \frac{t_5
+B}{64}\rceil \nonumber \end{eqnarray}
+
+For a typical 40GbE RoCEv2 setup, we have $L_{mtu}=1500$ bytes, $L_{pfc}=64$
+bytes, $t_2=t_6=1us$ (for about 200 meters cable length), $t_4=2.75us$,
+$L^{p}_{mtu}=1100$ bytes, $C=208$ bytes.  For a commodity switch with 32
+full duplex 40GbE ports, the total headroom size needed is 2.76MB for
+supporting one lossless queue.  
+
+\section{Optimal tagging scheme for Clos}
+\label{sec:clos_optimal}
+
+Algorithm~\ref{alg:clos} produces optimal tagging for Clos networks. Note
+similarity to Algorithm~\ref{alg:ttl}, except for the last step in the {\em for}
+loop, which is specific to Clos networks.
+
+\begin{algorithm}
+	\small
+    \KwIn{Clos topology and lossless routes $R$}
+	\KwOut{A tagged graph $G(V, E)$}
+	$V \gets Set()$\;
+	$E \gets Set()$\; 
+	\For{each path $r$ in $R$} {
+		$tag \gets 0$\;
+		\For{each hop $h$ in $r$} {
+			$V \gets V \cup \{(h, tag)\}$\;
+			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
+			\If{$h$ is going down \&\& nextHop is going up} {
+				$tag \gets tag+1$\;
+			}
+		}
+	}
+	\Return{$G(V, E)$}\;
+    \caption{The optimal tagging system for Clos topology.}
+	\label{alg:clos}
+\end{algorithm}
+\end{appendices}
