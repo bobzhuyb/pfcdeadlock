@@ -221,13 +221,17 @@ just 1.5 hours on a commodity desktop machine.
 		&scenario & scenario & scenario \\
 		\hline
 		\hline
-		1 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{6.87$\times 10^{-7}$}  & \multirow{2}{*}{1.61$\times 10^{-6}$} \\
 		
-		1 lossy Q &  &  & \\
+		Baseline: RoCE  & \multirow{2}{*}{1.25$\times 10^{-2}$} & \multirow{2}{*}{6.6$\times 10^{-2}$}  & \multirow{2}{*}{1.27$\times 10^{-1}$} \\
+		without PFC &  &  & \\
 		\hline
-		2 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
 		
-		1 lossy Q &  &  & \\
+		RoCE + Tagger & \multirow{2}{*}{0} & \multirow{2}{*}{6.87$\times 10^{-7}$}  & \multirow{2}{*}{1.61$\times 10^{-6}$} \\
+		(1 lossless Q) &  &  & \\
+		\hline
+		
+		RoCE + Tagger & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\	
+		(2 lossless Qs) &  &  & \\
 		\hline
 	\end{tabular}
 	\vspace{-0.5em}
@@ -246,14 +250,18 @@ just 1.5 hours on a commodity desktop machine.
 		& 8-to-1 & 16-to-1 & 24-to-1 \\
 		&scenario & scenario & scenario \\
 		\hline
-		\hline
-		1 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{1.01$\times 10^{-7}$}  & \multirow{2}{*}{5.2$\times 10^{-7}$} \\
 		
-		1 lossy Q &  &  & \\
+		Baseline: RoCE  & \multirow{2}{*}{1.51$\times 10^{-3}$} & \multirow{2}{*}{8.4$\times 10^{-3}$}  & \multirow{2}{*}{1.19$\times 10^{-2}$} \\
+		without PFC &  &  & \\
 		\hline
-		2 lossless Q + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
+				
+		\hline
+		RoCE + Tagger & \multirow{2}{*}{0} & \multirow{2}{*}{1.01$\times 10^{-7}$}  & \multirow{2}{*}{5.2$\times 10^{-7}$} \\
+		(1 lossless Q) &  &  & \\
+		\hline
 		
-		1 lossy Q &  &  & \\
+		RoCE + Tagger + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
+		(2 lossless Qs) &  &  & \\
 		\hline
 	\end{tabular}
 	\vspace{-0.5em}
@@ -283,13 +291,13 @@ just 1.5 hours on a commodity desktop machine.
 \textcolor{blue}{There are two takeaways from the results: 1) As the size of network scales up, the bounce probability decreases significantly. Hence the lossy queues of large-scale datacenter networks will only serve a very small percentage of flows;  2) It is very rare for a flow to be bounced more than once even under tens of concurrent link failures.}
 
 
-\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with 24 concurrent link failures, which has the largest bounce probability in the previous experiment\footnote{In practice, it is unlikely for a datacenter to have tens of unconverged link failures simultaneously, as the routing protocol used in today's datacenters can converge very fast (within a few seconds) after detecting failures. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search and data mining workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
+\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with 24 concurrent link failures.\footnote{In practice, it is unlikely for a datacenter to have tens of unconverged link failures simultaneously, as the routing protocol used in today's datacenters can converge very fast (within a few seconds) after detecting failures. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search~\cite{dctcp} and data mining~\cite{vl2}  workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
 
-\textcolor{blue}{The results shown in Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm} is consistent with the bounce percentage shown in Figure~\ref{fig:bounce_probability}. Given the expectation that $\sim 15\%$ of flows are bounced once, it is possible to have packet loss when only using 1 lossless queue. On the other hand, with the configured WRR scheduling, the lossy queue can get half of the link capacity to serve 1-bounced flows, so the packet loss rate is very small ($10^{-7}$-$10^{-6}$). }
+\textcolor{blue}{We use ``RoCE without PFC" as the baseline. 
+Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because 
+only $\sim 15\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as flows are rarely bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
 
-\textcolor{blue}{As less than $4\%$ of flows are bounced more than once, there is no packet loss when using 2 lossless queues. The takeaway is that in practice, making 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
-
-\textcolor{blue}{In Figure~\ref{fig:app_fct_impact}, we ploted the flow completion time (FCT) of flows with and without Tagger. As one may expect, \sysname{} has little impact on the FCT results for both web search and data mining workload.}
+\textcolor{blue}{In Figure~\ref{fig:app_fct_impact}, we ploted the flow completion time (FCT) of flows with and without Tagger. For all the three settings, we enabled PFC. As one may expect, \sysname{} has little impact on the FCT results for both web search and data mining workload.}
 
 
 \begin{figure}[t]
