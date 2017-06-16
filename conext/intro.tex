@@ -7,20 +7,20 @@ Memory Access (RDMA) over Converged Ethernet (RoCE) in their data centers to ena
 latency, high throughput data transfers with minimal CPU
 overhead~\cite{dcqcn,timely}. Systems like Pilaf~\cite{pilaf}, Farm~\cite{farm},
 TensorFlow~\cite{tensorflow}, and CNTK~\cite{cntk} rely on RDMA/RoCE for
-enhanced performance. 
+enhanced performance.
 
 RoCE uses Priority Flow Control (PFC) to prevent packet drops due to buffer
 overflow at the switches. PFC allows a switch to temporarily pause its upstream
 neighbor. While PFC is effective, it can lead to
 deadlocks~\cite{rdmaatscale,tcpbolt,hu2016deadlocks}. Deadlocks are caused by
-circular buffer dependency (CBD)~\cite{hu2016deadlocks}, {\em i.e.,} the occupied 
+circular buffer dependency (CBD)~\cite{hu2016deadlocks}, {\em i.e.,} the occupied
 buffers are waiting for each other in a loop.
 
 While CBD can be caused by a routing loop, routing loop is not required -- flows
 that travel on loop-free paths can create buffer dependencies that lead to CBD.
 A simple but contrived example is shown in Figure~\ref{fig:basic_deadlock}. We
 will discuss more realistic scenarios (e.g. Figure~\ref{fig:clos_1_bounce})
-later.  See~\cite{hu2016deadlocks} for several other examples. 
+later.  See~\cite{hu2016deadlocks} for several other examples.
 
 The deadlock problem is not merely theoretical -- our conversations with
 engineers at large cloud providers confirm that they have seen the problem in
@@ -38,11 +38,7 @@ and then use various techniques to {\em break} it~\cite{shpiner2016unlocking}.
 These solutions do not address the root cause of the problem, and hence cannot
 guarantee that the deadlock would not immediately reappear.
 
-The second category of solutions are designed to {\em prevent} deadlocks.  For
-deadlock formation, CBD is {\em necessary}, but not {\em
-sufficient}~\cite{hu2016deadlocks}. Unfortunately, {\em sufficient} conditions
-for deadlock formation are not well understood~\cite{hu2016deadlocks}. Thus,
-currently, preventing CBD is the only practical way to prevent deadlocks.
+The second category of solutions are designed to {\em prevent} deadlocks, by avoiding CBDs in the first place.
 
 In \S\ref{sec:challenges}, using data from a large cloud provider's data
 centers, we show that any practical deadlock prevention scheme must meet three
@@ -91,7 +87,7 @@ The number of lossless queues and the number of tag match-action rules required
 by \sysname{} are small.  Even for a Jellyfish topology with 2000 switches,
 \sysname{} requires just three lossless queues per switch.  In fact, we prove
 that for Clos topology,  \sysname{} is optimal in terms of number of lossless
-queues required.  We also show how to minimize the number of match-action rules
+queues required. We also show that using two lossless queues practically guarantees losses, and we further show how to minimize the number of match-action rules
 required to implement \sysname{}.
 
 We have implemented and tested \sysname{} on commodity Arista 7060 Switches with

@@ -12,7 +12,7 @@ are unwilling to deploy a brand-new routing
 protocols like~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
 or hardware just for deadlock avoidance --  especially when RoCEv2 itself can be
 deployed without any changes to routing\footnote{RoCEv2 packets are encapsulated
-in standard UDP packets.}! 
+in standard UDP packets.}!
 
 \subsection{Data center networks are dynamic}\label{sec:reroute}
 
@@ -38,11 +38,8 @@ deadlocks~\cite{shpiner2016unlocking}. See
 Figure~\ref{fig:clos_1_bounce}.
 
 In our data centers, we see hundreds of violations of up-down routing per
-day. Such routes can persist for minutes or even longer. Overall, we estimate
-that $0.001\%$ of the traffic is routed over such paths. This may sound tiny,
-but given that our network carries exabytes of traffic per day, the absolute
-volume of traffic affected by such routing is in tens of terabytes. This makes
-the threat of deadlocks, as discussed
+day. Such routes can persist for minutes or even longer. %Overall, we estimate that $0.001\%$ of the traffic is routed over such paths. This may sound tiny, but given that our network carries exabytes of traffic per day, 
+The absolute volume of traffic affected by such routing is in tens of terabytes. This makes the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 \subsection{Limited number of lossless queues}
@@ -50,7 +47,7 @@ in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 One idea to solve deadlock is to assign dynamic priority to packets. The
 priority of a packet increases as the packet approaches its destination
-~\cite{karol2003prevention}.  Such a design requires as many priorities as the largest 
+~\cite{karol2003prevention}.  Such a design requires as many priorities as the largest
 path length in the network.  The problem with this idea is that the PFC standard
 supports only 8 priority classes. Worse yet, commodity switches can
 realistically support fewer than 8 lossless classes.  The problem is that  to
@@ -81,4 +78,11 @@ response time. But even these are not expected to support more than four or five
 lossless queues. Hence the solutions that require a large number of lossless
 queues are not practical.
 
-We now describe how \sysname{} addresses these challenges.
+\textcolor{blue}{
+\subsection{The interplay of routing, deadlock, and lossless}}
+
+\textcolor{blue}{Our prerequisite in this work is that our design needs to be deadlock-free and it needs to work with all existing routing, including all the distributed protocols, e.g., BGP and OSPF. Switches running distributed routing protocols need to react failures locally, hence routing loops and CBDs are unavoidable. Therefore distributed routing, deadlock-free, lossless cannot coexist at the same time.}
+
+\textcolor{blue}{In this paper, we show how \sysname{} uses multiple lossless queues to avoid deadlock, and once deadlock and lossless are in conflict, we put conflicting packets into lossy queues. In \S~\ref{subsec:exp_performanceoverhead}, we will show that using two lossless queues achieves lossless practically.}
+
+%We now describe how \sysname{} addresses these challenges.
