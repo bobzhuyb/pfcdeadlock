@@ -4,37 +4,21 @@
 \para{Deadlock-free routing.} Many Deadlock-free routing designs have been
 proposed. See
 \cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
-for representative schemes. Generally, these designs prevent deadlock by
-imposing restrictions on the routing paths, and can be classified into two
-categories.
+for representative schemes. \textcolor{blue}{Generally, these designs prevent deadlock by
+imposing restrictions on the routing paths used in every virtual channel\footnote{In some previous works,  network link is called "physical channel", and priority class is called "virtual channel".}, and can be classified into two
+categories.}
 
-The first category is {\em deterministic routing based approach}, in which the
-routing path is not affected by the traffic status, and there is no CBD.  These
-routing algorithms are not compatible with existing routing protocols including
-OSFP and BGP. Worse, they cannot be implemented in current commodity switching
-ASICs.
+\textcolor{blue}{The first category is {\em deterministic routing based approach}, in which the
+routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each link into a group of ordered virtual channels, and constructed CBD-free routing by restricting packets to be routed only over decreasing order of virtual channels.
+TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed.}
 
-TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recently
-proposed deadlock-free routing designs. They both build edge-disjoint
-spanning trees (EDSTs), with DF-EDST~\cite{dfedst16} further builds a
-deadlock-free tree transition acyclic graph such that the transition
-among some EDSTs can be allowed. However, existing L3 routing protocols
-do not guarantee that packets will follow the pre-assign EDSTs, especially
-upon link failures. Current switching ASIC cannot detect and handle all 
-the potential EDST transition properly.
-
-%support EDST.
-%Furthermore, these designs need many EDSTs and
-%every EDST needs to occupy a lossless queue. 
-%Current switching ASIC,
-%however, can only support 2-3 lossless queues.
-
-The second category is {\em adaptive routing based approach.} The key idea is to
-pre-install  ``escape'' paths at every switch to cover all possible
+\textcolor{blue}{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
 destinations. The switches can reroute packets to the ``escape'' paths in the
-presence of congestion so that deadlock can be avoided.  As far as we know, no
-commodity switching ASIC supports dynamic reroute based on traffic / queue
-status.
+presence of congestion so that deadlock can be avoided.}
+
+%Generally, solutions under this category can achieve better network utilization, as they can tolerate CBD in the routing paths.
+
+\textcolor{blue}{The above routing designs cannot meet our requirements for three reasons. First, they are not compatible with existing routing protocols including OSFP and BGP. Second, existing L3 routing protocols do not guarantee that packets will follow the pre-constructed paths (e.g., EDSTs), especially upon link failures. Third, some of them cannot be implemented in current commodity switching ASICs. For example, as far as we know, no commodity switching ASIC supports the dynamic rerouting based on traffic / queue status required by the adaptive routing designs.}
 
 \para{Intel Omni-Path.} Intel Omni-Path architecture \cite{omnipath} uses the
 concept of Service Channels (SC) for routing deadlock avoidance.  Unlike
@@ -87,6 +71,54 @@ be used to help any routing protocol to be deadlock-free, as
 \para{Summary.} \sysname{} is different from prior work because it works with
 any routing protocol, and with existing hardware. We further have shown that
 \sysname{} needs only small number of lossless queues.
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\para{Deadlock-free routing.} Many Deadlock-free routing designs have been
+%proposed. See
+%\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
+%for representative schemes. Generally, these designs prevent deadlock by
+%imposing restrictions on the routing paths, and can be classified into two
+%categories.
+%
+%The first category is {\em deterministic routing based approach}, in which the
+%routing path is not affected by the traffic status, and there is no CBD.  These
+%routing algorithms are not compatible with existing routing protocols including
+%OSFP and BGP. Worse, they cannot be implemented in current commodity switching
+%ASICs.
+%
+%TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recently
+%proposed deadlock-free routing designs. They both build edge-disjoint
+%spanning trees (EDSTs), with DF-EDST~\cite{dfedst16} further builds a
+%deadlock-free tree transition acyclic graph such that the transition
+%among some EDSTs can be allowed. However, existing L3 routing protocols
+%do not guarantee that packets will follow the pre-assign EDSTs, especially
+%upon link failures. Current switching ASIC cannot detect and handle all 
+%the potential EDST transition properly.
+%
+%%support EDST.
+%%Furthermore, these designs need many EDSTs and
+%%every EDST needs to occupy a lossless queue. 
+%%Current switching ASIC,
+%%however, can only support 2-3 lossless queues.
+%
+%The second category is {\em adaptive routing based approach.} The key idea is to
+%pre-install  ``escape'' paths at every switch to cover all possible
+%destinations. The switches can reroute packets to the ``escape'' paths in the
+%presence of congestion so that deadlock can be avoided.  As far as we know, no
+%commodity switching ASIC supports dynamic reroute based on traffic / queue
+%status.
+
 
 %We believe that deciding the priority of packets along the path is
 %better than changing routing configurations.
