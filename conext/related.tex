@@ -9,8 +9,8 @@ imposing restrictions on the routing paths, and can be classified into two
 categories.
 
 \textcolor{blue}{The first category is {\em deterministic routing based approach}, in which the
-routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A physical channel is a network link associated with a queue. Each group of virtual channels shares a physical channel, but each virtual channel has its own queue.}, and constructed CBD-free routing by restricting packets over decreasing order of virtual channels.
-TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. These designs are not compatible with existing routing protocols including OSFP and BGP, as there is no guarantee that packets will follow the pre-constructed paths (e.g., EDSTs), especially upon link failures. }
+routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A virtual channel is equivalent to a priority queue in PFC in the store-and-forward setting.}, and constructed CBD-free routing by restricting packets over decreasing order of virtual channels.
+TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. These designs either only for specific topologies \cite{dally} or are not compatible with existing routing protocols including OSFP and BGP \cite{tcpbolt,dfedst16}.}
 
 \textcolor{blue}{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
 destinations. The switches can reroute packets to the ``escape'' paths in the
@@ -68,9 +68,8 @@ be used to help any routing protocol to be deadlock-free, as
 %\sysname{} can be easily modified to guarantee deadlock-free of each
 %reconfiguration stage.
 
-\para{Summary.} \sysname{} is different from prior work because it works with
-any routing protocol, and with existing hardware. We further have shown that
-\sysname{} needs only small number of lossless queues.
+\textcolor{blue}{
+\para{Summary.} \sysname{} is different from prior work. \sysname{}'s innovations are its ELP concept, and the algorithms that pre-generate the static tagging rules and minimize the number of priority classes. As a result, \sysname{} works with any routing protocol, and with existing hardware. }
 
 
 
