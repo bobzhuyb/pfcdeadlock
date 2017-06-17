@@ -5,7 +5,7 @@
 \subsection{Work with existing routing protocols and hardware}
 \label{sec:incremental} Data center routing protocols have to satisfy a variety
 of complex requirements regarding fault tolerance, and
-security~\cite{beckett2016don}.  Operators also invest heavily in  tools and
+security~\cite{beckett2016don}. Operators also invest heavily in  tools and
 technologies to monitor and maintain their networks; and these tools are
 tailored for the routing protocols that are already deployed.  Thus, operators
 are unwilling to deploy a brand-new routing
@@ -13,6 +13,10 @@ protocols like~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu200
 or hardware just for deadlock avoidance --  especially when RoCEv2 itself can be
 deployed without any changes to routing\footnote{RoCEv2 packets are encapsulated
 in standard UDP packets.}!
+
+\textcolor{blue}{Our prerequisite that our design needs to be deadlock-free and that it needs to work with all existing routing, including all the widely used protocols, e.g., BGP and OSPF poses technical challenge. Switches running distributed routing protocols need to react failures locally, hence routing loops and CBDs are unavoidable. Therefore distributed routing, deadlock-free, lossless cannot coexist at the same time.}
+
+\textcolor{blue}{In this paper, we show how \sysname{} uses multiple lossless queues to avoid deadlock, and once deadlock and lossless are in conflict, we put conflicting packets into lossy queues. In \S~\ref{subsec:exp_performanceoverhead}, we will show that using two lossless queues achieves lossless practically.}
 
 \subsection{Data center networks are dynamic}\label{sec:reroute}
 
@@ -38,7 +42,7 @@ deadlocks~\cite{shpiner2016unlocking}. See
 Figure~\ref{fig:clos_1_bounce}.
 
 In our data centers, we see hundreds of violations of up-down routing per
-day. Such routes can persist for minutes or even longer. %Overall, we estimate that $0.001\%$ of the traffic is routed over such paths. This may sound tiny, but given that our network carries exabytes of traffic per day, 
+day. Such routes can persist for minutes or even longer. %Overall, we estimate that $0.001\%$ of the traffic is routed over such paths. This may sound tiny, but given that our network carries exabytes of traffic per day,
 The absolute volume of traffic affected by such routing is in tens of terabytes. This makes the threat of deadlocks, as discussed
 in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
@@ -77,12 +81,5 @@ memory, using smaller cell size (64-byte) and by reducing the pause frame
 response time. But even these are not expected to support more than four or five
 lossless queues. Hence the solutions that require a large number of lossless
 queues are not practical.
-
-\textcolor{blue}{
-\subsection{The interplay of routing, deadlock, and lossless}}
-
-\textcolor{blue}{Our prerequisite in this work is that our design needs to be deadlock-free and it needs to work with all existing routing, including all the distributed protocols, e.g., BGP and OSPF. Switches running distributed routing protocols need to react failures locally, hence routing loops and CBDs are unavoidable. Therefore distributed routing, deadlock-free, lossless cannot coexist at the same time.}
-
-\textcolor{blue}{In this paper, we show how \sysname{} uses multiple lossless queues to avoid deadlock, and once deadlock and lossless are in conflict, we put conflicting packets into lossy queues. In \S~\ref{subsec:exp_performanceoverhead}, we will show that using two lossless queues achieves lossless practically.}
 
 %We now describe how \sysname{} addresses these challenges.
