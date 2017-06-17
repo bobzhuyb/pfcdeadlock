@@ -1,0 +1,299 @@
+===========================================================================
+                         SIGCOMM '17 Review #165A
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Top 25% but not top 10% of
+                                        submitted papers
+                 Reviewer expertise: 2. Some familiarity
+                  Technical Quality: 2. Flawed, but fixable for camera
+                                        ready
+
+                         ===== Paper summary =====
+
+Tagger solves the PFC deadlock problem in a practical way that requires no hardware changes and can be implemented on at least the Broadcom switches through programming it (via undefined publicly available resources).
+The insight is to define a set of Expected Lossless Paths (ELP) and use a tagging scheme that causes bouncing packets to be assigned to different PFC priorities and eventually be assigned to a lossy queue if too many bounces occur. Thus Tagger compromises the lossless network guarantee to achieve a practical and efficient solution, which is proven correct and of which results show good scalability properties.
+
+                  ===== Reasons to accept the paper =====
+
+It proposes a relatively simple and practical approach to the deadlock problem caused by PFC.
+
+It includes a generalized solution that works with any topology and any ELP set. It provides a formal analysis and proves the solution correct.
+
+The results show that the approach would be able to scale to networks with 2000 switches, even for unstructured topologies.
+
+             ===== Issues that could prevent acceptance =====
+
+No free lunches. The solution compromises the lossless guarantees that is expected by the applications of the network. Yet the paper does not show what implications this has.
+
+Shelf life of the paper is almost non existent. The problem is of immediate relevance because of the need of some company to resolve deadlocks for their existing hardware. However this is a paper of this company for this company, and probably any other company in a similar position would have the capability to develop their own solution. Given the existence of better schemes, it won't be long before the problem (and paper) is not relevant anymore.
+
+                      ===== Comments for author =====
+
+"Some may dislike the fact that we may eventually push a wayward packet into a lossy queue." -- I feel that I fall in this category. I do understand your perspective and your aim for a pragmatic approach to the deadlock problem. However, it seems to me that your approach falsifies the guarantees of a lossless fabric. I think you need to be much more upfront that you are making a trade-off and while you achieve the design requirements, you also give up a strong guarantee (that is possibly important to applications).
+In fact your guarantee is now relaxed to "packets in a lossless class will not be dropped due to buffer overflow as long as they traverse paths in ELP." But the Tagger cannot guarantee that this will be the case and applications cannot ensure that packets will traverse only paths in ELP.
+The paper would be stronger if it included an actual experiments with some RDMA application that shows what the impact on the application would be when deadlock prevention kicks in and at what point the packet loss becomes a problem.
+
+While reading the paper I also had another nagging question: if you are simply pursuing a practical solution, why isn't a solution that breaks the deadlock sufficient? I suppose such a solution does not need changes to the switches either. However it would guarantee lossless delivery. Contrasting the your approach to this other practical approach quantitatively (or at least qualitatively) would make the paper stronger.
+
+Another nagging question is: since you were able to actually implement Tagger on switches without modifying the ASIC, would it not be possible to implement any of the other approaches that you say require changes at switches/routing protocols in a similar fashion?
+
+"But even these are not expected to support more than four or five lossless queues" -- It would be good to have something to back this up.
+
+Figure 2 and 3 should order the position of S1 and S2 in the network in a consistent way.
+
+I find the (ab)use of exclamation marks the write up a bit annoying. I don't see any need for those.
+
+"switch ASIC, and everything is implemented using publicly available and documented functionality." -- AFAIK, this is not true. Without an NDA one does not have access to the Broadcom SDK and documentation. But I might wrong, in which case it would help to give references to resources in the public domain.
+
+===========================================================================
+                         SIGCOMM '17 Review #165B
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Top 25% but not top 10% of
+                                        submitted papers
+                 Reviewer expertise: 2. Some familiarity
+                  Technical Quality: 1. Serious issues; unlikely easily
+                                        fixed
+
+                         ===== Paper summary =====
+
+Tagger is a new approach to preventing PFC deadlock. The idea is surprisingly simple: packets carry tags and transitioned through a list of lossless queues when failures occur that cause them to deviate from their expected path, or into a lossy queue if no more lossless queues are available. The evaluation consists of end-to-end experiments using a map-reduce-style workload on a small Clos network, and simulations for random topologies (Jellyfish).
+
+                  ===== Reasons to accept the paper =====
+
++ A simple approach to avoiding deadlock
+
++ Designed to be readily deployable on commodity switches
+
++ An implementation on top of a Broadcom-based switch and a thorough evaluation on some representative workloads.
+
+             ===== Issues that could prevent acceptance =====
+
+- Tagger does not actually provide a lossless fabric under every situations.
+
+- Relatedly the evaluation doesn't study whether situations that lead to loss are likely to arise in practice, or what the impact might be on RDMA in general and applications in particular. The comment that Tagger has "no impact on throughput and latency" (Figure 14) seems potentially misleading.
+
+- The paper does not consider or evaluate other related schemes. For example, what happens if one ransitions over to a lossless queue on a single failure? If we keep the number of ELPs fixed, how does RDMA performance impacted as the number of lossless queues is increased from 1 up to the number used by your solution?
+
+                      ===== Comments for author =====
+
+This is a well-motivated and well-executed paper that tackles a problem of current interest. The solution is surprisingly simple and amazingly effective at mitigating the problem of deadlocks, which can arise when PFC is used to implement a lossless Ethernet fabric. The paper describes an implementation and an evaluation in hardware on a small testbed. It also present results from experiments showing that Tagger could be used in other topologies such as Jellyfish. This is a strong paper overall, and I believe it might be a good addition to the SIGCOMM program.
+
+However, there are some major issues that give me pause:
+
+1. The proposed technique does not actually provide a lossless fabric! If enough failures stack up, causing a packet to exceed the number of lossless queues, then it will be ejected to a lossy queue where it might be dropped if congestion occurs. This is a major relaxation of the problem. While itmight be totally reasonable to do this, I would have appreciated if the paper were more upfront about changing the requirements (note that I am *not* complaining about the use of lossy queues!)
+
+2. Relatedly, the paper does not devote much time to considering alternative designs. For example, as hinted above, it would be interesting to take Tagger to the extreme and see experiments where you use just a single lossless queue and a single lossy queue. Presumably for the failure scenarios you consider, this would eventually degrade RDMA and application-level performance. Then you could scale up the number of lossless queues until it was sufficient to cover the ELPs and show how performance improves.
+
+3. One way to view Tagger is as using a set of virtual networks -- N lossless and 1 lossy. The packet transitions between these when failures occur. It would be interesting if the work on virtualization in general and graph embeddings in particular had any connection to this work. For example, could the number of paths be derived analytically from such work?
+
+4. Overall, the evaluation is reasonable. However, to be somewhat critical, the first set experiments can be summarized as: "without Tagger, deadlock occurs" and "with Tagger, no deadlock occurs." I was surprised not to see a more in-depth analysis. For example, what happens to application performance when some traffic is ejected to the lossy queues?! The paper does not discuss this issue at all, and even claims that "Tagger has no impact on throughput and latency" (Figure 14) which seems misleading at best. 
+
+5. Finally, given that the authors are involved with the operation of multiple large data centers (as hinted by "our data centers" on p3) I was surprised not to see a more comprehensive evaluation on larger topologies and real-world workloads. To put it another way, there is an opportunity to make a contribution to the community by identifying a set of scenarios that cover the space of important issues related to PFC deadlock so others can replicate, build on, and extend their results. However, this paper does not make such a contribution.
+
+Typos:
+
+p1: "TesnorFlow" is misspelled
+
+===========================================================================
+                         SIGCOMM '17 Review #165C
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Top 25% but not top 10% of
+                                        submitted papers
+                 Reviewer expertise: 4. Expert
+                  Technical Quality: 2. Flawed, but fixable for camera
+                                        ready
+
+                         ===== Paper summary =====
+
+This paper describes tagger, a scheme to guarantee a deadlock-free operation for any routing scheme for RoCEv2. The paper does that by eliminating circular dependency between resources (buffers in this case). The paper starts by motivating the problem in a large-scale data center setting where link failures and routing changes are common. It also puts the constraint of using the same routing schemes currently deployed and the limited number of lossless queues.
+
+                  ===== Reasons to accept the paper =====
+
+- General purpose algorithm for assignment of tags is interesting.
+- Enough and careful implementation for Ethernet networks.
+- Well-motivated problem.
+
+             ===== Issues that could prevent acceptance =====
+
+- Over-claiming the contribution or at least missing key idea from the literature. 
+- Algorithm is not compared quantitatively (in terms of number of lossless classes) with literature.
+- Most of the evaluation is experimentally checking what was already proven analytically in the paper, in other words irrelevant. I would have liked more evaluation on the trade-offs between different tagging schemes for multi-application classes.
+
+                      ===== Comments for author =====
+
+The idea proposes using a “Tag” attached to the packet and uses this tag to allocation a lossless queue on the switch. Different tags will use different queues and if orchestrated correctly, it can remove the circular dependency. This is the exact same idea of using Virtual Channels for deadlock avoidance proposed in interconnection networks 30 years ago [1]. I am struck by the fact that the authors did not mention the word virtual channel in the paper a single time. Of course, this is not the only contribution of the paper but the lack of mentioning it would give the reader who is not familiar with interconnection networks (or HPC) the impression that the tagging idea is novel. IT IS NOT. 
+
+Having said that, the paper’s real contribution is the algorithm for minimizing the number of lossless classes using a greedy algorithm that merges different tags maintaining deadlock freedom. The modeling in section 5 and the corresponding greedy algorithm is interesting. The authors provides rational and an example on why it is not optimal. The algorithm is intuitive and neat.  I also like the idea of using a lossy queue as a last resort (removing the preemption condition).
+
+The paper has a detailed implementation details on commodity switches and discusses consideration such as multiple application classes.
+
+Notes:
+The paper makes several claims that are not accurate:
+In page 1, “Sufficient conditions for deadlock formation are not well understood”. That’s not true. These conditions are the coffman conditions. Mutual exclusion, Hold-and-wait, circular-wait and no-preemption. They have been cited in [2] [3] and I believe they are well understood in the interconnection networking community. [3] adds a discussion about whether a deadlock state is reachable or not.
+The paper didn’t evaluate the probability of loss (under different offered load) during routing convergence due to bounces (and using up all tags).
+
+Lastly, I highly suggest either use the agreed upon virtual channel terminology or define the difference between tags and virtual channels.
+
+Ref:
+[1] W. J. Dally and C. L. Seitz, "Deadlock-Free Message Routing in Multiprocessor Interconnection Networks," in IEEE Transactions on Computers, vol. C-36, no. 5, pp. 547-553, May 1987.
+doi: 10.1109/TC.1987.1676939 
+http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1676939&isnumber=35264
+
+[2] J. Domke, T. Hoefler and W. E. Nagel, "Deadlock-Free Oblivious Routing for Arbitrary Topologies," 2011 IEEE International Parallel & Distributed Processing Symposium, Anchorage, AK, 2011, pp. 616-627.
+doi: 10.1109/IPDPS.2011.65
+
+[3] L. Schwiebert, "Deadlock-free oblivious wormhole routing with cyclic dependencies," IEEE Trans. Comput., vol. 50, no. 9, pp. 865-876, 2001. (Pubitemid 32981665)
+
+===========================================================================
+                         SIGCOMM '17 Review #165D
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Top 50% but not top 25% of
+                                        submitted papers
+                 Reviewer expertise: 2. Some familiarity
+                  Technical Quality: 3. Only minor issues
+
+                         ===== Paper summary =====
+
+The paper presents Tagger, a "tagging" system to ensure no PFC deadlocks in a RoCE network.
+
+                  ===== Reasons to accept the paper =====
+
+Solid algorithm design. Demonstration that such algorithm can not only work in Clos topology but even in Jellyfish.
+
+             ===== Issues that could prevent acceptance =====
+
+Unclear whether the problem is an important one to solve. Limited evaluation on small testbed.
+
+                      ===== Comments for author =====
+
+A nicely put together paper solving a long standing problem (deadlock in back-pressure packet switching network) without routing changes!
+
+I have the following comments:
+
+- Section 1: RoCE stands for RDMA over _Converged_ Ethernet
+
+- Is it an important problem to solve? [26] specifically mentions that the PFC deadlock seen during the years of the only publicly reported RoCE network can be solved by simply disabling broadcast/multicast. Hence, it's not clear whether the PFC deadlock shown in Figure 3 is real.
+
+- The work still feels early without real world deployment. The proposal seems quite complicated with a lot of switch configuration to setup ELP, handle rule compression etc. Also, DSCP field may be used for other purposes. Such complex configuration may pose some challenge in real world deployment. The authors seem to imply that they operate large datacenter networks (Section 3.2, Section 6). It would be interesting to see how this approach rolls out to the real world, not limited in lab environment.
+
+- I feel that the "PFC alternatives" part in Section 6 is not quite convincing. RoCE as a whole is just picking up interest in the industry. So far there's only one large scale deployment reported ([26]). This is very different from what, say, TCP or BGP. Such "patch" solution (not a simple one in this case) may not leading the community towards the right direction and may actually hurt the adoption of RoCE.
+
+===========================================================================
+                         SIGCOMM '17 Review #165E
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Top 25% but not top 10% of
+                                        submitted papers
+                 Reviewer expertise: 2. Some familiarity
+                  Technical Quality: 3. Only minor issues
+
+                         ===== Paper summary =====
+
+The paper proposes a scheme to avoid deadlocks in PFC based RoCE
+deployments. These deadlocks can occur when flows take non-optimal
+paths (due to link/switch failures) and cause PFC-PAUSE loops to be
+generated, which can stall network traffic. Their solution Tagger
+exploits multiple priority classes available in PFC, and dynamically
+changes the priority of packets when they take unexpected paths. Since
+PFC-PAUSE frames are per-priority-class, flow loops cannot deadlock
+each other as one of the loop links will have a different
+priority. The paper shows how to construct such deadlock free paths
+for various topologies, and how to map it to a real network using TCAM
+match+action entries.
+
+                  ===== Reasons to accept the paper =====
+
+- Simple, clean and intuitive solution for a well defined problem.
+- They clearly present the requirements, challenges and discuss their solution with successive refinements.
+- Generic solution that works on any network topology and scales to reasonable sized networks.
+
+             ===== Issues that could prevent acceptance =====
+
+- I did not get a sense of the magnitude/seriousness of the deadlock
+  problem. Yes, deadlocks drop traffic to zero. But it would be nice
+  to see some measurements on how frequently deadlocks occur in their
+  datacenter. How are they currently dealing with it? How much
+  degradation do they cause over an extended period? Does it make PFC
+  based RoCE unusable as is?
+- Basic idea of dropping priority of packets to avoid deadlocks isn't very 
+   surprising.  In fact, similar ideas has been used in the supercomputing
+   literature from the 90s.
+- It is not clear that this isn't a band-aid job for a problem that might not 
+   exist in the near future.
+
+                      ===== Comments for author =====
+
+Overall, I thought it was a nice paper, easy to understand and follow. Not too many complaints and I don't think their solution has any correctness issues.
+
+- When I started reading Section 5, I was expecting a complex graph
+  algorithm for generating the tagging topology, but was disappointed
+  to see a simple greedy approach. But it seems the general problem is
+  very hard.
+
+- I wasn't sure whether the separate ingress and egress queues on
+  the switches are logical or physically separate queues. 
+
+- The authors have this discussion on supporting multiple traffic
+  classes using fewer than MN number of priority levels (M = number of
+  priority levels needed per traffic class, N = number of traffic
+  classes). I was not entirely convinced that their approach will
+  remain deadlock free.
+
+Minor nits
+- Some of the references are incomplete and not capitalized properly.
+- Graph legends could be larger.
+
+===========================================================================
+                         SIGCOMM '17 Review #165F
+---------------------------------------------------------------------------
+Paper #165: Tagger: Practical PFC Deadlock Prevention in Data Center
+            Networks
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Top 25% but not top 10% of
+                                        submitted papers
+                 Reviewer expertise: 2. Some familiarity
+                  Technical Quality: 2. Flawed, but fixable for camera
+                                        ready
+
+                         ===== Paper summary =====
+
+Tagger attempts to ensure that no deadlocks occur in a pause enabled network. Tagger's key insight is that given a set of expected lossless routes, a simple tagging scheme can be developed to ensure that no deadlock will occur under any failure conditions. The paper describes such a tagging scheme and proves that it prevents deadlock. Tagger is evaluated through real implementations on commodity hardware.
+
+                  ===== Reasons to accept the paper =====
+
++ Simple idea to solve a complex problem (deadlocks in networks).
++ Well executed by thinking through the space of practical solution, and presented in a convincing way to the readers.
+
+             ===== Issues that could prevent acceptance =====
+
+- The paper brushes aside a more fundamental question: are networks with deadlocks and pauses a good way to operate large scale networks? I grant it that this is not the main focus of the paper, but yet deserves some treatment.
+
+                      ===== Comments for author =====
+
+This is nice work with a simple insight and solid execution to prove that the insight works.
+
+This paper first requires the readers to buy into the fact that running networks with pause frames (PFCs) enabled and it's associated problems is an OK thing to do. If one doesn't buy into this premise, then a better effort would be to get rid of the pauses and operate networks that don't come with all of the problems with pauses (including deadlocks). Addressing this upfront with some background and the necessity of pauses would be helpful.
+
+When tagged packets are thrust into a lossy queue, what do the impact of losses have on RoCE traffic? Agree that losses are not guaranteed on entering a loss queue, but even if probability is small, it would be great to understand what impact the losses have.
+
+nit: "TesnorFlow" -> TensorFlow.
+
