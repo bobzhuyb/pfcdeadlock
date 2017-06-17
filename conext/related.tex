@@ -9,7 +9,7 @@ imposing restrictions on the routing paths, and can be classified into two
 categories.
 
 \textcolor{blue}{The first category is {\em deterministic routing based approach}, in which the
-routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels, and constructed CBD-free routing by restricting packets to be routed only over decreasing order of virtual channels \footnote{A physical channel is a network link associated with a queue. Each group of virtual channels shares a physical channel, but each virtual channel has its own queue.}.
+routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A physical channel is a network link associated with a queue. Each group of virtual channels shares a physical channel, but each virtual channel has its own queue.}, and constructed CBD-free routing by restricting packets to be routed only over decreasing order of virtual channels.
 TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed.}
 
 \textcolor{blue}{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
