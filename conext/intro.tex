@@ -40,7 +40,7 @@ guarantee that the deadlock would not immediately reappear.
 
 The second category of solutions are designed to {\em prevent} deadlocks, by avoiding CBDs in the first place.
 
-In \S\ref{sec:challenges}, using data from a large cloud provider's data
+In \S\ref{sec:challenges}, \yibo{based on the data and experience} from a large cloud provider's data
 centers, we show that any practical deadlock prevention scheme must meet three
 key challenges. These include: $(i)$ it should require no changes to existing
 routing protocols or switch hardware, $(ii)$ it must deal with link failures and
@@ -48,11 +48,14 @@ associated  route changes, and $(iii)$ it must work with limited buffer
 available in commodity switches.
 
 Prior proposals for deadlock prevention fail to meet one or more of these
-challenges.  Some schemes~\cite{infiniband,blazewicz1994optimal} require
-centralized routing.  These are difficult to deploy in existing data centers.
-Others are distributed, but brand-new routing
-protocols~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16,tcpbolt,dfedst16}
-that are not supported by commodity switches.  Many of these schemes also
+challenges. \yibo{Most of them~\cite{infiniband,blazewicz1994optimal,dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16,tcpbolt,dfedst16}
+are focused on designing routing protocols that are significantly different from
+what are supported by commodity Ethernet switches.}
+%Some schemes~\cite{infiniband,blazewicz1994optimal} require
+%centralized routing.  These are difficult to deploy in existing data centers.
+%Others are distributed, but brand-new routing protocols
+%that are not supported by commodity switches.  
+Many of these schemes also
 require carefully controlling the paths -- something that is simply not possible
 with decentralized routing in presence of link failures~\cite{netpilot}.
 Finally, some schemes~\cite{firstpaper,survey,datanetworks,karol2003prevention},
@@ -74,9 +77,12 @@ switches use these tags to enqueue packets in different lossless queues. The
 tags carried in packets are manipulated in a way such that CBD never forms due
 to packets traveling on paths in ELP.  If packets ever deviate from paths in ELP
 (e.g. due to link failures or routing errors) they are automatically placed in a
-lossy queue to ensure that they do not trigger PFC. \sysname{} guarantees that
+lossy queue to ensure that they do not trigger PFC. \yibo{Operators have full flexibility
+to add more redundant paths into ELP, bringing the possibility of falling in the lossy
+queue to nearly 0.} Once ELP is given, \sysname{} guarantees that
 there will be no deadlock - even under unforeseen link failures or routing
-errors. Even routing loops won't lead to deadlock!
+errors, \yibo{like loops!} 
+%Even routing loops won't lead to deadlock!
 
 \sysname{} works for any routing protocol because there are no restrictions on
 what paths can be included in the ELP, tagging rules are static, and are
@@ -87,11 +93,12 @@ The number of lossless queues and the number of tag match-action rules required
 by \sysname{} are small.  Even for a Jellyfish topology with 2000 switches,
 \sysname{} requires just three lossless queues per switch.  In fact, we prove
 that for Clos topology,  \sysname{} is optimal in terms of number of lossless
-queues required. We also show that using two lossless queues practically guarantees losses, and we further show how to minimize the number of match-action rules
+queues required. We also show that using two lossless queues practically guarantees losses, 
+and we further show how to minimize the number of match-action rules
 required to implement \sysname{}.
 
-We have implemented and tested \sysname{} on commodity Arista 7060 Switches with
-Broadcom chipsets. The implementation requires carefully addressing the problem
+We have implemented and tested \sysname{} on commodity Arista switches with Broadcom chips. 
+The implementation requires carefully addressing the problem
 of priority transition (\S\ref{sec:implementation}). Our simulations and experiments show that
 \sysname{} has no impact on throughput and latency of RDMA traffic.
 

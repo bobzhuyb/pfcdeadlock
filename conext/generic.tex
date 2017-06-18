@@ -402,8 +402,8 @@ original topology, respectively. Then, $G(V,E)$ can have at most $L \times T$
 nodes.  Each node will be examined exactly once for checking whether $G_{tmp}$
 is acyclic.  Checking whether $G_{tmp}$ is acyclic with a newly added node
 requires a Breadth-First Search, with runtime complexity of $O(|V_{tmp}| +
-|E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number of linkes $L$, and $|E_{tmp}|$ 
-is bounded by the number of pairs of incident links $L \times P$, in the network.  Therefore,
+|E_{tmp}|)$. $|V_{tmp}|$ is bounded by the number of links $L$, and $|E_{tmp}|$ 
+is bounded by the number of pairs of incident links $L \times P$, in the network. Thus,
 the total runtime complexity is $O(L \times T \times (L+L \times P))$. Note that $T$
 itself is bounded by the length of the longest path in $ELP$.
 
