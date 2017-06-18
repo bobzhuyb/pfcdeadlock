@@ -30,7 +30,7 @@ ConnectX-3 Pro NICs.
 	}
 	\vspace{-1em}
 	\caption{Clos deadlock due to 1-bounce paths}\label{fig:exp_validation_nonloop}
-	\vspace{-0.15in}
+	\vspace{-0.3in}
 \end{figure}
 
 \begin{figure}[t]
@@ -38,22 +38,19 @@ ConnectX-3 Pro NICs.
 	\centering
 	
 	\subfloat[short for lof][Scenario] {
-		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_scenario}
+		\includegraphics[width=0.27\textwidth] {figs/validation_loopcase_scenario}
 	}
-
-\vspace{-0.25in}
-
 	\subfloat[short for lof][Rate of flow 2]{
-		\includegraphics[width=0.4\textwidth] {figs/validation_loopcase_flowrate}
+		\includegraphics[width=0.23\textwidth] {figs/validation_loopcase_flowrate}
 	}
 	\vspace{-1em}
 	\caption{Deadlock due to routing loop}\label{fig:exp_validation_loop}
-	\vspace{-1em}
+	\vspace{-1.2em}
 	
 \end{figure}
 
 \begin{figure}[t]
-	%\vspace{-0.1in}
+	\vspace{-0.2in}
 	\centering
 	
 	\subfloat[short for lof][4-to-1 shuffle with \sysname] {
@@ -63,16 +60,18 @@ ConnectX-3 Pro NICs.
 		\includegraphics[width=0.25\textwidth] {figs/validation_pp_manytoone_notagger}
 	}
 
+\vspace{-1em}
+
 	\subfloat[short for lof][1-to-4 shuffle with \sysname] {
 	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_tagger}
 }
 \subfloat[short for lof][1-to-4 shuffle without \sysname]{
 	\includegraphics[width=0.25\textwidth] {figs/validation_pp_onetomany_notagger}
 }
-	\vspace{-0.5em}
+	\vspace{-1em}
 	\caption{PFC PAUSE propagation due to deadlock
 	 }\label{fig:exp_validation_propagation}
-	\vspace{-0.5em}
+	\vspace{-2em}
 \end{figure}
 
 
@@ -146,11 +145,14 @@ up to $k$ bounces. We now consider other topologies.
 			\hline
 			
 		\end{tabular}
-		\vspace{-1em}
+		%\vspace{-1em}
 		\caption{Rules and priorities required for Jellyfish. Half the ports on
 		each switch are connected to servers. ELP is shortest paths for first four entries. ELP for last entry includes additional 20,000 random paths.}
-		\vspace{-1em}
+		\vspace{-2em}
 \label{table:jellyfish_shortestpath} \end{table}
+
+
+
 
 Jellyfish topology is an r-regular random graph, characterized by the number of
 switches, the number of ports a switch has (n) and the number of ports used to
@@ -179,6 +181,34 @@ just 2 lossless priorities and 164 rules per switch.
 Thus, we conclude that in terms of number of lossless classes and ACLs,
 \sysname{} scales well for modern data center architectures.
 
+\begin{figure*}[t!]
+	\begin{minipage}{0.29\textwidth}
+			\vspace{-1.5em}
+		\includegraphics[width=1\textwidth] {figs/algo_runtime}
+		\vspace{-1.5em}
+		\caption{Runtime of Algorithm~\ref{alg:greedy} }
+		\label{fig:algo_runtime}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.7\textwidth}
+		\vspace{-2.5em}
+		\centering
+		\subfloat[short for lof][Flows bounced once.] {
+			\includegraphics[width=0.33\textwidth] {figs/bounce_probability}
+		}
+		\subfloat[short for lof][Flows bounced twice.]{
+			\includegraphics[width=0.33\textwidth] {figs/bounce_probability2}
+		}
+		\subfloat[short for lof][Flows bounced > 2 times.]{
+			\includegraphics[width=0.33\textwidth] {figs/bounce_probability3}
+		}
+		\vspace{-0.5em}
+		\caption{The percentage of bounced flows under varying link failure rate}
+		\label{fig:bounce_probability}
+	\end{minipage}
+	\vspace{-0.1in}
+\end{figure*}
+
 Generating tagging rules is a one-time activity. Still, runtime of
 Algorithm~\ref{alg:greedy} is of possible interest.
 Figure~\ref{fig:algo_runtime} shows the runtime for Jellyfish topologies of
@@ -186,31 +216,7 @@ different sizes. Even with 2000 switches, Algorithm~\ref{alg:greedy} takes
 just 1.5 hours on a commodity desktop machine.
 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.3\textwidth] {figs/algo_runtime}
-	\vspace{-1em}
-	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
-	\label{fig:algo_runtime}
-	\vspace{-0.25in}
-\end{figure}
-
 \subsection{Impact on throughput and latency}\label{subsec:exp_performanceoverhead}
-
-\begin{figure}[t]
-	\centering
-	
-	\subfloat[short for lof][Flows bounced once.] {
-		\includegraphics[width=0.25\textwidth] {figs/bounce_probability}
-	}
-	\subfloat[short for lof][Flows bounced more than once.]{
-		\includegraphics[width=0.25\textwidth] {figs/bounce_probability2}
-	}
-	\vspace{-1em}
-	\caption{Percentage of bounced flows under varying number of concurrent link failures.}
-	\vspace{-1em}
-	\label{fig:bounce_probability}
-\end{figure}
 
 \begin{table}[t]
 	\footnotesize
@@ -234,9 +240,8 @@ just 1.5 hours on a commodity desktop machine.
 		(2 lossless Qs) &  &  & \\
 		\hline
 	\end{tabular}
-	\vspace{-0.5em}
-	\caption{Packet loss rate under web search workload.}
-	\vspace{-0.5em}
+	\caption{Packet loss rate under web search workload}
+	\vspace{-2.5em}
 	\label{table:loss_rate_ws} 
 \end{table}
 
@@ -260,33 +265,26 @@ just 1.5 hours on a commodity desktop machine.
 		(1 lossless Q) &  &  & \\
 		\hline
 		
-		RoCE + Tagger + & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
+		RoCE + Tagger & \multirow{2}{*}{0} & \multirow{2}{*}{0}  & \multirow{2}{*}{0} \\
 		(2 lossless Qs) &  &  & \\
 		\hline
 	\end{tabular}
-	\vspace{-0.5em}
-	\caption{Packet loss rate under data mining workload.}
-	\vspace{-0.5em}
+	\caption{Packet loss rate under data mining workload}
+	\vspace{-2.5em}
 	\label{table:loss_rate_dm} 
 \end{table}
 
 
+\textcolor{blue}{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of bounced flows under varying link failure rate with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link failure(s) break the original paths.}
+
+\textcolor{blue}{Figure~\ref{fig:bounce_probability}(a), Figure~\ref{fig:bounce_probability}(b) and Figure~\ref{fig:bounce_probability}(c) show the percentage of flows bounced once, twice and more than twice, respectively. There are two takeaways from the results. First, when having link failures, the behavior of local rerouting has a good chance to cause DOWN-UP bounce for tree-based networks. Second, even under high link failure rate,  a flow is rarely bounced twice or more.}
 
 
-\textcolor{blue}{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of bounced flows under varying number of concurrent link failures with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link failure(s) break the original paths. Figure~\ref{fig:bounce_probability}(a) counts the percentage of flows bounced once, while Figure~\ref{fig:bounce_probability}(b) counts the percentage of flows bounced more than once.}
-
-\textcolor{blue}{The takeaway is that It is very rare for a flow to be bounced more than once even under tens of concurrent link failures.}
-
-%\textcolor{blue}{There are two takeaways from the results: 1) As the size of network scales up, the bounce probability decreases significantly. Hence the lossy queues of large-scale datacenter networks will only serve a very small percentage of flows;  2) It is very rare for a flow to be bounced more than once even under tens of concurrent link failures.}
-
-
-\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with 24 concurrent link failures.\footnote{In practice, it is unlikely for a datacenter to have tens of unconverged link failures simultaneously, as the routing protocol used in today's datacenters can converge very fast (within a few seconds) after detecting failures. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search~\cite{dctcp} and data mining~\cite{vl2}  workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
+\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with $20\%$ link failure rate.\footnote{In practice, it is unlikely to have such a high link failure rate. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search~\cite{dctcp} and data mining~\cite{vl2}  workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
 
 \textcolor{blue}{We use ``RoCE without PFC" as the baseline. 
 Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because 
-only $\sim 15\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as flows are rarely bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
-
-%\textcolor{blue}{In Figure~\ref{fig:app_fct_impact}, we ploted the flow completion time (FCT) of flows with and without Tagger. For all the three settings, we enabled PFC. As one may expect, \sysname{} has little impact on the FCT results for both web search and data mining workload.}
+only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of flows are bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
 
 
 \begin{figure}[t]
@@ -300,7 +298,7 @@ only $\sim 15\%$ of flows are bounced once. For Tagger with 2 lossless queues, w
 	}
 	\vspace{-1em}
 	\caption{\sysname{} has no impact on throughput and latency}
-	\vspace{-1em}
+	\vspace{-2em}
 	\label{fig:perf_penalty}
 \end{figure}
 
@@ -312,7 +310,36 @@ Figure~\ref{fig:perf_penalty} confirms that throughput and latency are not
 affected by the number of rules.
 
 
+%\textcolor{blue}{There are two takeaways from the results: 1) As the size of network scales up, the bounce probability decreases significantly. Hence the lossy queues of large-scale datacenter networks will only serve a very small percentage of flows;  2) It is very rare for a flow to be bounced more than once even under tens of concurrent link failures.}
 
+%\textcolor{blue}{In Figure~\ref{fig:app_fct_impact}, we ploted the flow completion time (FCT) of flows with and without Tagger. For all the three settings, we enabled PFC. As one may expect, \sysname{} has little impact on the FCT results for both web search and data mining workload.}
+
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.3\textwidth] {figs/algo_runtime}
+%	\vspace{-1em}
+%	\caption{Runtime of Algorithm~\ref{alg:greedy} for Jellyfish network of different sizes.}
+%	\label{fig:algo_runtime}
+%	\vspace{-0.25in}
+%\end{figure}
+
+%\begin{figure}[t]
+%	\centering
+%	
+%	\subfloat[short for lof][Percentage of flows bounced once.] {
+%		\includegraphics[width=0.25\textwidth] {figs/bounce_probability}
+%	}
+%	\subfloat[short for lof][Percentage of flows bounced more than once.]{
+%		\includegraphics[width=0.25\textwidth] {figs/bounce_probability2}
+%	}
+%\subfloat[short for lof][Percentage of flows bounced more than once.]{
+%	\includegraphics[width=0.25\textwidth] {figs/bounce_probability3}
+%}
+%	\vspace{-1em}
+%	\caption{Percentage of bounced flows under varying number of concurrent link failures.}
+%	\vspace{-1em}
+%	\label{fig:bounce_probability}
+%\end{figure}
 
 %\begin{figure}[t]
 %	\centering
