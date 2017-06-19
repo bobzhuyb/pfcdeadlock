@@ -6,7 +6,7 @@
 		\centering
 		\includegraphics[width=0.38\textwidth] {figs/updown_paths}
 		\vspace{-1em}
-		\caption{Clos topology with two flows following up-down .}
+		\caption{Clos topology with two flows following up-down.}
 		\vspace{-2em}
 		\label{fig:basic_clos}
 \end{figure}
@@ -84,7 +84,7 @@ is by TTL. Since the ELP consists of shortest paths, a bounced packet will have
 ``lower than expected'' TTL. However, TTL values are set by end
 hosts\footnote{Using TTL has other problems as well, see \S\ref{sec:implementation}}, so a
 more controllable way is for $L2$ to provide this information via a
-special tag (e.g. DSCP value) in the packet. 
+special tag (e.g. DSCP value) in the packet.
 
 Note that for any shortest, up-down path, $L2$ would have never
 forward any packet that arrived from $S2$ to $S1$. So, if $L2$ ``tags'' packets
@@ -154,7 +154,7 @@ packets never go up from there.
 %	\KwIn{Clos topology and lossless routes $R$}
 %	\KwOut{A tagged graph $G(V, E)$}
 %	$V \gets Set()$\;
-%	$E \gets Set()$\; 
+%	$E \gets Set()$\;
 %	\For{each path $r$ in $R$} {
 %		$tag \gets 0$\;
 %		\For{each hop $h$ in $r$} {
@@ -174,7 +174,7 @@ All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELP
 includes paths with up to $k$ bounces, the switches need to have $k+1$ lossless
 queues. If a packet bounces more than $k$ times (e.g. due to numerous link
 failures, or loop), it will carry a tag larger than $k+1$. All switches will put
-such packets into a lossy queue.  
+such packets into a lossy queue.
 
 %Pseudocode of the algorithm, using notation
 %developed in \S\ref{sec:generic}, is shown in Algorithm~\ref{alg:clos}.
@@ -185,7 +185,7 @@ Packets, when traveling on path segments before bounce carry a tag value of 1,
 and the tag is set to 2 after the bounce. This ensures that the packets are
 queued in separate lossless queues, and thus there is no CBD. In other words, we
 show a system for $k=2$. The lossy queue for packets that bounce more than once
-is omitted for clarity. 
+is omitted for clarity.
 
 %% The corresponding tag rewriting rules at  $T2, L2$ and $S2$ are shown in
 %% Table~\ref{tab:clos_tag_rules}.  Rules for other switches are similar. Note that
@@ -295,7 +295,7 @@ packet must have the same lossless priority. This is sufficient to cause
 a deadlock~\cite{hu2016deadlocks}. Contradiction.
 
 %% \subsection {Summary}
-%% 
+%%
 %% We showed that given a Clos topology and a set of  (up-down, plus up to $k$
 %% ``bounces'') that should be lossless, we can generate a system of tags and
 %% associated rules that ensure that packets are correctly classified into $k$
