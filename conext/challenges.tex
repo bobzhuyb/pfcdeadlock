@@ -11,7 +11,9 @@ tailored for the routing protocols that are already deployed.  Thus, operators
 are unwilling to deploy a brand-new routing
 protocols like~\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
 or hardware just for deadlock avoidance --  especially when RoCEv2 (encapsulated in standard UDP packets)
-itself can be deployed without any changes to routing!
+itself can be deployed without any changes to routing.
+
+%itself can be deployed without any changes to routing!
 %\footnote{RoCEv2 packets are encapsulated in standard UDP packets.}!
 
 \yibo{However, the widely-used routing protocols, like BGP and OSPF, never attempt to
@@ -58,7 +60,7 @@ Figure~\ref{fig:clos_1_bounce}.
 In our data centers, we see hundreds of violations of up-down routing per
 day. Such routes can persist for minutes or even longer. %Overall, we estimate that $0.001\%$ of the traffic is routed over such paths. This may sound tiny, but given that our network carries exabytes of traffic per day,
 The absolute volume of traffic affected by such routing is in tens of terabytes. This makes the threat of deadlocks, as discussed
-in\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
+in~\cite{rdmaatscale,shpiner2016unlocking,hu2016deadlocks} quite real.
 
 \subsection{Limited number of lossless queues}
 \label{subsec:pfcheadroom}
@@ -70,16 +72,16 @@ path length in the network.
 \yibo{However, there are two practical problems. First,
 the largest path length may not be bounded by a small number upon network dynamics
 (\S\ref{sec:reroute}). Second, the PFC standard
-supports only 8 priority classes. Worse yet, commodity switches can
-realistically support fewer than 8 lossless classes.  The problem is that  to
+supports only 8 priority classes. Worse yet, commodity switches can realistically support only two or three lossless
+priorities~\cite{rdmaatscale}.  The problem is that  to
 guarantee the lossless property, a switch needs to reserve certain amount of
 {\it headroom} for absorbing the packets in flight during the time
 it takes for the PAUSE message to take effect.
 
 %(Appendix~\ref{APPHEADROOM})
 
-In a typical setting, we estimate that 23\%
-of the total switch buffer is needed to support just one lossless priority~\cite{rdmaatscale}.
+%In a typical setting, we estimate that 23\% of the total switch buffer is needed to support just one lossless priority~\cite{rdmaatscale}.
+
 The switch buffers are extremely fast and expensive, so they are not expected
 to increase rapidly. The PFC response time is subject to physical limits.
 Furthermore, we need to reserve buffers for non-RDMA (i.e. lossy) traffic, 

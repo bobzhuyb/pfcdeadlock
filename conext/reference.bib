@@ -1,19 +1,19 @@
 @article{islip,
 	author = {McKeown, Nick},
-	title = {The iSLIP Scheduling Algorithm for Input-queued Switches},
+	title = {{The iSLIP Scheduling Algorithm for Input-queued Switches}},
 	journal = {IEEE/ACM Trans. Netw.},
 	issue_date = {April 1999},
 }
 
 @article{chuang1999matching,
 	author={Chuang, Shang-Tse and Goel, Ashish and McKeown, Nick and Prabhakar, Balaji},
-	title={Matching output queueing with a combined input/output-queued switch},
+	title={{Matching output queueing with a combined input/output-queued switch}},
 	journal={IEEE Journal on Selected Areas in Communications},
 }
 
 
 @article{tinytera,
-	title={Tiny Tera: a packet switch core},
+	title={{Tiny Tera: a packet switch core}},
 	author={McKeown, Nick and Izzard, Martin and Mekkittikul, Adisak and Ellersick, William and Horowitz, Mark},
 	journal={IEEE Micro},
 	year={1997},
@@ -72,22 +72,20 @@
  booktitle = {SIGCOMM '15},
 }
 
-@misc{roce,
- title = {RDMA over Converged Ethernet (RoCE)},
- howpublished = "\url{http://www.mellanox.com/page/products_dyn?product_family=79}",
-}
+
 
 @Misc{rroce,
     author = {{Infiniband Trade Association}},
     title = {{Supplement to InfiniBand Architecture Specification Volume 1
         Release 1.2.2 ANNEX A17: ROCEV2 (IP ROUTABLE ROCE))}},
-    year = 2014
+    year={2014},
 }
 
 @misc{pfcheadroom,
 	title = {Priority Flow Control: Build Reliable Layer 2 Infrastructure},
-	howpublished = "\url{http://www.cisco.com/c/en/us/products/collateral/switches/nexus-7000-series-switches/white_paper_c11-542809.pdf
-	}",
+	howpublished = "\url{{http://www.cisco.com/c/en/us/products/collateral/switches/nexus-7000-series-switches/white_paper_c11-542809.pdf
+	}}",
+	year={2015},
 }
 
 
@@ -223,9 +221,12 @@
 	journal={IBM Journal of Research and Development},
 }
 
+
 @misc{infiniband,
-	title = {InfiniBand Trade Association, InfiniBand Architecture, Specification},
-	howpublished = "\url{http://www.infinibandta.com, 2001}",
+	author = {InfiniBandcntk}
+	title = {{InfiniBand Trade Association, InfiniBand Architecture, Specification.}},
+	howpublished = "\url{http://www.infinibandta.com}",
+	year = {2001},
 }
 
 @article{doublescheme,
@@ -294,10 +295,10 @@
     year = {2016},
 }
 
-@Misc{cisco-whitepaper,
-    author = {{Cisco}},
-    title = {{Priority Flow Control: Build Reliable Layer 2 Infrastructure}},
-    url="{{http://www.cisco.com/en/US/prod/collateral/switches/ps9441/ps9670/white_paper_c11-542809_ns783_Networking_Solutions_White_Paper.html}}"
+@Misc{ciscowhitepaper,
+	author = {{Cisco}},
+	title = {{Priority Flow Control: Build Reliable Layer 2 Infrastructure}},
+    howpublished= "\url{{http://www.cisco.com/c/en/us/products/collateral/switches/nexus-7000-series-switches/white_paper_c11-542809.pdf}}"
 }
 
 @Misc{facebookrouting,
@@ -306,16 +307,13 @@
     url="{{https://code.facebook.com/posts/360346274145943/introducing-data-center-fabric-the-next-generation-facebook-data-center-network/ }}"
 }
 
-@article{singh2015jupiter,
-  title={Jupiter rising: A decade of clos topologies and centralized control in google's datacenter network},
-  author={Singh, Arjun and Ong, Joon and Agarwal, Amit and Anderson, Glen and Armistead, Ashby and Bannon, Roy and Boving, Seb and Desai, Gaurav and Felderman, Bob and Germano, Paulie and others},
-  journal={ACM SIGCOMM Computer Communication Review},
-  volume={45},
-  number={4},
-  pages={183--197},
-  year={2015},
-  publisher={ACM}
-}
+@inproceedings{singh2015jupiter,
+	author = {Singh, Arjun and Ong, Joon and Agarwal, Amit and Anderson, Glen and Armistead, Ashby and Bannon, Roy and Boving, Seb and Desai, Gaurav and Felderman, Bob and Germano, Paulie and Kanagala, Anand and Provost, Jeff and Simmons, Jason and Tanda, Eiichi and Wanderer, Jim and H\"{o}lzle, Urs and Stuart, Stephen and Vahdat, Amin},
+	title = {Jupiter Rising: A Decade of Clos Topologies and Centralized Control in Google's Datacenter Network},
+	series = {SIGCOMM '15},
+} 
+
+
 
 @inproceedings{qiu2007toward,
   title={Toward valley-free inter-domain routing},
@@ -338,7 +336,8 @@
 @misc{cntk,
     author={},
     title={{The Microsoft Cognitive Toolkit}},
-    howpublished={\url{https://github.com/Microsoft/CNTK/wiki}},
+    howpublished="\url{https://github.com/Microsoft/CNTK/wiki}",
+    year={2017}
     }
 
 @inproceedings{pilaf,
@@ -389,18 +388,13 @@
 }
 
 @inproceedings{fattree,
-  title={A scalable, commodity data center network architecture},
-  author={Al-Fares, Mohammad and Loukissas, Alexander and Vahdat, Amin},
-  booktitle={ACM SIGCOMM Computer Communication Review},
-  volume={38},
-  number={4},
-  pages={63--74},
-  year={2008},
-  organization={ACM}
-}
+	author = {Al-Fares, Mohammad and Loukissas, Alexander and Vahdat, Amin},
+	title = {{A Scalable, Commodity Data Center Network Architecture}},
+	series = {SIGCOMM '08},
+} 
 
 @article{clos,
-  title={A Study of Non-Blocking Switching Networks},
+  title={{A Study of Non-Blocking Switching Networks}},
   author={Clos, Charles},
   journal={Bell Labs Technical Journal},
   volume={32},
@@ -410,16 +404,13 @@
   publisher={Wiley Online Library}
 }
 
+
 @inproceedings{dctcp,
-  title={Data center tcp (dctcp)},
-  author={Alizadeh, Mohammad and Greenberg, Albert and Maltz, David A and Padhye, Jitendra and Patel, Parveen and Prabhakar, Balaji and Sengupta, Sudipta and Sridharan, Murari},
-  booktitle={ACM SIGCOMM computer communication review},
-  volume={40},
-  number={4},
-  pages={63--74},
-  year={2010},
-  organization={ACM}
-}
+	author = {Alizadeh, Mohammad and Greenberg, Albert and Maltz, David A. and Padhye, Jitendra and Patel, Parveen and Prabhakar, Balaji and Sengupta, Sudipta and Sridharan, Murari},
+	title = {{Data Center TCP (DCTCP)}},
+	series = {SIGCOMM '10},
+} 
+
 
 @inproceedings{omnipath,
     title = {{Intel Omni-Path Architecture Enabling Scalable, High Performance Fabrics}},
@@ -501,13 +492,13 @@
     }
 
 @article{sancho2004,
-	title={An effective methodology to improve the performance of the up*/down* routing algorithm},
+	title={{An effective methodology to improve the performance of the up*/down* routing algorithm}},
 	author={Sancho, Jose Carlos and Robles, Antonio and Duato, Jose},
 	journal={IEEE Transactions on Parallel and Distributed Systems},
 }
 
 @article{flich2012surveyB,
-	title={A survey and evaluation of topology-agnostic deterministic routing algorithms},
+	title={{A survey and evaluation of topology-agnostic deterministic routing algorithms}},
 	author={Flich, Jose and Skeie, Tor and Mejia, Andres and Lysne, Olav and Lopez, Pedro and Robles, Antonio and Duato, Jose and Koibuchi, Michihiro and Rokicki, Tomas and Sancho, Jose Carlos},
 	journal={IEEE Transactions on Parallel and Distributed Systems},
 }
@@ -515,75 +506,75 @@
 
 @inproceedings{lash,
 	author = {Skeie, Tor and Lysne, Olav and Theiss, Ingebj{\o}rg},
-	title = {Layered Shortest Path (LASH) Routing in Irregular System Area Networks},
+	title = {{Layered Shortest Path (LASH) Routing in Irregular System Area Networks}},
 	booktitle	= {Prof. of {IPDPS}},
 	year		= {2012}
 }
 
 @article{wu2003faultA,
-	title={A fault-tolerant and deadlock-free routing protocol in {2D} meshes based on odd-even turn model},
+	title={{A fault-tolerant and deadlock-free routing protocol in {2D} meshes based on odd-even turn model}},
 	author={Wu, Jie},
 	journal={IEEE Transactions on Computers},
 }
 
 @article{glass,
 	author = {Glass, Christopher J. and Ni, Lionel M.},
-	title = {The Turn Model for Adaptive Routing},
+	title = {{The Turn Model for Adaptive Routing}},
 	journal = {SIGARCH Comput. Archit. News},
 	year = {1992},
 } 
 
 @article{duato2001,
 	author = {Duato, J. and Pinkston, T. M.},
-	title = {A General Theory for Deadlock-Free Adaptive Routing Using a Mixed Set of Resources},
+	title = {{A General Theory for Deadlock-Free Adaptive Routing Using a Mixed Set of Resources}},
 	journal = {IEEE Trans. Parallel Distrib. Syst.},
 	year = {2001},
 } 
 
 @inproceedings{domke2011,
 	author = {Domke, Jens and Hoefler, Torsten and Nagel, Wolfgang E.},
-	title = {Deadlock-Free Oblivious Routing for Arbitrary Topologies},
+	title = {{Deadlock-Free Oblivious Routing for Arbitrary Topologies}},
 	series = {IPDPS '11},
 } 
 
 @inproceedings{venkatramani1996,
 	author = {Venkatramani, Anjan K. and Pinkston, Timothy Mark and Duato, Jos{\'e}},
-	title = {Generalized Theory for Deadlock-Free Adaptive Wormhole Routing and Its Application to Disha Concurrent},
+	title = {{Generalized Theory for Deadlock-Free Adaptive Wormhole Routing and Its Application to Disha Concurrent}},
 	series = {IPPS '96},
 } 
 
 @inproceedings{martinez1997,
-	title={Software-based deadlock recovery technique for true fully adaptive routing in wormhole networks},
+	title={{Software-based deadlock recovery technique for true fully adaptive routing in wormhole networks}},
 	author={Mart{\'\i}nez, Juan Miguel and Lopez, Pedro and Duato, Jos{\'e} and Pinkston, Timothy Mark},
 	booktitle={Parallel Processing, 1997., Proceedings of the 1997 International Conference on},
 }
 
 @inproceedings{Lopez1998,
 	author = {L\'{o}pez, P. and Duato, J.},
-	title = {A Very Efficient Distributed Deadlock Detection Mechanism for Wormhole Networks},
+	title = {{A Very Efficient Distributed Deadlock Detection Mechanism for Wormhole Networks}},
 	series = {HPCA '98},
 } 
 
 @inproceedings{puente1999,
 	author = {Puente, V. and Beivide, R. and Gregorio, J. A. and Prellezo, J. M. and Duato, J. and Izu, C.},
-	title = {Adaptive Bubble Router: A Design to Improve Performance in Torus Networks},
+	title = {{Adaptive Bubble Router: A Design to Improve Performance in Torus Networks}},
 	series = {ICPP '99},
 } 
 
 @article{doubleschemeA,
-	title={Deadlock-free dynamic reconfiguration schemes for increased network dependability},
+	title={{Deadlock-free dynamic reconfiguration schemes for increased network dependability}},
 	author={Pinkston, Timothy Mark and Pang, Ruoming and Duato, Jos{\'e}},
 	journal={IEEE Transactions on Parallel and Distributed Systems},
 }
 
 @article{lysne2005,
-	title={A methodology for developing deadlock-free dynamic network reconfiguration processes. part ii},
+	title={{A methodology for developing deadlock-free dynamic network reconfiguration processes. part ii}},
 	author={Lysne, Olav and Pinkston, Timothy Mark and Duato, Jose},
 	journal={IEEE Transactions on Parallel and Distributed Systems},
 }
 
 @book{automatic,
-	title={Automatic reconfiguration in Autonet},
+	title={{Automatic reconfiguration in Autonet}},
 	author={Rodeheffer, Thomas L and Schroeder, Michael D},
 	volume={25},
 	number={5},
@@ -592,7 +583,7 @@
 }
 
 @article{gara2005,
-	title={Overview of the Blue Gene/L system architecture},
+	title={{Overview of the Blue Gene/L system architecture}},
 	author={Gara, Alan and Blumrich, Matthias A and Chen, Dong and Chiu, GL-T and Coteus, Paul and Giampapa, Mark E and Haring, Ruud A and Heidelberger, Philip and Hoenicke, Dirk and Kopcsay, Gerard V and others},
 	journal={IBM Journal of Research and Development},
 }
@@ -600,12 +591,12 @@
 
 @inproceedings{f10A,
 	author = {Liu, Vincent and Halperin, Daniel and Krishnamurthy, Arvind and Anderson, Thomas},
-	title = {F10: A Fault-tolerant Engineered Network},
+	title = {{F10: A Fault-tolerant Engineered Network}},
 	series = {nsdi'13},
 } 
 
 @article{blazewicz1994optimal,
-  title={Optimal centralized algorithms for store-and-forward deadlock avoidance},
+  title={{Optimal centralized algorithms for store-and-forward deadlock avoidance}},
   author={Blazewicz, Jacek and Bovet, Daniel P. and Brzezinski, Jerzy and Gambosi, Giorgio and Talamo, Maurizio},
   journal={IEEE transactions on computers},
   volume={43},
@@ -615,14 +606,12 @@
   publisher={IEEE}
 }
 
+
 @inproceedings{beckett2016don,
-  title={Don't Mind the Gap: Bridging Network-wide Objectives and Device-level Configurations},
-  author={Beckett, Ryan and Mahajan, Ratul and Millstein, Todd and Padhye, Jitendra and Walker, David},
-  booktitle={Proceedings of the 2016 conference on ACM SIGCOMM 2016 Conference},
-  pages={328--341},
-  year={2016},
-  organization={ACM}
-}
+	author = {Beckett, Ryan and Mahajan, Ratul and Millstein, Todd and Padhye, Jitendra and Walker, David},
+	title = {{Don'T Mind the Gap: Bridging Network-wide Objectives and Device-level Configurations}},
+	series = {SIGCOMM '16},
+} 
 
 @misc{anandtech,
  title = {{Exploring Intel's Moni-Path Network Fabric}},

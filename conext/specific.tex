@@ -97,7 +97,7 @@ assign a $NoBounce$ tag to every packet. $L2$ then simply needs to check ingress
 and egress port for each packet: it changes the tag from $NoBounce$ to $Bounced$
 if a packet arriving from ingress port connected to $S2$ exits on egress port
 connected to $S1$.  It is easy to see that these rules can be pre-computed since
-we know the topology, and the set of  that we want to be ``lossless''.
+we know the topology, and the set of  paths that we want to be ``lossless''.
 
 While this scenario is quite simple, we chose it because it clearly illustrates
 the core idea behind \sysname{} -- given a topology and an ELP we can create a
@@ -110,7 +110,7 @@ just from the Leaf layer, but at any layer. Second, recall from
 \S\ref{sec:reroute} that ``bounces'' are a fact of life in data center networks.
 The operator may not want to put packets that have suffered just a single bounce
 into a lossy queue -- we may want to wait until the packet has bounced more than
-once before assigning it to a lossless queue. This means that ELP will consists
+once before assigning it to a lossy queue. This means that ELP will consist
 of more than shortest up-down paths, and the paths in ELP may be prone to CBD!
 Third, we must ensure that we don't end up using more lossless queues than the
 switch can support. To this end, we show how to combine tags.
@@ -129,7 +129,7 @@ switch can support. To this end, we show how to combine tags.
 \subsection{Reducing the number of lossless queues}
 \label{subsec:combine}
 
-Consider again the network Figure~\ref{fig:basic_clos}.  Let's say the operator
+Consider again the network in Figure~\ref{fig:basic_clos}.  Let's say the operator
 wants to make sure that in face of link failures, packets are not immediately
 put into a lossy queue. The operator is willing to tolerate up to $k$ bounces.
 So, the ELP consists of all shortest paths, and all paths with up to $k$ bounces.

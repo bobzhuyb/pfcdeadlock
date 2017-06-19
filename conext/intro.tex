@@ -81,7 +81,9 @@ lossy queue to ensure that they do not trigger PFC. \yibo{Operators have full fl
 to add more redundant paths into ELP, bringing the possibility of falling in the lossy
 queue to nearly 0.} Once ELP is given, \sysname{} guarantees that
 there will be no deadlock - even under unforeseen link failures or routing
-errors, \yibo{like loops!} 
+errors, \yibo{like loops!}
+
+
 %Even routing loops won't lead to deadlock!
 
 \sysname{} works for any routing protocol because there are no restrictions on
@@ -93,14 +95,15 @@ The number of lossless queues and the number of tag match-action rules required
 by \sysname{} are small.  Even for a Jellyfish topology with 2000 switches,
 \sysname{} requires just three lossless queues per switch.  In fact, we prove
 that for Clos topology,  \sysname{} is optimal in terms of number of lossless
-queues required. We also show that using two lossless queues practically guarantees losses, 
+queues required. We also show that using two lossless queues practically guarantees lossless, 
 and we further show how to minimize the number of match-action rules
 required to implement \sysname{}.
 
 We have implemented and tested \sysname{} on commodity Arista switches with Broadcom chips. 
 The implementation requires carefully addressing the problem
-of priority transition (\S\ref{sec:implementation}). Our simulations and experiments show that
-\sysname{} has no impact on throughput and latency of RDMA traffic.
+of priority transition (\S\ref{sec:implementation}). \shuihai{Our simulations and experiments show that \sysname{} has negligible performance penalty on RDMA traffic.}
+
+%Our simulations and experiments show that \sysname{} has no impact on throughput and latency of RDMA traffic.
 
 \begin{figure}[t]
 		\centering
