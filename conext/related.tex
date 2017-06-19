@@ -5,12 +5,12 @@
 proposed. See
 \cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,dag,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
 for representative schemes. Generally, these designs prevent deadlock by
-imposing restrictions on the routing paths \yibo{or enforcing rerouting packets under certain conditions. We classify them into two
+imposing restrictions on the routing paths \yibo{or enforcing certain packet rerouting policies. We classify them into two
 categories.}
 
 \modified{The first category is {\em deterministic routing based approach}, in which the
 routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A virtual channel is equivalent to a priority queue in PFC in the store-and-forward setting.}, and constructed CBD-free routing by restricting packets over decreasing order of virtual channels.
-TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. These designs either only for specific topologies \cite{dally} or are not compatible with existing routing protocols including OSFP and BGP \cite{tcpbolt,dfedst16}.}
+TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. These designs either work only for specific topologies \cite{dally} or are not compatible with existing routing protocols including OSFP and BGP \cite{tcpbolt,dfedst16}.}
 
 \modified{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
 destinations. The switches can reroute packets to the ``escape'' paths in the

@@ -14,7 +14,7 @@ have a performance penalty?
 
 \para{Testbed:} Our testbed (Figure~\ref{fig:basic_clos}) consists of a Clos
 network with 10 Arista 7060 (32x40Gb) switches and 16 servers with Mellanox 40Gb
-ConnectX-3 Pro NICs.  
+ConnectX-3 Pro NICs.
 
 \subsection{Deadlock prevention}\label{subsec:exp_validation}
 
@@ -118,8 +118,8 @@ flows are not affected by link failures.
 \subsection{Scalability}
 \label{subsec:exp_overhead}
 
-Can \sysname{} work on large-scale networks, while commodity switches can 
-support only a limited number of lossless queues (\S\ref{sec:challenges})?  
+Can \sysname{} work on large-scale networks, while commodity switches can
+support only a limited number of lossless queues (\S\ref{sec:challenges})?
 We have already shown that on an arbitrarily large Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
 up to $k$ bounces. We now consider other topologies.
@@ -168,7 +168,7 @@ random nature of the topology.} 135 match-action rules per switch.  Modern
 commodity switches can support 1-4K rules, so this is not an issue.
 
 We also considered smaller (100 switches, 32 ports) Jellyfish
-topologies with up to 16-shortest paths between every switch pair. 
+topologies with up to 16-shortest paths between every switch pair.
 We need only 2 lossless priorities, and no more than 47 rules per switch.
 
 BCube~\cite{bcube} is server-centric topology, constructed from servers with $n$
@@ -244,7 +244,7 @@ just 1.5 hours on a commodity desktop machine.
 }
 	\caption{Packet loss rate under web search workload}
 	\vspace{-3em}
-	\label{table:loss_rate_ws} 
+	\label{table:loss_rate_ws}
 
 \end{table}
 
@@ -274,31 +274,31 @@ just 1.5 hours on a commodity desktop machine.
 %	\end{tabular}
 %	\caption{Packet loss rate under data mining workload}
 %	\vspace{-2.5em}
-%	\label{table:loss_rate_dm} 
+%	\label{table:loss_rate_dm}
 %\end{table}
 
 
-\modified{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of 
-bounced flows under varying link failure rate with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), 
-we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link 
+\modified{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of
+bounced flows under varying link failure rate with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64),
+we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link
 failure(s) break the original paths.}
 
-\modified{Figure~\ref{fig:bounce_probability}(a), (b) and (c) show the percentage of flows bounced once, twice and more than twice, 
-respectively. There are two takeaways. First, when links fail, the behavior of local rerouting has a good chance 
+\modified{Figure~\ref{fig:bounce_probability}(a), (b) and (c) show the percentage of flows bounced once, twice and more than twice,
+respectively. There are two takeaways. First, when links fail, the behavior of local rerouting has a good chance
 to cause DOWN-UP bounce for tree-based networks. Second, even under high link failure rate, a flow is rarely bounced twice or more.}
 
 %and Table~\ref{table:loss_rate_dm}
 
-\modified{We also evaluate the packet loss rate of \sysname{} under stressful traffic using NS-3 simulations. We choose the setting of FatTree(k=8) with $20\%$ link failure rate.
-\footnote{In practice, it is unlikely to have such a high link failure rate. We choose this setting as a stress test for \sysname{}.}. 
-We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  
+\modified{We also evaluate the packet loss rate of \sysname{} under stressful traffic using NS-3 simulations. We choose the setting of FatTree(k=8) with $20\%$ link failure rate
+\footnote{In practice, it is unlikely to have such a high link failure rate. We choose this setting as a stress test for \sysname{}.}.
+We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.
 The flows are generated according to web search~\cite{dctcp} and data mining~\cite{vl2}  workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
 
-\modified{The result under web search workload is shown in Table~\ref{table:loss_rate_ws}. Due to space limitation, we omit the similar result under data mining workload. We use ``RoCE without PFC" as the baseline. 
-Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because 
-only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of 
-flows are bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough 
-to minimize congestion loss even for extreme scenarios.}
+\modified{The result under web search workload is shown in Table~\ref{table:loss_rate_ws}. Due to space limitation, we omit the similar result under data mining workload. We use ``RoCE without PFC" as the baseline.
+Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because
+only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of
+flows are bounced more than once.  The takeaway is that making two-bounce paths lossless is good enough
+to achieve lossless in practice.}
 
 
 \begin{figure}[t]
