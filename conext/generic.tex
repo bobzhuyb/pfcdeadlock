@@ -448,7 +448,7 @@ Hence it seems the number of rules needed per switch is $n(n-1)\times
 \frac{m(m-1)}{2}$, where $n$ is the number of switch ports and $m=|G'_{k}|$ is
 the number of Tags. We will show in \S~\ref{sec:implementation} that the number
 of rules can be compressed to  $n\times \frac{m(m-1)}{2}$, by taking advantage
-of the bit masking technique supported in commodity switching ASICs.
+of the bit masking technique supported in commodity ASICs.
 Table~\ref{table:tagging_table2} shows the rules before compression.
 
 \para{Optimality:} Algorithm~\ref{alg:greedy} may not return the optimal
@@ -475,8 +475,8 @@ solutions, as seen in \S\ref{sec:specific} and Appendix~\ref{sec:clos_optimal}.
 However, we do note that the number of tags in the solution of
 Algorithm~\ref{alg:greedy} is an upper bound on the optimal solution.  Without
 any assumptions, the worst case is the same as using the brute-force solution,
-which require as many tags as the length of longest lossless route, $T$.
+which requires as many tags as the length of longest lossless route, $T$.
 However, if we know that the smallest cycle in lossless routes is longer than
 $l$, the output number of tags is bounded by $\lceil T/l \rceil$. We omit the
-proof for brevity.
+proof.
 

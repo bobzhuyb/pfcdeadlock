@@ -77,7 +77,7 @@ ConnectX-3 Pro NICs.
 
 We have already {\em proved} that \sysname{} prevents deadlock. Thus,
 experiments in this section are primarily illustrative. We have also done
-extensive simulations, which we omit due to lack of space.
+extensive simulations, which we omit for brevity.
 
 \textbf{Deadlock due to one bounce:} We recreate the scenario shown in
 Figure~\ref{fig:clos_1_bounce}, where 1-bounce paths lead to CBD.  In this
@@ -99,7 +99,6 @@ without \sysname{}. Without \sysname{}, deadlock occurs
 and $F_2$ is paused due to propagation of PFC PAUSE. With \sysname{}, there is
 no deadlock and $F_2$ is not paused (but rate is affected by the routing loop). Note that
 throughput of $F_1$ is zero, as packets are dropped due to TTL expiration.
-
 The key takeaway here is that \sysname{} was able to successfully deal with a
 routing loop.
 
@@ -119,8 +118,9 @@ flows are not affected by link failures.
 \subsection{Scalability}
 \label{subsec:exp_overhead}
 
-As discussed in \S\ref{sec:challenges}, commodity switches can support only a
-limited number of lossless queues.  We have already shown that on a Clos
+Can \sysname{} work on large-scale networks, while commodity switches can 
+support only a limited number of lossless queues (\S\ref{sec:challenges})?  
+We have already shown that on a arbitrarily large Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
 up to $k$ bounces. We now consider other topologies.
 
@@ -178,8 +178,8 @@ F10~\cite{f10} is a fault-tolerant FatTree-like topology.  With three-level
 network of 64 port switches, and ELP of all shortest and 1-bounce paths, we need
 just 2 lossless priorities and 164 rules per switch.
 
-Thus, we conclude that in terms of number of lossless classes and ACLs,
-\sysname{} scales well for modern data center architectures.
+To conclude, in terms of number of lossless classes and ACLs,
+\sysname{} scales well for modern data center topology.
 
 \begin{figure*}[t!]
 	\begin{minipage}{0.29\textwidth}
@@ -275,16 +275,28 @@ just 1.5 hours on a commodity desktop machine.
 \end{table}
 
 
-\textcolor{blue}{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of bounced flows under varying link failure rate with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link failure(s) break the original paths.}
+\textcolor{blue}{\textbf{Impact of using lossy queue as a last resort:} In Figure~\ref{fig:bounce_probability}, we measured the percentage of 
+bounced flows under varying link failure rate with a flow-level simulator. For FatTree topologies (with switch port number k = 8, 16, 32 and 64), 
+we generate 1 million flows with random source, destination and initial shortest path. The switches will do a local rerouting of flows when link 
+failure(s) break the original paths.}
 
-\textcolor{blue}{Figure~\ref{fig:bounce_probability}(a), Figure~\ref{fig:bounce_probability}(b) and Figure~\ref{fig:bounce_probability}(c) show the percentage of flows bounced once, twice and more than twice, respectively. There are two takeaways from the results. First, when having link failures, the behavior of local rerouting has a good chance to cause DOWN-UP bounce for tree-based networks. Second, even under high link failure rate,  a flow is rarely bounced twice or more.}
+\textcolor{blue}{Figure~\ref{fig:bounce_probability}(a), (b) and (c) show the percentage of flows bounced once, twice and more than twice, 
+respectively. There are two takeaways. First, when links fail, the behavior of local rerouting has a good chance 
+to cause DOWN-UP bounce for tree-based networks. Second, even under high link failure rate, a flow is rarely bounced twice or more.}
 
 
-\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} under incast-like traffic pattern using NS-3 simulations. we choose the setting of FatTree(k=8) with $20\%$ link failure rate.\footnote{In practice, it is unlikely to have such a high link failure rate. We choose this setting as a stress test for \sysname{} .}. We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  The flows are generated according to web search~\cite{dctcp} and data mining~\cite{vl2}  workload with 0.99 average load on bottleneck link. At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
+\textcolor{blue}{In Table~\ref{table:loss_rate_ws} and Table~\ref{table:loss_rate_dm}, we evaluate the packet loss rate of \sysname{} 
+under stressful traffic using NS-3 simulations. we choose the setting of FatTree(k=8) with $20\%$ link failure rate.
+\footnote{In practice, it is unlikely to have such a high link failure rate. We choose this setting as a stress test for \sysname{}.}. 
+We establish many-to-one traffic scenarios by letting servers under different ToRs send traffic to a common destination server.  
+The flows are generated according to data mining~\cite{vl2} and web search~\cite{dctcp} workload with 0.99 average load on bottleneck link. 
+At switches, we configure WRR scheduling among lossless and lossy queues with equal weight.}
 
 \textcolor{blue}{We use ``RoCE without PFC" as the baseline. 
 Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because 
-only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of flows are bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough to eliminate congestion loss even for extreme scenarios.}
+only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of 
+flows are bounced more than once.  The takeaway is that in practice, making shortest paths and 1-bounce paths lossless is usually enough 
+to minimize congestion loss even for extreme scenarios.}
 
 
 \begin{figure}[t]

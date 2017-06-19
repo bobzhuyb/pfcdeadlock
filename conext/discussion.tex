@@ -14,8 +14,8 @@ approach would use $N*(M+1)$ priorities.
 
 However, we can use fewer priorities by trading off some isolation.  The first
 application class starts with tag 1, and uses tags up to $M+1$.  The second
-application class starts with tag 2, and also increases tags by 1 at each
-bounce.  Thus, the second application class uses tags $2 \ldots M+2$. Thus, for
+class starts with tag 2, and also increases tags by 1 at each
+bounce.  Thus, the second class uses tags $2 \ldots M+2$. Thus, for
 $N$ application classes need just $M + N -1$ tags. This can be further reduced
 by making some application classes to tolerate fewer bounces than others.
 
@@ -63,9 +63,9 @@ as long as ELP set is specified.
 \para{PFC alternatives:} One might argue that PFC is not worth the trouble it
 causes; and we should focus on getting rid of PFC altogether.  We are
 sympathetic to this view, and are actively investigating numerous schemes,
-including minimizing PFC generation (e.g.  using DCQCN~\cite{dcqcn} or
-Timely~\cite{timely}, better retransmission schemes in the NIC, as well as other
-more novel schemes.  For now, we need \sysname{} to ensure proper operation of
-currently deployed RDMA hardware, which is reliant on PFC, and in which we and
+including minimizing PFC generation (e.g. DCQCN~\cite{dcqcn} or
+Timely~\cite{timely}), better retransmission in the NIC, as well as other
+novel schemes.  For now, we need \sysname{} to ensure proper operation of
+currently deployed RDMA hardware, which relies on PFC, and in which we and
 others have made substantial investments.
 

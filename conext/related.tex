@@ -3,10 +3,10 @@
 
 \para{Deadlock-free routing.} Many Deadlock-free routing designs have been
 proposed. See
-\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
+\cite{dally,duato93,dally93,sancho2004,flich2012survey,lash,dag,wu2003fault,glass,duato2001,domke2011,puente1999,dfedst16}
 for representative schemes. Generally, these designs prevent deadlock by
-imposing restrictions on the routing paths, and can be classified into two
-categories.
+imposing restrictions on the routing paths \yibo{or enforcing rerouting packets under certain conditions. We classify them into two
+categories.}
 
 \textcolor{blue}{The first category is {\em deterministic routing based approach}, in which the
 routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A virtual channel is equivalent to a priority queue in PFC in the store-and-forward setting.}, and constructed CBD-free routing by restricting packets over decreasing order of virtual channels.
@@ -14,7 +14,7 @@ TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under t
 
 \textcolor{blue}{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
 destinations. The switches can reroute packets to the ``escape'' paths in the
-presence of congestion so that deadlock can be avoided. These designs cannot be implemented in current commodity switching ASICs. No commodity switching ASICs so far support the dynamic rerouting based on traffic / queue status required by the adaptive routing designs.}
+presence of congestion so that deadlock can be avoided. However, no commodity switching ASICs so far support the dynamic rerouting based on traffic / queue status required by the adaptive routing designs.}
 
 %Generally, solutions under this category can achieve better network utilization, as they can tolerate CBD in the routing paths.
 
@@ -37,10 +37,12 @@ data center scale.
 increasing the packet priority hop-by-hop, and putting packets of different
 priority into different buffers, deadlock can be avoided
 \cite{firstpaper,survey,datanetworks,karol2003prevention}. These designs,
-however, need a large number lossless queues (which is the diameter of the
-network). In \cite{dag}, the author tried to reduce the number of lossless
-queues to only two. The design does not guarantee losslessness. Furthermore,
-some switches need much larger buffer space than the others.
+however, need a large number lossless queues, which is the \yibo{longest path
+length in the network.}
+
+%In \cite{dag}, the author tried to reduce the number of lossless
+%queues to only two. The design does not guarantee losslessness. Furthermore,
+%some switches need much larger buffer space than the others.
 
 \para{Deadlock recovery.} Deadlock recovery schemes
 \cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998}
@@ -56,7 +58,7 @@ recovery). (2) They cannot be deployed using existing switch hardware.
 %work by preemption. This does not work in Ethernet and in practice.
 
 \para{Deadlock-free routing reconfiguration}:
-Several deadlock-free routing reconfiguration schemes
+Several schemes
 \cite{automatic,lysne2005,doublescheme,gara2005} have been proposed for
 ensuring deadlock-free during routing reconfiguration. \sysname{} can
 be used to help any routing protocol to be deadlock-free, as
