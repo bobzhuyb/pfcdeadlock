@@ -76,8 +76,10 @@ guarantee the lossless property, a switch needs to reserve certain amount of
 {\it headroom} for absorbing the packets in flight during the time
 it takes for the PAUSE message to take effect.
 
-In a typical setting (Appendix~\ref{APPHEADROOM}), we estimate that 23\%
-of the total switch buffer is needed to support just one lossless priority.
+%(Appendix~\ref{APPHEADROOM})
+
+In a typical setting, we estimate that 23\%
+of the total switch buffer is needed to support just one lossless priority~\cite{rdmaatscale}.
 The switch buffers are extremely fast and expensive, so they are not expected
 to increase rapidly. The PFC response time is subject to physical limits.
 Furthermore, we need to reserve buffers for non-RDMA (i.e. lossy) traffic, 

@@ -4,10 +4,10 @@
 
 \begin{figure}[t]
 		\centering
-		\includegraphics[width=0.3\textwidth] {figs/updown_paths}
+		\includegraphics[width=0.38\textwidth] {figs/updown_paths}
 		\vspace{-1em}
 		\caption{Clos topology with two flows following up-down .}
-		\vspace{-3em}
+		\vspace{-2em}
 		\label{fig:basic_clos}
 \end{figure}
 
@@ -149,12 +149,35 @@ a packet coming down and then going up (therefore, bouncing) for any reasons,
 they increase the tag by one. Spine switches do not need to change tags since
 packets never go up from there.
 
+%\begin{algorithm}
+%	\small
+%	\KwIn{Clos topology and lossless routes $R$}
+%	\KwOut{A tagged graph $G(V, E)$}
+%	$V \gets Set()$\;
+%	$E \gets Set()$\; 
+%	\For{each path $r$ in $R$} {
+%		$tag \gets 0$\;
+%		\For{each hop $h$ in $r$} {
+%			$V \gets V \cup \{(h, tag)\}$\;
+%			$E \gets E \cup \{lastHop\rightarrow(h, tag)\}$\;
+%			\If{$h$ is going down \&\& nextHop is going up} {
+%				$tag \gets tag+1$\;
+%			}
+%		}
+%	}
+%	\Return{$G(V, E)$}\;
+%	\caption{The optimal tagging system for Clos topology.}
+%	\label{alg:clos}
+%\end{algorithm}
+
 All switches put packets with tag $i$ to $i^{th}$ lossless queues. Since ELP
 includes paths with up to $k$ bounces, the switches need to have $k+1$ lossless
 queues. If a packet bounces more than $k$ times (e.g. due to numerous link
 failures, or loop), it will carry a tag larger than $k+1$. All switches will put
-such packets into a lossy queue.  Pseudocode of the algorithm, using notation
-developed in \S\ref{sec:generic}, is shown in Appendix~\ref{sec:clos_optimal}.
+such packets into a lossy queue.  
+
+%Pseudocode of the algorithm, using notation
+%developed in \S\ref{sec:generic}, is shown in Algorithm~\ref{alg:clos}.
 
 Figure~\ref{fig:clos_tagger} illustrates the tagging algorithm in action, for
 ELP consisting of all shortest up-down paths, plus all 1-bounce paths.

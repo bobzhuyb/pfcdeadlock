@@ -30,7 +30,7 @@ to corresponding lossless queue.  In addition, each edge corresponds to a switch
 action of setting the tag for the next hop.
 
 \begin{table}[t]
-\small
+\footnotesize
 \centering
 \begin{tabular}{|c|c|}
 \hline
@@ -470,7 +470,9 @@ The fundamental reason for this is that generic algorithm does not fully utilize
 the inherent characteristics of structured topology like Clos. We have not been
 able to find an optimal solution to this problem (nor have we been able to prove
 that the problem is NP-hard) -- although we can create topology-specific
-solutions, as seen in \S\ref{sec:specific} and Appendix~\ref{sec:clos_optimal}. 
+solutions, as seen in \S\ref{sec:specific}. 
+
+%and Appendix~\ref{sec:clos_optimal}
 
 However, we do note that the number of tags in the solution of
 Algorithm~\ref{alg:greedy} is an upper bound on the optimal solution.  Without
