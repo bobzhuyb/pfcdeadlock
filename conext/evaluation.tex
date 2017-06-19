@@ -1,6 +1,6 @@
 \section{Evaluation}\label{sec:eval}
 
-We evaluate \sysname{} using testbed experiments and numerical analysis.  We
+We evaluate \sysname{} using testbed experiments, numerical analysis and NS-3 simulations.  We
 consider three questions: $(i)$ Can \sysname{} prevent deadlock?  $(ii)$ Is
 \sysname{} scalable for large data center networks?, and $(iii)$ Does \sysname{}
 have a performance penalty?
@@ -120,7 +120,7 @@ flows are not affected by link failures.
 
 Can \sysname{} work on large-scale networks, while commodity switches can 
 support only a limited number of lossless queues (\S\ref{sec:challenges})?  
-We have already shown that on a arbitrarily large Clos
+We have already shown that on an arbitrarily large Clos
 topology, \sysname{} requires $k+1$ lossless priorities to support paths with
 up to $k$ bounces. We now consider other topologies.
 
@@ -312,7 +312,7 @@ to minimize congestion loss even for extreme scenarios.}
 	}
 	\vspace{-1em}
 	\caption{\sysname{} rules have no impact on throughput and latency}
-	\vspace{-1em}
+	\vspace{-2em}
 	\label{fig:perf_penalty}
 \end{figure}
 
