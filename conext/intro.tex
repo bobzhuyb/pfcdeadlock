@@ -66,7 +66,8 @@ priorities~\cite{rdmaatscale}.
 
 In this paper, we present \sysname{}, which meets all three challenges described
 above. \sysname{} is based on a simple observation: in a data center, we can ask
-the operator to supply a list of paths that must be lossless.  We call these
+the operator to supply a list of paths that must be lossless. \jitu{Packets that
+do not travel on lossless paths may be dropped under extreme circumstances.} We call these
 expected lossless paths (ELPs). Enumerating ELPs is straightforward for
 ``structured'' topologies like Clos~\cite{clos}, FatTree~\cite{fattree} or
 Bcube~\cite{bcube}, and not onerous even for randomized topologies like
@@ -101,7 +102,8 @@ required to implement \sysname{}.
 
 We have implemented and tested \sysname{} on commodity Arista switches with Broadcom chips. 
 The implementation requires carefully addressing the problem
-of priority transition (\S\ref{sec:implementation}). \shuihai{Our simulations and experiments show that \sysname{} has negligible performance penalty on RDMA traffic.}
+of priority transition (\S\ref{sec:implementation}). \shuihai{Our simulations
+and experiments show \sysname{} imposes negligible performance penalty on RDMA traffic.}
 
 %Our simulations and experiments show that \sysname{} has no impact on throughput and latency of RDMA traffic.
 

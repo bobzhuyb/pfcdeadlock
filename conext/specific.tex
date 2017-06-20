@@ -1,19 +1,11 @@
-%\vspace{-0.1in}
+\vspace{-0.15in}
 \section{\sysname{} for Clos Topology}
 \label{sec:specific}
-
-\begin{figure}[t]
-		\centering
-		\includegraphics[width=0.38\textwidth] {figs/updown_paths}
-		\vspace{-1em}
-		\caption{Clos topology with two flows following up-down.}
-		\vspace{-2em}
-		\label{fig:basic_clos}
-\end{figure}
 
 While \sysname{} works for any topology, we first describe the core ideas using
 the popular Clos network topology.
 
+\vspace{-0.05in}
 \subsection {Definitions}
 
 \para{Expected Lossless Paths (ELP):} This is a set of paths that the network
@@ -43,6 +35,7 @@ and the original tag value.
 
 We now describe the core idea behind \sysname{}.
 
+\vspace{-0.05in}
 \subsection{Tagging on bounce}
 \label{subsec:tag}
 
@@ -82,9 +75,9 @@ lossy queue.
 One way for $S1$ (and any switches afterwards) to recognize a bounced packet
 is by TTL. Since the ELP consists of shortest paths, a bounced packet will have
 ``lower than expected'' TTL. However, TTL values are set by end
-hosts\footnote{Using TTL has other problems as well, see \S\ref{sec:implementation}}, so a
+hosts (more in \S\ref{sec:implementation}), so a
 more controllable way is for $L2$ to provide this information via a
-special tag (e.g. DSCP value) in the packet.
+special tag (e.g. DSCP) in the packet.
 
 Note that for any shortest, up-down path, $L2$ would have never
 forward any packet that arrived from $S2$ to $S1$. So, if $L2$ ``tags'' packets
@@ -120,7 +113,7 @@ switch can support. To this end, we show how to combine tags.
 	\includegraphics[width=0.5\textwidth] {figs/cbd_a}
 	\vspace{-1em}
 		\caption{1-bounce path creates CBD. The green flow (T3 to T1) bounces at L2 due to failure
-		of L2-T1. The blue flow (T2 to T4) bounces at L3 due to failure of link
+		of L2-T1. The blue flow (T2 to T4) bounces at L3 due to failure of
 		L3-T4. Note that the paths are loop-free, and yet there is a CBD.}
 	\vspace{-1em}
 	\label{fig:clos_1_bounce}
