@@ -7,8 +7,8 @@ requires a key insight into the way PFC PAUSE frames are handled.
 \begin{figure}
 	\hspace{-0.2in}
 	\centering
-	\includegraphics[width=0.4\textwidth] {figs/Tagger}
-	\vspace{-1em}
+	\includegraphics[width=0.42\textwidth] {figs/Tagger}
+	%\vspace{-1em}
 	\caption{Tagger match-action rules}\label{fig:tagger}
 	\vspace{-2em}
 \end{figure}
@@ -23,21 +23,21 @@ The {\em third} step, wherein the packet is placed in an egress queue based on t
 {\em new} tag value, is needed to ensure correct PFC operation, as described below.
 
 \begin{figure}[t]
-  \vspace{-3em}
+  %\vspace{-3em}
  	\centering
  	\subfloat[short for lof][Ingress priority = egress priority  $\rightarrow$ packet drop.] {
  	%	\vspace{-3em}
- 		\includegraphics[width=0.4\textwidth] {figs/prioritydecoupling_1}
+ 		\includegraphics[width=0.42\textwidth] {figs/prioritydecoupling_1}
  	}
-  \vspace{-1.2em}
+  %\vspace{-1.2em}
   
  	\subfloat[short for lof][Ingress priority = 1, egress priority = 2 $\rightarrow$ no drop.]{
  		%\vspace{-3em}
- 		\includegraphics[width=0.4\textwidth] {figs/prioritydecoupling_2}
+ 		\includegraphics[width=0.42\textwidth] {figs/prioritydecoupling_2}
  	}
-	 \vspace{-1em}
+	% \vspace{-1em}
  	\caption{Decoupling ingress priority from egress priority at switch B is necessary for lossless priority transition.}\label{fig:prioritydecoupling}
-	\vspace{-1em}
+	%\vspace{-1em}
 \end{figure}
 
 \para{Handling priority transition:}

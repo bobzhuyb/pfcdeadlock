@@ -65,7 +65,11 @@ causes; and we should focus on getting rid of PFC altogether.  We are
 sympathetic to this view, and are actively investigating numerous schemes,
 including minimizing PFC generation (e.g. DCQCN~\cite{dcqcn} or
 Timely~\cite{timely}), better retransmission in the NIC, as well as other
-novel schemes.  For now, we need \sysname{} to ensure proper operation of
-currently deployed RDMA hardware, which relies on PFC, and in which we and
-others have made substantial investments.
+novel schemes.  
+
+\revisionshuihai{ However, current RoCE transport is designed and optimized to work with PFC. It has been demonstrated that RoCE without PFC can suffer from severe performance downgrade~\cite{irn,dcqcn}. To deploy RoCE over a lossy network, we will need to develop a new RoCE transport that can be implemented in the NIC hardware.  For now, we need \sysname{} to ensure proper operation of currently deployed RoCE hardware, which relies on PFC, and in which we and others have made substantial investments. }
+
+\revisionshuihai{ \para{Deployment of \sysname{}:}   To deploy \sysname{} in production data centers, we only need to install some \sysname{} rules at the switches. As will be explained in Section~\ref{sec:implementation}, these rules can be directly expressed with TCAM entries, and hence have no discernible impact on throughput and latency.
+}
+
 

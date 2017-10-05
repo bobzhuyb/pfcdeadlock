@@ -1,11 +1,11 @@
-\vspace{-0.15in}
+%\vspace{-0.15in}
 \section{\sysname{} for Clos Topology}
 \label{sec:specific}
 
 While \sysname{} works for any topology, we first describe the core ideas using
 the popular Clos network topology.
 
-\vspace{-0.05in}
+%\vspace{-0.05in}
 \subsection {Definitions}
 
 \para{Expected Lossless Paths (ELP):} This is a set of paths that the network
@@ -35,7 +35,7 @@ and the original tag value.
 
 We now describe the core idea behind \sysname{}.
 
-\vspace{-0.05in}
+%\vspace{-0.05in}
 \subsection{Tagging on bounce}
 \label{subsec:tag}
 
@@ -111,11 +111,11 @@ switch can support. To this end, we show how to combine tags.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.5\textwidth] {figs/cbd_a}
-	\vspace{-1em}
+%	\vspace{-1em}
 		\caption{1-bounce path creates CBD. The green flow (T3 to T1) bounces at L2 due to failure
 		of L2-T1. The blue flow (T2 to T4) bounces at L3 due to failure of
 		L3-T4. Note that the paths are loop-free, and yet there is a CBD.}
-	\vspace{-1em}
+%	\vspace{-1em}
 	\label{fig:clos_1_bounce}
 \end{figure}
 
@@ -193,11 +193,11 @@ lossless queues.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.47\textwidth] {figs/cbd_b}
-		\vspace{-0.15in}
+	%	\vspace{-0.15in}
 	\caption{Illustration of \sysname{} for ELP of all shortest up-down paths,
 		and all 1-bounce paths. For clarity, only lossless queues are shown.}
 	\label{fig:clos_tagger}
-		\vspace{-0.25in}
+	%	\vspace{-0.25in}
 \end{figure}
 
 %% \begin{table}[t]
@@ -278,14 +278,15 @@ The network is deadlock-free since CBD is a necessary condition for deadlock.  A
 formal proof, which applies to any topology, is given in \S\ref{sec:generic}.
 %(Figure~\ref{fig:subspace}).
 
-\para{\sysname{} is optimal in terms of lossless priorities used:} We show that
-to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$
+
+\revisionshuihai{  \para{\sysname{} is optimal in terms of lossless priorities used:} We show that to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$
 lossless priorities are required. We use contradiction.  Assume there exists a
-system with only $k$ lossless priorities. Consider a flow that loops between
+system that can make $k$ bounces paths lossless and deadlock-free with only $k$ lossless priorities. Consider a flow that loops between two directly connected switches
 $T1$ and $L1$ for $k+1$ times, which means it bounces $k$ times at $T1$. With
 Pigeonhole principle, we know that at least two times during the looping, the
-packet must have the same lossless priority. This is sufficient to cause
-a deadlock~\cite{hu2016deadlocks}. Contradiction.
+packet must have the same lossless priority. This means there exists a CBD, and deadlock can happen when having sufficient traffic demand~\cite{hu2016deadlocks}. Contradiction. }
+
+%\para{\sysname{} is optimal in terms of lossless priorities used:} We show that to make all $k$ bounces paths lossless and deadlock-free, at least $k+1$ lossless priorities are required. We use contradiction.  Assume there exists a system with only $k$ lossless priorities. Consider a flow that loops between $T1$ and $L1$ for $k+1$ times, which means it bounces $k$ times at $T1$. With Pigeonhole principle, we know that at least two times during the looping, the packet must have the same lossless priority. This is sufficient to cause a deadlock~\cite{hu2016deadlocks}. Contradiction.
 
 %% \subsection {Summary}
 %%

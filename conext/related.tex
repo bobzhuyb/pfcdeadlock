@@ -8,13 +8,15 @@ for representative schemes. Generally, these designs prevent deadlock by
 imposing restrictions on the routing paths \yibo{or enforcing certain packet rerouting policies. We classify them into two
 categories.}
 
-\modified{The first category is {\em deterministic routing based approach}, in which the
+The first category is {\em deterministic routing based approach}, in which the
 routing path is not affected by the traffic status, and there is no CBD. For example, the solution proposed by Dally and Seitz~\cite{dally} split each physical channel  into a group of ordered virtual channels\footnote{A virtual channel is equivalent to a priority queue in PFC in the store-and-forward setting.}, and constructed CBD-free routing by restricting packets over decreasing order of virtual channels.
-TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. These designs either work only for specific topologies \cite{dally} or are not compatible with existing routing protocols including OSFP and BGP \cite{tcpbolt,dfedst16}.}
+TCP-Bolt~\cite{tcpbolt} and DF-EDST~\cite{dfedst16} are two recent works under this category. They both built edge-disjoint spanning trees (EDSTs) to construct CBD-free routing paths. DF-EDST further built a deadlock-free tree transition acyclic graph, such that the transition among some EDSTs can be allowed. \revisionshuihai{These designs either work only for specific topologies \cite{dally} or are not compatible with existing routing protocols including OSPF and BGP \cite{tcpbolt,dfedst16}.}
 
-\modified{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible
+\revisionshuihai{ The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at the switches to cover all possible
 destinations. The switches can reroute packets to the ``escape'' paths in the
-presence of congestion so that deadlock can be avoided. However, no commodity switching ASICs so far support the dynamic rerouting based on traffic / queue status required by the adaptive routing designs.}
+presence of congestion so that deadlock can be avoided. However, no commodity switching ASICs so far support the dynamic rerouting based on traffic / queue status required by the adaptive routing designs. Furthermore, a certain amount of buffer needs to be reserved at the switches for the use of pre-installed ``escape'' paths.}
+
+%\modified{The second category is {\em adaptive routing based approach.} The key idea is to pre-install  ``escape'' paths at every switch to cover all possible destinations. The switches can reroute packets to the ``escape'' paths in the presence of congestion so that deadlock can be avoided. However, no commodity switching ASICs so far support the dynamic rerouting based on traffic / queue status required by the adaptive routing designs.}
 
 %Generally, solutions under this category can achieve better network utilization, as they can tolerate CBD in the routing paths.
 
@@ -36,20 +38,18 @@ data center scale.
 \para{Buffer management for deadlock prevention.} It has been shown that by
 increasing the packet priority hop-by-hop, and putting packets of different
 priority into different buffers, deadlock can be avoided
-\cite{firstpaper,survey,datanetworks,karol2003prevention}. These designs,
-however, need a large number lossless queues, which is the \yibo{longest path
+\cite{firstpaper,survey,datanetworks,karol2003prevention}. \revisionshuihai{These designs,
+however, need a large number of lossless queues, which is the longest path
 length in the network.}
 
 %In \cite{dag}, the author tried to reduce the number of lossless
 %queues to only two. The design does not guarantee losslessness. Furthermore,
 %some switches need much larger buffer space than the others.
 
-\para{Deadlock recovery.} Deadlock recovery schemes
-\cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998}
-detect deadlocks once they occur, and then try to break them by rerouting
-packets.  These approaches have two issues: (1) They cannot guarantee that
-deadlock will not happen again (if they can, there will be no need for deadlock
-recovery). (2) They cannot be deployed using existing switch hardware.
+
+\revisionshuihai{ \para{Deadlock detection and recovery.}  The solutions under this category~\cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998} mainly include two steps. First, employing a heuristic mechanism to detect suspected deadlocks, e.g., monitoring the throughput and queue occupancy of each switch port. Second, recovering deadlock by dropping or temporarily rerouting some of the packets involved in the deadlock. The main problem with these solutions is that they do not resolve the root cause of the detected deadlock, and hence cannot prevent the reappearing of the same deadlock.  }
+
+%\para{Deadlock recovery.} Deadlock recovery schemes \cite{isca95,shpiner2016unlocking,venkatramani1996,martinez1997,Lopez1998} detect deadlocks once they occur, and then try to break them by rerouting packets.  These approaches have two issues: (1) They cannot guarantee that deadlock will not happen again (if they can, there will be no need for deadlock recovery). (2) They cannot be deployed using existing switch hardware.
 
 %% need to add new deadlock detection algorithms and deadlock
 %% breaking protocols into the switches.
@@ -57,12 +57,13 @@ recovery). (2) They cannot be deployed using existing switch hardware.
 %\para{Circuit switching-based approaches.} Those solutions from HPC and InfiniBand
 %work by preemption. This does not work in Ethernet and in practice.
 
-\para{Deadlock-free routing reconfiguration}:
+\para{Deadlock-free routing reconfiguration.}
 Several schemes
 \cite{automatic,lysne2005,doublescheme,gara2005} have been proposed for
 ensuring deadlock-free during routing reconfiguration. \sysname{} can
 be used to help any routing protocol to be deadlock-free, as
 \sysname{} is decoupled from the routing protocols.
+
 
 %The basic idea is to divide the reconfiguration process into multiple
 %stages, and guarantee deadlock-free routing within each stage. We
