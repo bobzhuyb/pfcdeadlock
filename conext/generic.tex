@@ -1,8 +1,8 @@
 \section{Generalizing \sysname{}}
 \label{sec:generic}
 
-We begin by  formalizing the description of the tagging system using notation in
-Table~\ref{tab:symbols}.
+\revisionshuihai{ We begin by  formalizing the description of the tagging system using notations in
+Table~\ref{tab:symbols}. }
 
 Let $A_i$ represent a unique ingress port in the network, {\em i.e.,} switch
 $A$'s $i^{th}$ ingress port.  We use a {\em tagged graph} $G(V,E)$ to uniquely
@@ -94,11 +94,12 @@ Case 1 and Case 2 cover all possible scenarios. Thus, we conclude that there doe
 \end{proof}
 
 
-We now describe the algorithm to generate $G(V,E)$ for any given topology, and
-the ELP set.
+%We now describe the algorithm to generate $G(V,E)$ for any given topology, and the ELP set.
 
 
 \subsection{Generating $G(V,E)$}
+
+\revisionshuihai{ In the next, we describe our algorithm to generate a deadlock-free $G(V,E)$ for any given topology, and the ELP set. }
 
 
 \begin{figure*}[t]
@@ -436,13 +437,10 @@ itself is bounded by the length of the longest path in $ELP$.
 %itself is bounded by the length of the longest path in $ELP$.
 
 
+\revisionshuihai{ \para{Number of tags:} Algorithm~\ref{alg:greedy} is not optimal, but works well in practice. For example, it gives optimal results for BCube topology without requiring any BCube-specific changes -- a $k$-level BCube with default routing only needs $k$ tags to prevent deadlock. The results are promising even for unstructured topology like Jellyfish. Using Algorithm~\ref{alg:greedy}, a 2000-node Jellyfish topology with shortest-path routing requires only 3 tags to be deadlock-free (\S\ref{sec:eval}). }
 
-\para{Number of tags:} Algorithm~\ref{alg:greedy}, while not optimal, works well
-in practice. For example, it gives optimal results for BCube topology without
-requiring any BCube-specific changes -- a $k$-level BCube needs $k$ tags to
-prevent deadlock with default routing. The results are promising even for
-unstructured topology like Jellyfish. Jellyfish with 2000 nodes require only 3
-tags with shortest-path routing (\S\ref{sec:eval}).
+
+%\para{Number of tags:} Algorithm~\ref{alg:greedy}, while not optimal, works well in practice. For example, it gives optimal results for BCube topology without requiring any BCube-specific changes -- a $k$-level BCube needs $k$ tags to prevent deadlock with default routing. The results are promising even for unstructured topology like Jellyfish. Jellyfish with 2000 nodes require only 3 tags with shortest-path routing (\S\ref{sec:eval}).
 
 
 
