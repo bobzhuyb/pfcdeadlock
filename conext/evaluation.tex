@@ -301,7 +301,7 @@ The flows are generated according to web search~\cite{dctcp} and data mining~\ci
 
 \revisionshuihai{The result under web search workload is shown in Table~\ref{table:loss_rate_ws}. Due to space limitation, we omit the similar result under data mining workload. We use ``RoCE without PFC" as the baseline.
 Compared with the baseline, Tagger with 1 lossless queue has a much lower packet loss rate ( only $10^{-7}$-$10^{-6}$). This is mainly because
-only $\sim 16\%$ of flows are bounced once. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of
+only $\sim 16\%$ of flows are bounced once and enter the lossy priority class. For Tagger with 2 lossless queues, we don't observe any packet loss as only $\sim 3\%$ of
 flows are bounced more than once.  The takeaway is as follows: The use of lossy queue as a last resort will not cause severe packet loss, because only a small part of flows will be bounced into the lossy priority class under failures. In practice, making two-bounce paths lossless is good enough to achieve losslessness. }
 
 
