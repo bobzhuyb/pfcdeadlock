@@ -67,7 +67,9 @@ including minimizing PFC generation (e.g. DCQCN~\cite{dcqcn} or
 Timely~\cite{timely}), better retransmission in the NIC, as well as other
 novel schemes.  
 
-\revisionshuihai{ However, current RoCE transport is designed and optimized to work with PFC. It has been demonstrated that RoCE without PFC can suffer from severe performance downgrade~\cite{irn,dcqcn}. To deploy RoCE over a lossy network, we will need to develop a new RoCE transport that can be implemented in the NIC hardware.  For now, we need \sysname{} to ensure proper operation of currently deployed RoCE hardware, which relies on PFC, and in which we and others have made substantial investments. }
+Our goal in this paper, however, is to ensure safe deployment of RoCE using PFC and existing RDMA transport. Tagger fixes a missing piece of the current RoCE design: the deadlock issue caused by existing routing protocols which were designed for lossy networks. Besides the research value of providing a deadlock free network, Tagger protects the substantial investments which we and many others already made in production data centers.
+
+%\revisionshuihai{ However, current RoCE transport is designed and optimized to work with PFC. It has been demonstrated that RoCE without PFC can suffer from severe performance downgrade~\cite{irn,dcqcn}. To deploy RoCE over a lossy network, we will need to develop a new RoCE transport that can be implemented in the NIC hardware.  For now, we need \sysname{} to ensure proper operation of currently deployed RoCE hardware, which relies on PFC, and in which we and others have made substantial investments. }
 
 \revisionshuihai{ \para{Deployment of \sysname{}:}   To deploy \sysname{} in production data centers, we only need to install some \sysname{} rules at the switches. As will be explained in Section~\ref{sec:implementation}, these rules can be directly expressed with TCAM entries, and hence have no discernible impact on throughput and latency.
 }
