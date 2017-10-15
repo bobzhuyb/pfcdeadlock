@@ -2088,7 +2088,7 @@ Computing Machinery]
   \def\@article@string{\ifx\@acmArticle\@empty{\ }\else,
     Article~\@acmArticle\ \fi}%
   \par\medskip\small\noindent{\bfseries ACM Reference Format:}\par\nobreak
-  \noindent\authors. \@acmYear. \@title
+  \noindent Shuihai Hu,~~~~~Yibo Zhu,~~~~~Peng Cheng,~~~~~Chuanxiong Guo,~~~~~Kun Tan,~~~~~Jitendra Padhye,~~~~~and Kai Chen. \@acmYear. \@title
   \ifx\@subtitle\@empty. \else: \@subtitle. \fi
   \if@ACM@journal
      \textit{\@journalNameShort}
